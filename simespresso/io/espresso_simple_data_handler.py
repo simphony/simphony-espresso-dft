@@ -1,5 +1,6 @@
 class EspressoSimpleDataHandler(object):
-    """  Class to handle what is parsed by EspressoDataFileParser
+    """  
+        Class to handle what is parsed by Espresso DataFileParser
         Class just stores the parsed data and provides methods to
         retrieve this data
     """
@@ -13,7 +14,8 @@ class EspressoSimpleDataHandler(object):
         self._number_types = None
         self._atoms = {}
         self._masses = {}
-   #     self._velocities = {}    not sure if espresso uses velocities
+	#not sure that espresso deals with v at all
+        self._velocities = {}
 
     def end(self):
         """ Handle end of file parsing
@@ -38,6 +40,7 @@ class EspressoSimpleDataHandler(object):
     def get_masses(self):
         return self._masses
 
+# check if espresso uses v at all
     def process_velocities(self, id, values):
         self._velocities[id] = values
 
