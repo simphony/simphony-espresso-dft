@@ -49,43 +49,43 @@ class EspressoDataFileParser(object):
 
                     state = _ReadState.get_state(state, line)
    	    	 	#DEBUG
-		        print('current state:'+str(state))
+		    print('current state:'+str(state))
                     if state is _ReadState.CONTROL:
 			values = line.split()
 			if "calculation" in line:
 				calculation = values[1]			
-			else if "restart_mode" in line:
+			elif "restart_mode" in line:
 				restart_mode = values[1]			
-			else if "pseudo_dir" in line:
+			elif "pseudo_dir" in line:
 				pseudo_dir = values[1]			
-			else if "prefix" in line:
+			elif "prefix" in line:
 				prefix = values[1]			
-			else if "tprnfor" in line:
+			elif "tprnfor" in line:
 				tprnfor = values[1]			
-			else if "max_seconds" in line:
+			elif "max_seconds" in line:
 				max_seconds = float(values[1])			
-			else if "outdir" in line:
+			elif "outdir" in line:
 				outdir = values[1]			
 
                     elif state is _ReadState.SYSTEM:
                         values = line.split()
 			if "ibrav" in line:
 				ibrav = int(values[1])			
-			else if "celldm(1)" in line:
+			elif "celldm(1)" in line:
 				celldm[0] = float(values[1])			
-			else if "celldm(2)" in line:
+			elif "celldm(2)" in line:
 				celldm[1] = float(values[1])			
-			else if "celldm(3)" in line:
+			elif "celldm(3)" in line:
 				celldm[2] = float(values[1])			
-			else if "nat" in line:
+			elif "nat" in line:
 				n_atoms = int(values[1])			
-			else if "ntyp" in line:
+			elif "ntyp" in line:
 				n_atom_types = int(values[1])			
-			else if "ecutwfc" in line:
+			elif "ecutwfc" in line:
 				ecutwfc = float(values[1])			
-			else if "ecutrho" in line:
-				ecutrho = float(values[1]) //maybe int			
-			else if "input_dft" in line:
+			elif "ecutrho" in line:
+				ecutrho = float(values[1]) #maybe int			
+			elif "input_dft" in line:
 				input_dft = values[1]			
 
                     elif state is _ReadState.ELECTRONS:
@@ -138,10 +138,10 @@ class _ReadState(Enum):
 	SYSTEM_BEGIN, SYSTEM, \
 	ELECTRONS_BEGIN, ELECTRONS, \
 	IONS_BEGIN, IONS,	\
-	CELL_BEGIN, CELL, \	
-        ATOM_TYPES_BEGIN, ATOM_TYPES, \  #called 'ATOMIC_SPECIES' in qe input files
-        ATOMS, \
-        ATOMS_BEGIN = range(9),\  #this is for atomic positions maybe? check in cuds
+	CELL_BEGIN, CELL,\
+        ATOM_TYPES_BEGIN, ATOM_TYPES, \
+        ATOMS,\
+        ATOMS_BEGIN = range(9),\
 	K_POINTS_BEGIN, K_POINTS, \
 	ATOMIC_POSITIONS_BEGIN, ATOMIC_POSITIONS
 
