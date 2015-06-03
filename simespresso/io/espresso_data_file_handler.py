@@ -70,7 +70,7 @@ class EspressoInputDataFileParser(object):
                         line = self.process_system(file_iter)
                         continue
                     elif state is _ReadState.ELECTRONS:
-                        print('reading atoms')
+                        print('reading electrons')
                         line = self.process_electrons(file_iter)
                         continue
                     elif state is _ReadState.ATOMIC_SPECIES:
