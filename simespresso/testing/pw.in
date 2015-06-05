@@ -1,0 +1,42 @@
+&CONTROL
+    calculation='scf'
+    restart_mode='from_scratch',
+    pseudo_dir = './',
+    prefix='NANO'
+    tprnfor = .true.
+    max_seconds=82000
+    outdir = './'
+/
+&SYSTEM
+    ibrav=8
+    celldm(1)=40
+    celldm(2)= 0.115981
+    celldm(3)=1.00
+    nat=6
+    ntyp=1
+    ecutwfc=60.0
+    ecutrho=240
+    input_dft='vdw-df-c09'
+ /
+ &ELECTRONS
+    mixing_mode='local-TF'
+    mixing_beta = 0.8
+    conv_thr =  1.0d-7
+ /
+ &IONS
+ /
+ &CELL
+ /
+ATOMIC_SPECIES
+C 12.0107 06-C.GGA.fhi.UPF
+
+K_POINTS automatic
+  1 8 1 0 0 0
+
+ATOMIC_POSITIONS (angstrom)
+C        4.533520557  -0.015659299   1.396325317
+C        3.919311645  -0.015456942   2.674702484
+C        1.735328192  -0.015034893   4.412842012
+C        0.352415152  -0.015029285   4.727001312
+C       -2.370427231  -0.015079345   4.108075934
+C       -3.479923777  -0.015350707   3.225128349
