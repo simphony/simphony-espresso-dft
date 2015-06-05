@@ -4,12 +4,13 @@ from simphony.cuds.abstractlattice import ABCLattice
 from simphony.core.data_container import DataContainer
 from simphony.io.data_container_description import Record
 
-from simphony.core.data_container import DataContainer
+#from simphony.core.data_container import DataContainer
+import simphony.core.data_container
 from simphony.core.cuba import CUBA
 
 
 
-class EspressoInputDataFileParser(object):
+def ReadEspressoInputFile(file_name):
     """  This class parses  Espresso data files, either input or output
     (produced by the espresso command  write_data) and calls a handler 
     which processes the parsed information.
@@ -33,193 +34,195 @@ class EspressoInputDataFileParser(object):
     ----------
     handler :
        handler will handle the parsed information provided by this class """
-    def __init__(self, handler):
-        self._handler = handler
-        self.atomtypes = ["C","H","He","N","O","Na","Mg"]
 
-    def parse(self, file_name):
-        """ Read in data file containing starting state of simulation - 
-            atom ids and positions, simulation type
-        """
-#        self._handler.begin()
-        self.dc = DataContainer()
-        state = _ReadState.UNKNOWN
 
-        with open(file_name, 'r') as f:
-            line_number = 0
-            file_iter = iter(f)
-            line = file_iter.next()
-            try:
-                while line is not None:
-                    #file_iter.hasnext():
-    #                   #line = f[line_number]
-                    line_number += 1
-                    #DEBUG
-                    print('in main loop, got line:'+str(line))
-                    # skip blank lines
-     #               if not line.strip():
-     #                   continue
+    dc = simphony.core.data_container.DataContainer
+    dc(ACCELERATION=220)
+    state = _ReadState.UNKNOWN
 
-                    state = _ReadState.get_state(state,line)
-                    if state is _ReadState.CONTROL:
-                        print('reading control section')
-                        line = self.process_control(file_iter)
-                        continue
-                    elif state is _ReadState.SYSTEM:
-                        print('reading system')
-                        line = self.process_system(file_iter)
-                        continue
-                    elif state is _ReadState.ELECTRONS:
-                        print('reading electrons')
-                        line = self.process_electrons(file_iter)
-                        continue
-                    elif state is _ReadState.ATOMIC_SPECIES:
-                        print('reading atomic species')
-                        line = self.process_atomic_species(file_iter)
-                        continue
-                    elif state is _ReadState.K_POINTS:
-                        print('reading k points')
-                        values = line.split()
-                        line = self.process_k_points(file_iter,mode=values[1])
-                        continue
-                    elif state is _ReadState.ATOMIC_POSITIONS:
-                        print('reading atomic positions')
-                        values = line.split()
-                        line = self.process_atomic_positions(file_iter,units=values[1])
-                        if line == 'EOF':
-                            return
-                        else:
-                            continue
+    with open(file_name, 'r') as f:
+        line_number = 0
+        file_iter = iter(f)
+        line = file_iter.next()
+        try:
+            while line is not None:
+                #file_iter.hasnext():
+#                   #line = f[line_number]
+                line_number += 1
+                #DEBUG
+                print('read line:'+str(line))
+                # skip blank lines
+ #               if not line.strip():
+ #                   continue
 
-                    line = file_iter.next()
-            except StopIteration:
-                print('eof reached')
-                return
-            except Exception:
-                print("problem with line number=", line_number, line)
-                raise
-#        self._handler.end()
+                state = _ReadState.get_state(state,line)
+                if state is _ReadState.CONTROL:
+                    print('reading control section')
+                    line = process_control(file_iter)
+                    continue
+                elif state is _ReadState.SYSTEM:
+                    print('reading system')
+                    line = process_system(file_iter)
+                    continue
+                elif state is _ReadState.ELECTRONS:
+                    print('reading electrons')
+                    line = process_electrons(file_iter)
+                    continue
+                elif state is _ReadState.ATOMIC_SPECIES:
+                    print('reading atomic species')
+                    line = process_atomic_species(file_iter)
+                    continue
+                elif state is _ReadState.K_POINTS:
+                    print('reading k points')
+                    values = line.split()
+                    line = process_k_points(file_iter,mode=values[1])
+                    continue
+                elif state is _ReadState.ATOMIC_POSITIONS:
+                    print('reading atomic positions')
+                    values = line.split()
+                    line = process_atomic_positions(file_iter,units=values[1])
+                    if line == 'EOF':
+                        return
+                    else:
+                        continue
 
-    def process_control(self,f):
-        print('processing control section')
+                line = file_iter.next()
+        except StopIteration:
+            print('eof reached')
+            return
+        except Exception:
+            print("problem with line number=", line_number, line)
+            raise
+
+def process_control(f):
+    print('processing control section')
+    line = f.next()
+    while _ReadState.get_state(_ReadState.CONTROL,line) == _ReadState.CONTROL:
+        values = [x.strip() for x in line.split('=')]
+        print('line in control section:'+str(line))
+        if "calculation" in line:
+            values = line.split('=')
+            calculation = values[1]
+        elif "restart_mode" in line:
+            restart_mode = values[1]
+        elif "pseudo_dir" in line:
+            pseudo_dir = values[1]
+        elif "prefix" in line:
+            prefix = values[1]
+        elif "tprnfor" in line:
+            tprnfor = values[1]
+        elif "max_seconds" in line:
+            max_seconds = float(values[1])
+        elif "outdir" in line:
+            outdir = values[1]
+
         line = f.next()
-        while _ReadState.get_state(_ReadState.CONTROL,line) == _ReadState.CONTROL:
-            values = [x.strip() for x in line.split('=')]
-            print('line in control section:'+str(line))
-            if "calculation" in line:
-                values = line.split('=')
-                calculation = values[1]
-            elif "restart_mode" in line:
-                restart_mode = values[1]
-            elif "pseudo_dir" in line:
-                pseudo_dir = values[1]
-            elif "prefix" in line:
-                prefix = values[1]
-            elif "tprnfor" in line:
-                tprnfor = values[1]
-            elif "max_seconds" in line:
-                max_seconds = float(values[1])
-            elif "outdir" in line:
-                outdir = values[1]
+    return line
 
-            line = f.next()
-        return line
-
-    def process_system(self,f):
-        print('processing system section')
+def process_system(f):
+    print('processing system section')
+    line = f.next()
+    celldm=[0,0,0]
+    while _ReadState.get_state(_ReadState.SYSTEM,line) == _ReadState.SYSTEM:
+        values = [x.strip() for x in line.split('=')]
+        print('line in control section:'+str(line))
+        if "ibrav" in line:
+            ibrav = int(values[1])
+        elif "celldm(1)" in line:
+            celldm[0] = float(values[1])
+        elif "celldm(2)" in line:
+            celldm[1] = float(values[1])
+        elif "celldm(3)" in line:
+            celldm[2] = float(values[1])
+        elif "nat" in line:
+            n_atoms = int(values[1])
+        elif "ntyp" in line:
+            n_atom_types = int(values[1])
+        elif "ecutwfc" in line:
+            ecutwfc = float(values[1])
+        elif "ecutrho" in line:
+            ecutrho = float(values[1]) #maybe int
+        elif "input_dft" in line:
+            input_dft = values[1]
         line = f.next()
-        celldm=[0,0,0]
-        while _ReadState.get_state(_ReadState.SYSTEM,line) == _ReadState.SYSTEM:
-            values = [x.strip() for x in line.split('=')]
-            print('line in control section:'+str(line))
-            if "ibrav" in line:
-                ibrav = int(values[1])
-            elif "celldm(1)" in line:
-                celldm[0] = float(values[1])
-            elif "celldm(2)" in line:
-                celldm[1] = float(values[1])
-            elif "celldm(3)" in line:
-                celldm[2] = float(values[1])
-            elif "nat" in line:
-                n_atoms = int(values[1])
-            elif "ntyp" in line:
-                n_atom_types = int(values[1])
-            elif "ecutwfc" in line:
-                ecutwfc = float(values[1])
-            elif "ecutrho" in line:
-                ecutrho = float(values[1]) #maybe int
-            elif "input_dft" in line:
-                input_dft = values[1]
-            line = f.next()
-        return line
+    return line
 
 
-    def process_electrons(self,f):
-        print('processing eletrons section')
+def process_electrons(f):
+    print('processing eletrons section')
+    line = f.next()
+    while _ReadState.get_state(_ReadState.ELECTRONS,line) == _ReadState.ELECTRONS:
+        values = [x.strip() for x in line.split('=')]
+        print('line in electrons section:'+str(line))
+        if "mixing_mode" in line:
+            mixing_mode = values[1]
+        elif "mixing_beta" in line:
+            mixing_beta = float(values[1])
+        elif "conv_thr" in line:
+            conv_thr = values[1] #numbers like 1.0d-7 might have to be converted to float
         line = f.next()
-        while _ReadState.get_state(_ReadState.ELECTRONS,line) == _ReadState.ELECTRONS:
-            values = [x.strip() for x in line.split('=')]
-            print('line in electrons section:'+str(line))
-            if "mixing_mode" in line:
-                mixing_mode = values[1]
-            elif "mixing_beta" in line:
-                mixing_beta = float(values[1])
-            elif "conv_thr" in line:
-                conv_thr = values[1] #numbers like 1.0d-7 might have to be converted to float
-            line = f.next()
-        return line
+    return line
 
-    def process_atomic_species(self,f):
-        print('processing atomic species section')
-        line = f.next()
-        while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
-            values = line.split()
-            print('line in atomic species section:'+str(line))
+def process_atomic_species(f):
+    print('processing atomic species section')
+    line = f.next()
+    while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
+        values = line.split()
+        print('line in atomic species section:'+str(line))
 #            print('atomtypes:'+str(self.atomtypes))
 
-            if len(values)>0:
-                if values[0] in self.atomtypes:
-                    print("atom type:"+values[0])
-                    #self.dc(CHEMICAL_SPECIE = values[0])
-                    DataContainer(CHEMICAL_SPECIE=values[0])
-                    mass = float(values[1])
-                    potential_file = values[2]
-            line = f.next()
-        return line
-
-    def process_k_points(self,f,mode='automatic'):
-        #skip line
-        print('processing k_points section')
+        if len(values)>0:
+            if values[0] in atomtypes:
+                print("atom type:"+values[0])
+                #self.dc(CHEMICAL_SPECIE = values[0])
+                DataContainer(CHEMICAL_SPECIE=values[0])
+                mass = float(values[1])
+                potential_file = values[2]
         line = f.next()
-        while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
-            values = [x.strip() for x in line.split('=')]
-            print('line in k points section:'+str(line))
-            K_points = values
-            line = f.next()
-        return line
+    return line
 
-    def process_atomic_positions(self,f,units='(angstrom)'):
-        print('processing atomic_positions section')
-        atom_positions = []
+def process_k_points(f,mode='automatic'):
+    #skip line
+    print('processing k_points section')
+    line = f.next()
+    while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
+        values = [x.strip() for x in line.split('=')]
+        print('line in k points section:'+str(line))
+        K_points = values
+        line = f.next()
+    return line
+
+
+   # for each particle in the file, we do the following
+##       coords = # determine coordinates
+ #      specie = # determine chemical specie
+ #      partcle = Particle(coordinates = coords
+ #      particle.data[CUBA.CHEMICAL_SPECIE] = specie
+ #      particles.add_particle(particle)
+ #  return particles
+
+def process_atomic_positions(f,units='(angstrom)'):
+    print('processing atomic_positions section')
+    atom_positions = []
+    try:
+        line = f.next()
+    except StopIteration:
+        return('EOF')
+
+    while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
+        print('line in atomic positions section:'+str(line))
+        values = [x.strip() for x in line.split('=')]
+        if values[0] in atomtypes:
+            atomtype = values[0]
+            atom_pos[0] = values[1]
+            atom_pos[1] = values[2]
+            atom_pos[2] = values[3]
+            atom_positions.append(atom_pos)
         try:
             line = f.next()
         except StopIteration:
             return('EOF')
-
-        while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
-            print('line in atomic positions section:'+str(line))
-            values = [x.strip() for x in line.split('=')]
-            if values[0] in self.atomtypes:
-                atomtype = values[0]
-                atom_pos[0] = values[1]
-                atom_pos[1] = values[2]
-                atom_pos[2] = values[3]
-                atom_positions.append(atom_pos)
-            try:
-                line = f.next()
-            except StopIteration:
-                return('EOF')
-        return line
+    return line
 
 
 class _ReadState(Enum):
@@ -263,7 +266,10 @@ class _ReadState(Enum):
         print('current state:'+str(new_state))
         return new_state
 
+
+atomtypes = ["C","H","He","N","O","Na","Mg"]
+
 if __name__ == "__main__":
     filename = 'pw.in'
     print('started parsing file '+str(filename))
-    parser = EspressoInputDataFileParser(filename)
+    ReadEspressoInputFile(filename)
