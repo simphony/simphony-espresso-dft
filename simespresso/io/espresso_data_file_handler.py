@@ -1,12 +1,10 @@
 import string
 from enum import Enum
 from simphony.cuds.abstractlattice import ABCLattice
-from simphony.core.data_container import DataContainer
-from simphony.io.data_container_description import Record
 
-#from simphony.core.data_container import DataContainer
-import simphony.core.data_container
 from simphony.core.cuba import CUBA
+from simphony.core.data_container import DataContainer
+from simphony.cuds.particles import Particle, Particles
 
 
 
@@ -36,8 +34,6 @@ def ReadEspressoInputFile(file_name):
        handler will handle the parsed information provided by this class """
 
 
-    dc = simphony.core.data_container.DataContainer
-    dc(ACCELERATION=220)
     state = _ReadState.UNKNOWN
 
     with open(file_name, 'r') as f:
@@ -79,20 +75,27 @@ def ReadEspressoInputFile(file_name):
                     continue
                 elif state is _ReadState.ATOMIC_POSITIONS:
                     print('reading atomic positions')
+                    pc = Particles("Test")
+
                     values = line.split()
-                    line = process_atomic_positions(file_iter,units=values[1])
-                    if line == 'EOF':
-                        return
-                    else:
-                        continue
+                    process_atomic_positions(file_iter,pc,units=values[1])
+                    break
 
                 line = file_iter.next()
         except StopIteration:
             print('eof reached')
-            return
         except Exception:
             print("problem with line number=", line_number, line)
             raise
+
+    print('a')
+    if pc:
+        print('b')
+        print('pc = '+str(pc))
+        return pc
+    else:
+        return
+
 
 def process_control(f):
     print('processing control section')
@@ -175,7 +178,7 @@ def process_atomic_species(f):
             if values[0] in atomtypes:
                 print("atom type:"+values[0])
                 #self.dc(CHEMICAL_SPECIE = values[0])
-                DataContainer(CHEMICAL_SPECIE=values[0])
+#                DataContainer(CHEMICAL_SPECIE=values[0])
                 mass = float(values[1])
                 potential_file = values[2]
         line = f.next()
@@ -185,7 +188,7 @@ def process_k_points(f,mode='automatic'):
     #skip line
     print('processing k_points section')
     line = f.next()
-    while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
+    while _ReadState.get_state(_ReadState.K_POINTS,line) == _ReadState.K_POINTS:
         values = [x.strip() for x in line.split('=')]
         print('line in k points section:'+str(line))
         K_points = values
@@ -193,36 +196,38 @@ def process_k_points(f,mode='automatic'):
     return line
 
 
-   # for each particle in the file, we do the following
-##       coords = # determine coordinates
- #      specie = # determine chemical specie
- #      partcle = Particle(coordinates = coords
- #      particle.data[CUBA.CHEMICAL_SPECIE] = specie
- #      particles.add_particle(particle)
- #  return particles
 
-def process_atomic_positions(f,units='(angstrom)'):
+def process_atomic_positions(f,pc,units='(angstrom)'):
     print('processing atomic_positions section')
-    atom_positions = []
     try:
         line = f.next()
     except StopIteration:
         return('EOF')
 
-    while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
+    while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS,line) == _ReadState.ATOMIC_POSITIONS:
         print('line in atomic positions section:'+str(line))
-        values = [x.strip() for x in line.split('=')]
+        values = line.split()
+        print('values:'+str(values))
+        atom_pos = [0,0,0]
+        i = 0
         if values[0] in atomtypes:
             atomtype = values[0]
-            atom_pos[0] = values[1]
-            atom_pos[1] = values[2]
-            atom_pos[2] = values[3]
-            atom_positions.append(atom_pos)
+            atom_id = i
+            atom_pos[0] = float(values[1]) * 1e-10  #position in meters, original in Angstrom
+            atom_pos[1] = float(values[2]) * 1e-10
+            atom_pos[2] = float(values[3]) * 1e-10
+            p = Particle([atom_id,atom_pos[0],atom_pos[1],atom_pos[2]])
+
+            p.data[CUBA.CHEMICAL_SPECIE] = atomtype
+            pc.add_particle(p)
+  #          print('pc:'+str(pc))
+            i = i +1
         try:
             line = f.next()
         except StopIteration:
             return('EOF')
-    return line
+
+    return pc
 
 
 class _ReadState(Enum):
@@ -242,11 +247,6 @@ class _ReadState(Enum):
         """
         new_state = current_state
 
-        # TODO how the state is determined and how
-        # we transition to other states needs to be
-        # rewritten.
-       # print('entering getstate')
-
         if "&CONTROL" in line:
             new_state = _ReadState.CONTROL
         elif "&SYSTEM" in line:
@@ -263,7 +263,7 @@ class _ReadState(Enum):
             new_state = _ReadState.K_POINTS
         elif "ATOMIC_POSITIONS" in line:
             new_state = _ReadState.ATOMIC_POSITIONS
-        print('current state:'+str(new_state))
+  #      print('current state:'+str(new_state))
         return new_state
 
 
