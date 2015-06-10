@@ -4,9 +4,15 @@ from simphony.cuds.abstractlattice import ABCLattice
 
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
+from cuba_extension import CUBAExtension
 from simphony.cuds.particles import Particle, Particles
 
+import uuid
 
+BC = DataContainer()   #boundary conditions
+CM = DataContainer()   #computational method
+SP = DataContainer()   #System Parameters and Conditions
+SD = DataContainer()  #state data
 
 def ReadEspressoInputFile(file_name):
     """  This class parses  Espresso data files, either input or output
@@ -33,6 +39,9 @@ def ReadEspressoInputFile(file_name):
     handler :
        handler will handle the parsed information provided by this class """
 
+
+#CM.[CUBA.]
+#BC.[CUBA.]
 
     state = _ReadState.UNKNOWN
 
@@ -88,10 +97,8 @@ def ReadEspressoInputFile(file_name):
             print("problem with line number=", line_number, line)
             raise
 
-    print('a')
     if pc:
-        print('b')
-        print('pc = '+str(pc))
+#        print('pc = '+str(pc))
         return pc
     else:
         return
@@ -105,19 +112,26 @@ def process_control(f):
         print('line in control section:'+str(line))
         if "calculation" in line:
             values = line.split('=')
-            calculation = values[1]
+            calculation_type = values[1]
+            SP[CUBAExtension.SIMULATION_TYPE] = calculation_type
         elif "restart_mode" in line:
             restart_mode = values[1]
+#            SP[CUBAExtension.RESTART_MODE] = restart_mode
         elif "pseudo_dir" in line:
             pseudo_dir = values[1]
+#            SP[CUBAExtension.PSEUDO_DIR] = pseudo_dir
         elif "prefix" in line:
             prefix = values[1]
-        elif "tprnfor" in line:
+#            SP[CUBAExtension.PREFIX] = prefix
+        elif "tprnfor" in line:  #calculate forces
             tprnfor = values[1]
+#            SP[CUBAExtension.TPRNFOR] = tprnfor
         elif "max_seconds" in line:
             max_seconds = float(values[1])
+#            SP[CUBAExtension.SIMULATION_MAXIMUM_RUNTIME] = max_seconds
         elif "outdir" in line:
             outdir = values[1]
+#            SP[CUBAExtension.OUTDIR] = outdir
 
         line = f.next()
     return line
@@ -129,24 +143,31 @@ def process_system(f):
     while _ReadState.get_state(_ReadState.SYSTEM,line) == _ReadState.SYSTEM:
         values = [x.strip() for x in line.split('=')]
         print('line in control section:'+str(line))
-        if "ibrav" in line:
+        if "ibrav" in line:  #bravais lattice index
             ibrav = int(values[1])
+#            SP[CUBAExtension.IBRAV] = ibrav
         elif "celldm(1)" in line:
             celldm[0] = float(values[1])
+#            SP[CUBAExtension.UNIT_CELL_DIMENSIONS][0] = celldm[0]
         elif "celldm(2)" in line:
             celldm[1] = float(values[1])
+#            SP[CUBAExtension.UNIT_CELL_DIMENSIONS][1] = celldm[1]
         elif "celldm(3)" in line:
             celldm[2] = float(values[1])
+#            SP[CUBAExtension.UNIT_CELL_DIMENSIONS][2] = celldm[2]
         elif "nat" in line:
             n_atoms = int(values[1])
         elif "ntyp" in line:
             n_atom_types = int(values[1])
         elif "ecutwfc" in line:
             ecutwfc = float(values[1])
+#            SP[CUBAExtension.KINETIC_ENERGY_CUTOFF_FOR_WAVEFUNCTIONS] = ecutwfc
         elif "ecutrho" in line:
             ecutrho = float(values[1]) #maybe int
+#            SP[CUBAExtension.KINETIC_ENERGY_CUTOFF_FOR_CHARGE_DENSITY_AND_POTENTIAL] = ecutwfc
         elif "input_dft" in line:
             input_dft = values[1]
+#            SP[CUBAExtension.EXCHANGE_CORRELATION_FUNCTIONAL] = input_dft
         line = f.next()
     return line
 
@@ -159,10 +180,13 @@ def process_electrons(f):
         print('line in electrons section:'+str(line))
         if "mixing_mode" in line:
             mixing_mode = values[1]
+#            SP[CUBAExtension.MIXING_MODE] = mixing_mode
         elif "mixing_beta" in line:
             mixing_beta = float(values[1])
+#            SP[CUBAExtension.MIXING_BETA] = mixing_beta
         elif "conv_thr" in line:
             conv_thr = values[1] #numbers like 1.0d-7 might have to be converted to float
+#            SP[CUBAExtension.CONVERGENCE_THRESHOLD] = conv_thr
         line = f.next()
     return line
 
@@ -188,10 +212,16 @@ def process_k_points(f,mode='automatic'):
     #skip line
     print('processing k_points section')
     line = f.next()
+#    SP[CUBAExtension.K_POINTS_MODE] = mode
+    i = 0
     while _ReadState.get_state(_ReadState.K_POINTS,line) == _ReadState.K_POINTS:
-        values = [x.strip() for x in line.split('=')]
-        print('line in k points section:'+str(line))
-        K_points = values
+#        print('line:'+str(line))
+        values = line.split()
+        if len(values):
+            K_points = (values)
+            print('k points:'+str(K_points))
+#            SP[CUBAExtension.K_POINTS] = K_points
+
         line = f.next()
     return line
 
@@ -216,8 +246,14 @@ def process_atomic_positions(f,pc,units='(angstrom)'):
             atom_pos[0] = float(values[1]) * 1e-10  #position in meters, original in Angstrom
             atom_pos[1] = float(values[2]) * 1e-10
             atom_pos[2] = float(values[3]) * 1e-10
-            p = Particle([atom_id,atom_pos[0],atom_pos[1],atom_pos[2]])
+            s = str(i)
+            #make uid using string of index
+            #uidstring =
+            #uid = uuid.UUID(uidstring)
 
+            p = Particle(coordinates=[atom_pos[0],atom_pos[1],atom_pos[2]])
+
+            print('uid:'+str(p.uid))
             p.data[CUBA.CHEMICAL_SPECIE] = atomtype
             pc.add_particle(p)
   #          print('pc:'+str(pc))
