@@ -148,13 +148,13 @@ def process_system(f):
 #            SP[CUBAExtension.IBRAV] = ibrav
         elif "celldm(1)" in line:
             celldm[0] = float(values[1])
-#            SP[CUBAExtension.UNIT_CELL_DIMENSIONS][0] = celldm[0]
+#            SP[CUBAExtension.BOX_VECTORS][0] = celldm[0]
         elif "celldm(2)" in line:
             celldm[1] = float(values[1])
-#            SP[CUBAExtension.UNIT_CELL_DIMENSIONS][1] = celldm[1]
+#            SP[CUBAExtension.BOX_VECTORS][1] = celldm[1]
         elif "celldm(3)" in line:
             celldm[2] = float(values[1])
-#            SP[CUBAExtension.UNIT_CELL_DIMENSIONS][2] = celldm[2]
+#            SP[CUBAExtension.BOX_VECTORS][2] = celldm[2]
         elif "nat" in line:
             n_atoms = int(values[1])
         elif "ntyp" in line:
