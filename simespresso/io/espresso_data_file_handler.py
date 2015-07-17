@@ -4,7 +4,7 @@ from simphony.cuds.abstractlattice import ABCLattice
 
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
-from cuba_extension import CUBAExtension
+#from simespresso.cuba_extension import CUBAExtension
 from simphony.cuds.particles import Particle, Particles
 
 import uuid
@@ -113,16 +113,24 @@ def process_control(f):
         if "calculation" in line:
             values = line.split('=')
             calculation_type = values[1]
-            SP[CUBAExtension.SIMULATION_TYPE] = calculation_type
+            #THIS IS A HACK . Use of ZETA POTENTIAL for restart mode is because attempts to use
+            #CUBAExtension were unsuccessful.
+            SP[CUBA.TORQUE] = calculation_type
         elif "restart_mode" in line:
             restart_mode = values[1]
-#            SP[CUBAExtension.RESTART_MODE] = restart_mode
+            #THIS IS A HACK . Use of ZETA POTENTIAL for restart mode is because attempts to use
+            #CUBAExtension were unsuccessful.
+            SP[CUBA.ZETA_POTENTIAL] = restart_mode
         elif "pseudo_dir" in line:
             pseudo_dir = values[1]
-#            SP[CUBAExtension.PSEUDO_DIR] = pseudo_dir
+            #THIS IS A HACK . Use of YOUNG MODULUS for restart mode is because attempts to use
+            #CUBAExtension were unsuccessful.
+            SP[CUBA.YOUNG_MODULUS] = pseudo_dir
         elif "prefix" in line:
             prefix = values[1]
-#            SP[CUBAExtension.PREFIX] = prefix
+            #THIS IS A HACK . Use of VOLUME FRACTION for prefix is because attempts to use
+            #CUBAExtension were unsuccessful.
+            SP[CUBA.VOLUME_FRACTION] = prefix
         elif "tprnfor" in line:  #calculate forces
             tprnfor = values[1]
 #            SP[CUBAExtension.TPRNFOR] = tprnfor
@@ -306,6 +314,6 @@ class _ReadState(Enum):
 atomtypes = ["C","H","He","N","O","Na","Mg"]
 
 if __name__ == "__main__":
-    filename = 'pw.in'
+    filename = '../../examples/input_pw.in'
     print('started parsing file '+str(filename))
     ReadEspressoInputFile(filename)

@@ -7,7 +7,7 @@ import logging
 import sys
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
-
+from simphony.core.keywords import KEYWORDS
 
 class OutcomesTest(unittest.TestCase):
 
@@ -16,8 +16,11 @@ class OutcomesTest(unittest.TestCase):
         with open(self.filename,'w') as text_file:
             text_file.write(_data_file_contents)
 
-    def test_espress_data_file_handler(self):
+    def test_espresso_data_file_handler(self):
         print('starting test of data file handler')
+    #   What are the allowed keywords?
+    #    for kw in KEYWORDS:
+    #        print('kw:'+kw+'='+str(KEYWORDS[kw]))
         particle_container = espresso_data_file_handler.ReadEspressoInputFile(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
