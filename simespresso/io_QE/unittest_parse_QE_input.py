@@ -1,7 +1,7 @@
 __author__ = 'jeremy'
 
 import unittest
-import espresso_data_file_handler
+import espresso_data_file_read
 import subprocess
 import logging
 import sys
@@ -21,7 +21,7 @@ class OutcomesTest(unittest.TestCase):
     #   What are the allowed keywords?
     #    for kw in KEYWORDS:
     #        print('kw:'+kw+'='+str(KEYWORDS[kw]))
-        particle_container = espresso_data_file_handler.ReadEspressoInputFile(self.filename)
+        particle_container = espresso_data_file_read.ReadEspressoInputFile(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
         expected_atom_positions.append((1.0e-10,2.0e-10,3.0e-10))

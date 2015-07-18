@@ -7,12 +7,10 @@ from simphony.core.data_container import DataContainer
 #from simespresso.cuba_extension import CUBAExtension
 from simphony.cuds.particles import Particle, Particles
 
+#from simphony.cuds.abstractparticles import ABCParticles
+
 import uuid
 
-BC = DataContainer()   #boundary conditions
-CM = DataContainer()   #computational method
-SP = DataContainer()   #System Parameters and Conditions
-SD = DataContainer()  #state data
 
 def ReadEspressoInputFile(file_name):
     """  This class parses  Espresso data files, either input or output
@@ -37,14 +35,32 @@ def ReadEspressoInputFile(file_name):
     Parameters
     ----------
     handler :
-       handler will handle the parsed information provided by this class """
+       handler will handle the parsed information provided by this class
+
+
+                    SP[CUBA.TORQUE] = calculation_type
+            SP[CUBA.ZETA_POTENTIAL] = restart_mode
+            SP[CUBA.YOUNG_MODULUS] = pseudo_dir
+            SP[CUBA.VOLUME_FRACTION] = prefix
+            SP[CUBA.AMPHIPHILICITY] = tprnfor
+            SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
+            SP[CUBA.OUTDIR] = outdir
+
+
+
+        """
 
 
 #CM.[CUBA.]
 #BC.[CUBA.]
 
     state = _ReadState.UNKNOWN
-
+#    BC = DataContainer()   #boundary conditions
+#    CM = DataContainer()   #computational method
+    SP = DataContainer()   #System Parameters and Conditions
+#    SD = DataContainer()  #state data
+    pc = Particles('quantum_espresso_particles')
+    dc = DataContainer()
     with open(file_name, 'r') as f:
         line_number = 0
         file_iter = iter(f)
@@ -63,11 +79,11 @@ def ReadEspressoInputFile(file_name):
                 state = _ReadState.get_state(state,line)
                 if state is _ReadState.CONTROL:
                     print('reading control section')
-                    line = process_control(file_iter)
+                    line = process_control(file_iter,SP)
                     continue
                 elif state is _ReadState.SYSTEM:
                     print('reading system')
-                    line = process_system(file_iter)
+                    line = process_system(file_iter,SP)
                     continue
                 elif state is _ReadState.ELECTRONS:
                     print('reading electrons')
@@ -84,10 +100,9 @@ def ReadEspressoInputFile(file_name):
                     continue
                 elif state is _ReadState.ATOMIC_POSITIONS:
                     print('reading atomic positions')
-                    pc = Particles("Test")
 
                     values = line.split()
-                    process_atomic_positions(file_iter,pc,units=values[1])
+                    pc = process_atomic_positions(file_iter,pc,units=values[1])
                     break
 
                 line = file_iter.next()
@@ -96,15 +111,10 @@ def ReadEspressoInputFile(file_name):
         except Exception:
             print("problem with line number=", line_number, line)
             raise
-
-    if pc:
-#        print('pc = '+str(pc))
-        return pc
-    else:
-        return
+    return pc
 
 
-def process_control(f):
+def process_control(f,SP):
     print('processing control section')
     line = f.next()
     while _ReadState.get_state(_ReadState.CONTROL,line) == _ReadState.CONTROL:
@@ -113,38 +123,38 @@ def process_control(f):
         if "calculation" in line:
             values = line.split('=')
             calculation_type = values[1]
-            #THIS IS A HACK . Use of ZETA POTENTIAL for restart mode is because attempts to use
+            #THIS IS A HACK . Use of ZETA POTENTIAL for calculation_type is because attempts to use
             #CUBAExtension were unsuccessful.
             SP[CUBA.TORQUE] = calculation_type
         elif "restart_mode" in line:
             restart_mode = values[1]
-            #THIS IS A HACK . Use of ZETA POTENTIAL for restart mode is because attempts to use
-            #CUBAExtension were unsuccessful.
+            #THIS IS A HACK . Use of ZETA POTENTIAL for restart mode
             SP[CUBA.ZETA_POTENTIAL] = restart_mode
         elif "pseudo_dir" in line:
             pseudo_dir = values[1]
-            #THIS IS A HACK . Use of YOUNG MODULUS for restart mode is because attempts to use
-            #CUBAExtension were unsuccessful.
+            #THIS IS A HACK . Use of YOUNG MODULUS for pseudo_dir
             SP[CUBA.YOUNG_MODULUS] = pseudo_dir
         elif "prefix" in line:
             prefix = values[1]
-            #THIS IS A HACK . Use of VOLUME FRACTION for prefix is because attempts to use
-            #CUBAExtension were unsuccessful.
+            #THIS IS A HACK . Use of VOLUME FRACTION for prefix
             SP[CUBA.VOLUME_FRACTION] = prefix
         elif "tprnfor" in line:  #calculate forces
             tprnfor = values[1]
-#            SP[CUBAExtension.TPRNFOR] = tprnfor
+            #THIS IS A HACK . Using AMPHILICITY for tprnfor
+            SP[CUBA.AMPHIPHILICITY] = tprnfor
         elif "max_seconds" in line:
             max_seconds = float(values[1])
-#            SP[CUBAExtension.SIMULATION_MAXIMUM_RUNTIME] = max_seconds
+            #THIS IS A HACK . Using NUMBER_OF_TIME_STEPS for max_seconds
+            SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
         elif "outdir" in line:
             outdir = values[1]
-#            SP[CUBAExtension.OUTDIR] = outdir
+            #THIS IS A HACK . Using DIRECTION for outdir
+            SP[CUBA.DIRECTION] = outdir
 
         line = f.next()
     return line
 
-def process_system(f):
+def process_system(f,SP):
     print('processing system section')
     line = f.next()
     celldm=[0,0,0]
@@ -156,13 +166,15 @@ def process_system(f):
 #            SP[CUBAExtension.IBRAV] = ibrav
         elif "celldm(1)" in line:
             celldm[0] = float(values[1])
-#            SP[CUBAExtension.BOX_VECTORS][0] = celldm[0]
+ #           SP[CUBA.LATTICE_VECTORS = celldm[0]
         elif "celldm(2)" in line:
             celldm[1] = float(values[1])
-#            SP[CUBAExtension.BOX_VECTORS][1] = celldm[1]
+#            SP[CUBA.BOX_VECTORS][1] = celldm[1]
         elif "celldm(3)" in line:
             celldm[2] = float(values[1])
-#            SP[CUBAExtension.BOX_VECTORS][2] = celldm[2]
+#            SP[CUBA.BOX_VECTORS][2] = celldm[2]
+            SP[CUBA.LATTICE_VECTORS] = celldm
+
         elif "nat" in line:
             n_atoms = int(values[1])
         elif "ntyp" in line:
@@ -234,7 +246,7 @@ def process_k_points(f,mode='automatic'):
     return line
 
 
-
+#I am not sure whether to use datacontainer or particlecontainer - maybe PC goes in DC?
 def process_atomic_positions(f,pc,units='(angstrom)'):
     print('processing atomic_positions section')
     try:
@@ -251,7 +263,7 @@ def process_atomic_positions(f,pc,units='(angstrom)'):
         if values[0] in atomtypes:
             atomtype = values[0]
             atom_id = i
-            atom_pos[0] = float(values[1]) * 1e-10  #position in meters, original in Angstrom
+            atom_pos[0] = float(values[1]) * 1e-10  #store position in meters; original in Angstrom
             atom_pos[1] = float(values[2]) * 1e-10
             atom_pos[2] = float(values[3]) * 1e-10
             s = str(i)
@@ -259,10 +271,16 @@ def process_atomic_positions(f,pc,units='(angstrom)'):
             #uidstring =
             #uid = uuid.UUID(uidstring)
 
-            p = Particle(coordinates=[atom_pos[0],atom_pos[1],atom_pos[2]])
-
+            p = Particle([atom_pos[0],atom_pos[1],atom_pos[2]])  #,uuid.UUID(int=i)
+            #from cuds/tests/test_particles.py: particle = Particle([20.5, 30.5, 40.5], uuid.UUID(int=33), data)
             print('uid:'+str(p.uid))
             p.data[CUBA.CHEMICAL_SPECIE] = atomtype
+
+            part = Particle()
+            part_container = Particles(name="foo")
+            part_container.add_particle(part)
+
+
             pc.add_particle(p)
   #          print('pc:'+str(pc))
             i = i +1
