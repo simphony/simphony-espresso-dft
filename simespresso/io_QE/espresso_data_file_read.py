@@ -37,14 +37,13 @@ def ReadEspressoInputFile(file_name):
     handler :
        handler will handle the parsed information provided by this class
 
-
-                    SP[CUBA.TORQUE] = calculation_type
-            SP[CUBA.ZETA_POTENTIAL] = restart_mode
-            SP[CUBA.YOUNG_MODULUS] = pseudo_dir
-            SP[CUBA.VOLUME_FRACTION] = prefix
-            SP[CUBA.AMPHIPHILICITY] = tprnfor
-            SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
-            SP[CUBA.OUTDIR] = outdir
+        SP[CUBA.TORQUE] = calculation_type
+        SP[CUBA.ZETA_POTENTIAL] = restart_mode
+        SP[CUBA.YOUNG_MODULUS] = pseudo_dir
+        SP[CUBA.VOLUME_FRACTION] = prefix
+        SP[CUBA.AMPHIPHILICITY] = tprnfor
+        SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
+        SP[CUBA.OUTDIR] = outdir
 
 
 
@@ -111,6 +110,7 @@ def ReadEspressoInputFile(file_name):
         except Exception:
             print("problem with line number=", line_number, line)
             raise
+        #put pc into dc!
     return pc
 
 
@@ -278,7 +278,8 @@ def process_atomic_positions(f,pc,units='(angstrom)'):
 
             part = Particle()
             part_container = Particles(name="foo")
-            part_container.add_particle(part)
+
+            part_container.add_particle(p)
 
 
             pc.add_particle(p)

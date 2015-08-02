@@ -11,13 +11,17 @@ def WriteEspressoInputFile(file_name,data_container):
     :param data_container: contains data to write to file
     :return:
     """
-    with open(file_name, 'w') as f:
-        try:
+    d=DataContainer.items()
+    pc=data_container
+    for item in d:
 
-            f.write()
-        except:
-            ('error in write block of WriteEspressoInputFile')
-            raise
+        with open(file_name, 'w') as f:
+            try:
+
+                f.write()
+            except:
+                ('error in write block of WriteEspressoInputFile')
+                raise
     f.closed
 
 
