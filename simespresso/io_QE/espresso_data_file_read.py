@@ -44,11 +44,7 @@ def ReadEspressoInputFile(file_name):
         SP[CUBA.AMPHIPHILICITY] = tprnfor
         SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
         SP[CUBA.OUTDIR] = outdir
-
-
-
         """
-
 
 #CM.[CUBA.]
 #BC.[CUBA.]
@@ -86,22 +82,23 @@ def ReadEspressoInputFile(file_name):
                     continue
                 elif state is _ReadState.ELECTRONS:
                     print('reading electrons')
-                    line = process_electrons(file_iter)
+                    line = process_electrons(file_iter,SP)
                     continue
                 elif state is _ReadState.ATOMIC_SPECIES:
                     print('reading atomic species')
-                    line = process_atomic_species(file_iter)
+                    line = process_atomic_species(file_iter,SP)
                     continue
                 elif state is _ReadState.K_POINTS:
                     print('reading k points')
                     values = line.split()
-                    line = process_k_points(file_iter,mode=values[1])
+                    line = process_k_points(file_iter,SP,mode=values[1])
                     continue
                 elif state is _ReadState.ATOMIC_POSITIONS:
                     print('reading atomic positions')
 
                     values = line.split()
-                    pc = process_atomic_positions(file_iter,pc,units=values[1])
+                    pc = process_atomic_positions(file_iter,pc,SP,units=values[1])
+
                     break
 
                 line = file_iter.next()
@@ -111,6 +108,7 @@ def ReadEspressoInputFile(file_name):
             print("problem with line number=", line_number, line)
             raise
         #put pc into dc!
+
     return pc
 
 
@@ -154,26 +152,26 @@ def process_control(f,SP):
         line = f.next()
     return line
 
+celldm=[0,0,0]
 def process_system(f,SP):
     print('processing system section')
     line = f.next()
-    celldm=[0,0,0]
     while _ReadState.get_state(_ReadState.SYSTEM,line) == _ReadState.SYSTEM:
         values = [x.strip() for x in line.split('=')]
         print('line in control section:'+str(line))
         if "ibrav" in line:  #bravais lattice index
             ibrav = int(values[1])
-#            SP[CUBAExtension.IBRAV] = ibrav
+            SP[CUBA.ROLLING_FRICTION] = ibrav
         elif "celldm(1)" in line:
             celldm[0] = float(values[1])
- #           SP[CUBA.LATTICE_VECTORS = celldm[0]
+#            SP[CUBA.ORIGINAL_POSITION] = celldm[0]
         elif "celldm(2)" in line:
             celldm[1] = float(values[1])
-#            SP[CUBA.BOX_VECTORS][1] = celldm[1]
+#            SP[CUBA.ORIGINAL_POSITION][1] = celldm[1]
         elif "celldm(3)" in line:
             celldm[2] = float(values[1])
-#            SP[CUBA.BOX_VECTORS][2] = celldm[2]
-            SP[CUBA.LATTICE_VECTORS] = celldm
+            SP[CUBA.ORIGINAL_POSITION] = [celldm[0],celldm[1],celldm[2]]
+        #    SP[CUBA.LATTICE_VECTORS] = celldm
 
         elif "nat" in line:
             n_atoms = int(values[1])
@@ -181,18 +179,18 @@ def process_system(f,SP):
             n_atom_types = int(values[1])
         elif "ecutwfc" in line:
             ecutwfc = float(values[1])
-#            SP[CUBAExtension.KINETIC_ENERGY_CUTOFF_FOR_WAVEFUNCTIONS] = ecutwfc
+            SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT] = ecutwfc
         elif "ecutrho" in line:
             ecutrho = float(values[1]) #maybe int
-#            SP[CUBAExtension.KINETIC_ENERGY_CUTOFF_FOR_CHARGE_DENSITY_AND_POTENTIAL] = ecutwfc
+            SP[CUBA.POISSON_RATIO] = ecutrho
         elif "input_dft" in line:
             input_dft = values[1]
-#            SP[CUBAExtension.EXCHANGE_CORRELATION_FUNCTIONAL] = input_dft
+            SP[CUBA.LATTICE_SPACING] = input_dft
         line = f.next()
     return line
 
 
-def process_electrons(f):
+def process_electrons(f,SP):
     print('processing eletrons section')
     line = f.next()
     while _ReadState.get_state(_ReadState.ELECTRONS,line) == _ReadState.ELECTRONS:
@@ -200,19 +198,22 @@ def process_electrons(f):
         print('line in electrons section:'+str(line))
         if "mixing_mode" in line:
             mixing_mode = values[1]
-#            SP[CUBAExtension.MIXING_MODE] = mixing_mode
+            SP[CUBA.SMOOTHING_LENGTH] = mixing_mode
         elif "mixing_beta" in line:
             mixing_beta = float(values[1])
-#            SP[CUBAExtension.MIXING_BETA] = mixing_beta
+            SP[CUBA.PHASE_INTERACTION_STRENGTH] = mixing_beta
         elif "conv_thr" in line:
             conv_thr = values[1] #numbers like 1.0d-7 might have to be converted to float
-#            SP[CUBAExtension.CONVERGENCE_THRESHOLD] = conv_thr
+            SP[CUBA.DEBYE_LENGTH] = conv_thr
         line = f.next()
     return line
 
-def process_atomic_species(f):
+def process_atomic_species(f,SP):
     print('processing atomic species section')
     line = f.next()
+    SP[CUBA.CHEMICAL_SPECIE]=[]
+    SP[CUBA.SCALING_COEFFICIENT]=[]
+    SP[CUBA.FRICTION_COEFFICIENT]=[]
     while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
         values = line.split()
         print('line in atomic species section:'+str(line))
@@ -222,25 +223,30 @@ def process_atomic_species(f):
             if values[0] in atomtypes:
                 print("atom type:"+values[0])
                 #self.dc(CHEMICAL_SPECIE = values[0])
-#                DataContainer(CHEMICAL_SPECIE=values[0])
+                SP[CUBA.CHEMICAL_SPECIE].append(values[0])
                 mass = float(values[1])
+                SP[CUBA.MASS].append(mass)
                 potential_file = values[2]
+                SP[CUBA.FRICTION_COEFFICIENT].append(potential_file)
         line = f.next()
     return line
 
-def process_k_points(f,mode='automatic'):
+def process_k_points(f,SP,mode='automatic'):
     #skip line
     print('processing k_points section')
     line = f.next()
 #    SP[CUBAExtension.K_POINTS_MODE] = mode
     i = 0
+
+    SP[CUBA.PROBABILITY_COEFFICIENT] = mode
+
     while _ReadState.get_state(_ReadState.K_POINTS,line) == _ReadState.K_POINTS:
 #        print('line:'+str(line))
         values = line.split()
         if len(values):
             K_points = (values)
             print('k points:'+str(K_points))
-#            SP[CUBAExtension.K_POINTS] = K_points
+            SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = K_points
 
         line = f.next()
     return line
@@ -253,7 +259,7 @@ def process_atomic_positions(f,pc,units='(angstrom)'):
         line = f.next()
     except StopIteration:
         return('EOF')
-
+    SP[CUBA.KINEMATIC_VISCOSITY] = units
     while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS,line) == _ReadState.ATOMIC_POSITIONS:
         print('line in atomic positions section:'+str(line))
         values = line.split()
@@ -277,9 +283,9 @@ def process_atomic_positions(f,pc,units='(angstrom)'):
             p.data[CUBA.CHEMICAL_SPECIE] = atomtype
 
             part = Particle()
-            part_container = Particles(name="qetest")
 
-            part_container.add_particle(p)
+
+            pc.add_particle(p)
 
 
           #  part_container.add_particle(p)
