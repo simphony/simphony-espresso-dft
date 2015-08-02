@@ -277,12 +277,12 @@ def process_atomic_positions(f,pc,units='(angstrom)'):
             p.data[CUBA.CHEMICAL_SPECIE] = atomtype
 
             part = Particle()
-            part_container = Particles(name="foo")
+            part_container = Particles(name="qetest")
 
             part_container.add_particle(p)
 
 
-            pc.add_particle(p)
+          #  part_container.add_particle(p)
   #          print('pc:'+str(pc))
             i = i +1
         try:
