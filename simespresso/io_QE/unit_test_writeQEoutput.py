@@ -65,6 +65,14 @@ class OutcomesTest(unittest.TestCase):
 
             espresso_data_file_write.WriteEspressoInputFile(file_name,SP,pc)
 
+    def test_start_qe(self):
+        name_in = './test_pw.in'
+        name_out = './test_pw.out'
+        path_to_espresso = '/usr/bin/pw.x'
+        command = 'mpirun -np 2 '+path_to_espresso+' < '+name_in +' > '+name_out
+       # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
+        subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
+
 if __name__ == '__main__':
     unittest.main()
 
