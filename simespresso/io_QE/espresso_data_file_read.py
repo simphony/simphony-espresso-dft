@@ -1,11 +1,8 @@
-import string
 from enum import Enum
-from simphony.cuds.abstractlattice import ABCLattice
-
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
-#from simespresso.cuba_extension import CUBAExtension
 from simphony.cuds.particles import Particle, Particles
+
 
 #from simphony.cuds.abstractparticles import ABCParticles
 
@@ -212,7 +209,7 @@ def process_atomic_species(f,SP):
     print('processing atomic species section')
     line = f.next()
     SP[CUBA.CHEMICAL_SPECIE]=[]
-    SP[CUBA.SCALING_COEFFICIENT]=[]
+    SP[CUBA.MASS]=[]
     SP[CUBA.FRICTION_COEFFICIENT]=[]
     while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
         values = line.split()
@@ -253,7 +250,7 @@ def process_k_points(f,SP,mode='automatic'):
 
 
 #I am not sure whether to use datacontainer or particlecontainer - maybe PC goes in DC?
-def process_atomic_positions(f,pc,units='(angstrom)'):
+def process_atomic_positions(f,pc,SP,units='(angstrom)'):
     print('processing atomic_positions section')
     try:
         line = f.next()
@@ -281,11 +278,15 @@ def process_atomic_positions(f,pc,units='(angstrom)'):
             #from cuds/tests/test_particles.py: particle = Particle([20.5, 30.5, 40.5], uuid.UUID(int=33), data)
             print('uid:'+str(p.uid))
             p.data[CUBA.CHEMICAL_SPECIE] = atomtype
+           # pc = Particles('quantum_espresso_particles')
 
-            part = Particle()
-
-
+            #This is failing for some reason....
             pc.add_particle(p)
+
+    #    p1 = Particle(1.0,2.0,3.0)
+    #    p1.data[CUBA.CHEMICAL_SPECIE] = 'C'
+    #    pc.add_particle(p1)
+
 
 
           #  part_container.add_particle(p)
