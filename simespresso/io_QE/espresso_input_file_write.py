@@ -130,22 +130,20 @@ def WriteEspressoInputFile(file_name,data_container,particle_container):
                 f.write(line)
 
             #this is until setting/getting particles from particle_container works
-            kluge(f)
-            return
 
-            for particle in pc.iter_particles:
+
+            for particle in pc.iter_particles():
                 atom_type = particle.data
-                atom_coords = [particle.coordinates[0],
-                               particle.coordinates[1],
-                               particle.coordinates[2]]
-                line =str(atom_type)+' '+str(particle.coordinates[0])+' '+\
-                      str(particle.coordinates[1])+' '+str(particle.coordinates[2])
+                atom = atom_type[CUBA.CHEMICAL_SPECIE]
+                print('atom:'+str(atom))
+                line =str(atom)+' '+str(particle.coordinates[0])+' '+\
+                      str(particle.coordinates[1])+' '+str(particle.coordinates[2]) + '\n'
                 f.write(line)
-
 
         except:
                 ('error in write block of WriteEspressoInputFile')
                 raise
+    print('finished writing file')
     f.closed
 
 def kluge(f):
@@ -159,10 +157,36 @@ def kluge(f):
     f.write(line)
     return
 
-
-
+def write_pp_in():
+    '''
+    this writes an auxiliary required file determined the plot parameters
+    :return:
+    '''
+    ppfilename = 'testpp.in'
+    outdir = './'
+    plotfile = 'output.charge'
+    outfile = 'density.dat'
+    lines=['&inputpp',
+           'prefix =\'NANO\'',
+           'filplot=\''+plotfile+'\'',
+           'plot_num=0',
+           'outdir = '+outdir,
+           '/',
+            '&plot',
+           'nfile = 1',
+            'filepp(1) = \''+plotfile+'\'',
+           'weight(1) = 1.0',
+            'iflag = 3',
+            'output_format = 6',
+            'fileout = \''+outfile+'\''  ]
+    with open(ppfilename,'w') as pp:
+        for line in lines:
+            print'line:'+str(line)
+            pp.write(str(line)+'\n')
+    print('finished writing file')
 
 if __name__ == "__main__":
+    write_pp_in()
     filename = '../../examples/input_pw.in'
     print('started parsing file '+str(filename))
     ReadEspressoInputFile(filename)

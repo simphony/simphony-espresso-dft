@@ -3,7 +3,7 @@ __author__ = 'jeremy'
 __author__ = 'jeremy'
 
 import unittest
-import espresso_data_file_read
+import espresso_input_file_read
 import subprocess
 import logging
 import sys
@@ -11,7 +11,7 @@ from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.core.keywords import KEYWORDS
 from simphony.cuds.particles import Particle, Particles
-import espresso_data_file_write
+import espresso_input_file_write
 
 class OutcomesTest(unittest.TestCase):
 
@@ -47,23 +47,19 @@ class OutcomesTest(unittest.TestCase):
         SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = [1,4,1,0,0,0] #K_POINTS
         SP[CUBA.KINEMATIC_VISCOSITY] = '(angstrom)'#ATOMIC_POSITIONS
 
-#this actually should go below except there is a'pacticles has no attribute add_particle' problem
-        espresso_data_file_write.WriteEspressoInputFile(espresso_input_filename,SP,pc)
-        if(0):
-            p1 = Particle([1.0,2.0,3.0])
-            p1.data[CUBA.CHEMICAL_SPECIE] = 'C'
-            pc.add_particle(p1)
-            p2 = Particle([2.0,3.0,4.0])
-            p2.data[CUBA.CHEMICAL_SPECIE] = 'C'
-            pc.add_particle(p2)
-            p3 = Particle([3.0,4.0,5.0])
-            p3.data[CUBA.CHEMICAL_SPECIE] = 'C'
-            pc.add_particle(p3)
-            p4 = Particle([4.0,5.0,6.0])
-            p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
-            pc.add_particle(p4)
+        espresso_input_file_write.WriteEspressoInputFile(espresso_input_filename,SP,pc)
+        p1 = Particle([1.0,2.0,3.0])
+        p1.data[CUBA.CHEMICAL_SPECIE] = 'C'
+        p2 = Particle([2.0,3.0,4.0])
+        p2.data[CUBA.CHEMICAL_SPECIE] = 'C'
+        p3 = Particle([3.0,4.0,5.0])
+        p3.data[CUBA.CHEMICAL_SPECIE] = 'C'
+        p4 = Particle([4.0,5.0,6.0])
+        p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
+        pc.add_particles([p1,p2,p3,p4])
 
-            espresso_data_file_write.WriteEspressoInputFile(file_name,SP,pc)
+
+        espresso_input_file_write.WriteEspressoInputFile(espresso_input_filename,SP,pc)
 
     def test_start_qe(self):
         name_in = './test_pw.in'

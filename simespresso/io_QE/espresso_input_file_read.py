@@ -81,6 +81,14 @@ def ReadEspressoInputFile(file_name):
                     print('reading electrons')
                     line = process_electrons(file_iter,SP)
                     continue
+                elif state is _ReadState.IONS:
+                    print('reading ions')
+                    line = process_ions(file_iter,SP)
+                    continue
+                elif state is _ReadState.CELL:
+                    print('reading ions')
+                    line = process_ions(file_iter,SP)
+                    continue
                 elif state is _ReadState.ATOMIC_SPECIES:
                     print('reading atomic species')
                     line = process_atomic_species(file_iter,SP)
@@ -92,11 +100,10 @@ def ReadEspressoInputFile(file_name):
                     continue
                 elif state is _ReadState.ATOMIC_POSITIONS:
                     print('reading atomic positions')
-
                     values = line.split()
                     pc = process_atomic_positions(file_iter,pc,SP,units=values[1])
 
-                    break
+                break
 
                 line = file_iter.next()
         except StopIteration:
@@ -205,6 +212,18 @@ def process_electrons(f,SP):
         line = f.next()
     return line
 
+def process_ions(f,SP):
+    print('processing ions section')
+    line = f.next()
+    line = f.next()
+    return line
+
+def process_cell(f,SP):
+    print('processing cell section')
+    line = f.next()
+    line = f.next()
+    return line
+
 def process_atomic_species(f,SP):
     print('processing atomic species section')
     line = f.next()
@@ -254,48 +273,40 @@ def process_atomic_positions(f,pc,SP,units='(angstrom)'):
     print('processing atomic_positions section')
     try:
         line = f.next()
+        SP[CUBA.KINEMATIC_VISCOSITY] = units
+        particle_list = []
+        while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS,line) == _ReadState.ATOMIC_POSITIONS:
+            print('line in atomic positions section:'+str(line))
+            values = line.split()
+            print('values:'+str(values))
+            atom_pos = [0,0,0]
+            i = 0
+            if values[0] in atomtypes:
+                atomtype = values[0]
+                atom_id = i
+                atom_pos[0] = float(values[1]) * 1e-10  #store position in meters; original in Angstrom
+                atom_pos[1] = float(values[2]) * 1e-10
+                atom_pos[2] = float(values[3]) * 1e-10
+                s = str(i)
+                #make uid using string of index
+                #uidstring =
+                #uid = uuid.UUID(uidstring)
+
+                p = Particle([atom_pos[0],atom_pos[1],atom_pos[2]])  #,uuid.UUID(int=i)
+                print('uid:'+str(p.uid))
+                p.data[CUBA.CHEMICAL_SPECIE] = atomtype
+                particle_list.append(p)
+                try:
+                    line = f.next()
+                except StopIteration:
+                    print('EOF')
+                    break
+        if len(particle_list):
+            pc.add_particles(particle_list)
+              #  part_container.add_particle(p)
+
     except StopIteration:
         return('EOF')
-    SP[CUBA.KINEMATIC_VISCOSITY] = units
-    while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS,line) == _ReadState.ATOMIC_POSITIONS:
-        print('line in atomic positions section:'+str(line))
-        values = line.split()
-        print('values:'+str(values))
-        atom_pos = [0,0,0]
-        i = 0
-        if values[0] in atomtypes:
-            atomtype = values[0]
-            atom_id = i
-            atom_pos[0] = float(values[1]) * 1e-10  #store position in meters; original in Angstrom
-            atom_pos[1] = float(values[2]) * 1e-10
-            atom_pos[2] = float(values[3]) * 1e-10
-            s = str(i)
-            #make uid using string of index
-            #uidstring =
-            #uid = uuid.UUID(uidstring)
-
-            p = Particle([atom_pos[0],atom_pos[1],atom_pos[2]])  #,uuid.UUID(int=i)
-            #from cuds/tests/test_particles.py: particle = Particle([20.5, 30.5, 40.5], uuid.UUID(int=33), data)
-            print('uid:'+str(p.uid))
-            p.data[CUBA.CHEMICAL_SPECIE] = atomtype
-           # pc = Particles('quantum_espresso_particles')
-
-            #This is failing for some reason....
-            pc.add_particle(p)
-
-    #    p1 = Particle(1.0,2.0,3.0)
-    #    p1.data[CUBA.CHEMICAL_SPECIE] = 'C'
-    #    pc.add_particle(p1)
-
-
-
-          #  part_container.add_particle(p)
-  #          print('pc:'+str(pc))
-            i = i +1
-        try:
-            line = f.next()
-        except StopIteration:
-            return('EOF')
 
     return pc
 
@@ -324,9 +335,9 @@ class _ReadState(Enum):
         elif "&ELECTRONS" in line:
             new_state = _ReadState.ELECTRONS
         elif "&IONS" in line:
-            new_state = _ReadState.UNSUPPORTED
+            new_state = _ReadState.IONS
         elif "&CELL" in line:
-            new_state = _ReadState.UNSUPPORTED
+            new_state = _ReadState.CELL
         elif "ATOMIC_SPECIES" in line:
             new_state = _ReadState.ATOMIC_SPECIES
         elif "K_POINTS" in line:
