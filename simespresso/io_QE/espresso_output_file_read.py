@@ -114,8 +114,8 @@ def read_densities(n_latticepoints,L,file_iter):
     charge_density = read_xyz(n_latticepoints,file_iter)
     iterator = L.iter_nodes(n_latticepoints)
     for i in range(0,n_latticepoints[0]):
-        for j in range(0,n_latticepoints[0]):
-            for k in range(0,n_latticepoints[0]):
+        for j in range(0,n_latticepoints[1]):
+            for k in range(0,n_latticepoints[2]):
                 L.data = charge_density
                 iterator.next()
     return L
