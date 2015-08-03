@@ -104,21 +104,23 @@ def ReadEspressoOutputFile(file_name):
                 line = file_iter.next()
              #   print('lineN:'+str(line))
 
-        read_densities(n_lattice_points,L,file_iter)
+        L = read_densities(n_lattice_points,L,file_iter)
         #put pc into dc!
 
-    return pc
 
 
 def read_densities(n_latticepoints,L,file_iter):
     charge_density = read_xyz(n_latticepoints,file_iter)
-    iterator = L.iter_nodes(n_latticepoints)
-    for i in range(0,n_latticepoints[0]):
-        for j in range(0,n_latticepoints[1]):
-            for k in range(0,n_latticepoints[2]):
-                L.data = charge_density
-                iterator.next()
+    charge_as_list = charge_density.tolist()
+    L._data = charge_as_list
     return L
+
+#    iterator = L.iter_nodes(n_latticepoints)
+#    for i in range(0,n_latticepoints[0]):
+#        for j in range(0,n_latticepoints[1]):
+#            for k in range(0,n_latticepoints[2]):
+#                L.data = charge_density[i,j,k]
+ #               iterator.next()
 
 def read_xyz(n_latticepoints,file_iter):
     line_numer = 0
