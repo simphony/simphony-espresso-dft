@@ -104,15 +104,17 @@ def ReadEspressoOutputFile(file_name):
                 line = file_iter.next()
              #   print('lineN:'+str(line))
 
-        L = read_densities(n_lattice_points,L,file_iter)
+        L = read_densities(n_lattice_points,L,file_iter,aviz_filename='avizout.xyz')
         #put pc into dc!
 
 
 
-def read_densities(n_latticepoints,L,file_iter):
+def read_densities(n_latticepoints,L,file_iter,aviz_filename=False):
     charge_density = read_xyz(n_latticepoints,file_iter)
     charge_as_list = charge_density.tolist()
     L._data = charge_as_list
+    if aviz_filename:
+        write_aviz_output(charge_density,aviz_filename,L.base_vect)
     return L
 
 #    iterator = L.iter_nodes(n_latticepoints)
@@ -121,6 +123,29 @@ def read_densities(n_latticepoints,L,file_iter):
 #            for k in range(0,n_latticepoints[2]):
 #                L.data = charge_density[i,j,k]
  #               iterator.next()
+def write_aviz_output(xyz_array,aviz_xyzfile,base_vector):
+    n_elements = np.shape(xyz_array)
+    print('np shape:'+str(n_elements))
+    n_size = np.size(xyz_array)
+
+    with open(aviz_xyzfile, 'w') as f:
+        try:
+            line = str(n_size)+'\n'  #calculation
+            f.write(line)
+            line = 'simphony to aviz xyz file\n'  #calculation
+            f.write(line)
+            for i in range(0,n_elements[0]):
+                x=i*base_vector[0]
+                for j in range(0,n_elements[1]):
+                    y=j*base_vector[0]
+                    for k in range(0,n_elements[2]):
+                        z=k*base_vector[0]
+                        density = xyz_array[i,j,k]
+                        line = 'C '+str(x)+' ' +str(y)+' '+str(z)+' '+str(density)+'\n'
+                        f.write(line)
+        except:
+            print('error writing aviz file')
+    return
 
 def read_xyz(n_latticepoints,file_iter):
     line_numer = 0
@@ -163,5 +188,6 @@ def read_xyz(n_latticepoints,file_iter):
 
 if __name__ == "__main__":
     filename = 'xyzoutput.txt.bak'
+    filename = 'xyzoutput.txt'
     print('started parsing file '+str(filename))
     ReadEspressoOutputFile(filename)
