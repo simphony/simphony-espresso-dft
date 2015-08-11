@@ -109,10 +109,22 @@ def ReadEspressoOutputFile(file_name):
 
 
 
+def running_index_to_node_index(index,n_latticepoints):
+    node_z = index/(n_latticepoints[0]*n_latticepoints[1])
+    node_y = (index/n_latticepoints[0])%n_latticepoints[1]
+    node_x = index%n_latticepoints[0]
+    return [node_x,node_y,node_z]
+
 def read_densities(n_latticepoints,L,file_iter,aviz_filename=False):
     charge_density = read_xyz(n_latticepoints,file_iter)
-    charge_as_list = charge_density.tolist()
-    L._data = charge_as_list
+    charge_as_list = charge_density.flatten()
+    for charge_index, charge in enumerate(charge_as_list):
+        node_index = running_index_to_node_index(charge_index,n_latticepoints)# TODO convert charge_index to node index
+        node = L.get_node(node_index)
+        node.data[CUBA.MASS] = charge
+        L.update_node(node)  #we have to ask the lattice to update the changed node
+
+
     if aviz_filename:
         write_aviz_output(charge_density,aviz_filename,L.base_vect)
     return L
@@ -125,7 +137,6 @@ def read_densities(n_latticepoints,L,file_iter,aviz_filename=False):
  #               iterator.next()
 def write_aviz_output(xyz_array,aviz_xyzfile,base_vector):
     n_elements = np.shape(xyz_array)
-    print('np shape:'+str(n_elements))
     n_size = np.size(xyz_array)
 
     with open(aviz_xyzfile, 'w') as f:
@@ -161,12 +172,12 @@ def read_xyz(n_latticepoints,file_iter):
     try:
         while line is not None:
             line_number = line_number + 1
-            print('x{0} y{1} z{2} line:{3}'.format(x_count,y_count,z_count,str(line)))
+#            print('x{0} y{1} z{2} line:{3}'.format(x_count,y_count,z_count,str(line)))
             values = line.split()
             charges = [float(val) for val in values]
+#            print('charges:'+str(charges))
 
             for charge in charges:
-                print('charges:'+str(charges))
                 charge_density[x_count,y_count,z_count] = charge
                 x_count+=1
                 if x_count== x_points:
