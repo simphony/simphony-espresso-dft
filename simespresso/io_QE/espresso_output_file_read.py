@@ -118,11 +118,13 @@ def running_index_to_node_index(index,n_latticepoints):
 def read_densities(n_latticepoints,L,file_iter,aviz_filename=False):
     charge_density = read_xyz(n_latticepoints,file_iter)
     charge_as_list = charge_density.flatten()
+    nodelist = []
     for charge_index, charge in enumerate(charge_as_list):
         node_index = running_index_to_node_index(charge_index,n_latticepoints)# TODO convert charge_index to node index
         node = L.get_node(node_index)
         node.data[CUBA.MASS] = charge
-        L.update_node(node)  #we have to ask the lattice to update the changed node
+        nodelist.append(node)
+    L.update_nodes(nodelist)  #we have to ask the lattice to update the changed node
 
 
     if aviz_filename:
