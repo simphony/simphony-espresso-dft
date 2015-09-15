@@ -6,13 +6,14 @@ import espresso_output_file_read
 
 class OutcomesTest(unittest.TestCase):
 
-    def test_espresso_data_file_read(self):
+    def test_ReadEspressoOutputFile(self):
         filename = 'xyzoutput.txt'
-        print('started parsing file '+str(filename))
+        print('testing parsing file '+str(filename))
         espresso_output_file_read.ReadEspressoOutputFile(filename)
 
 
-    def test_espresso_data_file_read(self):
+    def test_running_index_to_node_index(self):
+        print('testing espresso_data_file_read')
         n_latticepoints = [10,7,6]
         index = 5
         indices = espresso_output_file_read.running_index_to_node_index(index,n_latticepoints)

@@ -3,6 +3,7 @@ from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particle, Particles
 
+#VASP, AbINIT, Quantum Espresso, AIIDA
 
 #from simphony.cuds.abstractparticles import ABCParticles
 
@@ -43,14 +44,11 @@ def ReadEspressoInputFile(file_name):
         SP[CUBA.OUTDIR] = outdir
         """
 
-#CM.[CUBA.]
-#BC.[CUBA.]
-
     state = _ReadState.UNKNOWN
 #    BC = DataContainer()   #boundary conditions
-#    CM = DataContainer()   #computational method
+    CM = DataContainer()   #computational method
     SP = DataContainer()   #System Parameters and Conditions
-#    SD = DataContainer()  #state data
+    SD = DataContainer()  #state data
     pc = Particles('quantum_espresso_particles')
     dc = DataContainer()
     with open(file_name, 'r') as f:
