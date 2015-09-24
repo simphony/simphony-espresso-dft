@@ -19,6 +19,9 @@ class qe_wrapper(object):
 
     def __init__(self):
         self.SP = DataContainer()   #System Parameters and Conditions
+#        SP = self.data_container
+        self.pc =  Particles('quantum_espresso_particles')
+
 
 
     def ReadEspressoOutputFile(self,file_name):
@@ -204,20 +207,19 @@ class qe_wrapper(object):
         except StopIteration:
             print('EOF')
         if x_count<x_points or y_count<y_points or z_count<z_points:
-            logging.debug('Got fewer points than expected')
+            logging.debug('Got fewer points than expected:read {0} of {1} x, {2} of {3} y, {4} of {5} z'.format(x_count,x_points,y_count,y_points,z_count,z_points))
         return charge_density
 
 
-    def WriteEspressoInputFile(self,file_name,data_container,particle_container):
+    def WriteEspressoInputFile(self,file_name):
         """
         :param file_name: name of the input file to write
-        :param data_container: contains data to write to file
         :return:
         """
-     #   d=DataContainer.items()
-     #   d2=data_container.items()
-        SP = data_container
-        pc = particle_container
+        SP = self.SP
+        pc = self.pc
+        #write parameters for a particular working input file
+
         print('attempting to write '+file_name)
         with open(file_name, 'w') as f:
             try:
@@ -360,12 +362,11 @@ class qe_wrapper(object):
         f.write(line)
         return
 
-    def write_pp_in(self):
+    def WriteEspressoPPFile(self,ppfilename="testpp.in"):
         '''
         this writes an auxiliary required file determined the plot parameters
         :return:
         '''
-        ppfilename = 'testpp.in'
         outdir = './'
         plotfile = 'output.charge'
         outfile = 'density.dat'
@@ -396,7 +397,6 @@ class qe_wrapper(object):
         then determine what to  do with it.  For, example it could just store
         the data in memory (see LammpsSimpleDataHandler) or write it some other
         data file (e.g. a CUDS-file).
-
         cheatsheet for quantum espresso
 
         0. create/obtain input file such as pp.in from cuds data
@@ -407,12 +407,10 @@ class qe_wrapper(object):
                 mpirun -np 48 /usr/local/espresso/bin/pp.x < input_pp.in > pp.out &
         2. convert output (which is a charge density file) into simphony format (see charge_density_xyz.cpp)
 
-
         Parameters
         ----------
         handler :
            handler will handle the parsed information provided by this class
-
             SP[CUBA.TORQUE] = calculation_type
             SP[CUBA.ZETA_POTENTIAL] = restart_mode
             SP[CUBA.YOUNG_MODULUS] = pseudo_dir
@@ -422,7 +420,6 @@ class qe_wrapper(object):
             SP[CUBA.OUTDIR] = outdir
             """
         self.celldm=[None,None,None]
-
         state = _ReadState.UNKNOWN
     #    BC = DataContainer()   #boundary conditions
         CM = DataContainer()   #computational method
@@ -688,6 +685,15 @@ class qe_wrapper(object):
         return pc
 
 
+    def test_start_qe(self,in_filename,out_filename,path_to_espresso='/usr/bin/pw.x'):
+#        name_in = './test_pw.in'
+#        name_out = './test_pw.out'
+        path_to_espresso = '/usr/bin/pw.x'
+        command = 'mpirun -np 2 '+path_to_espresso+' < '+name_in +' > '+name_out
+       # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
+        print('qe wrapper attempting to run '+command)
+        subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
+
 class _ReadState(Enum):
     UNKNOWN, UNSUPPORTED, \
         CONTROL,\
@@ -730,14 +736,21 @@ atomtypes = ["C","H","He","N","O","Na","Mg"]
 
 
 if __name__ == "__main__":
-    filename = 'xyzoutput.txt.bak'
+    wrapper = qe_wrapper()
+#    filename = 'xyzoutput.txt.bak'
+    filename = '../../examples/input_pw.in'
+    print('started parsing qe input file '+str(filename))
+    wrapper.ReadEspressoInputFile(filename)
+
+    new_inputfilename =  '../../examples/new_input_pw.in'
+    wrapper.WriteEspressoInputFile(new_inputfilename)
+
+    ppfilename = 'testpp.in'
+    print('started writing qe input file '+str(ppfilename))
+    wrapper.WriteEspressoPPFile()
+
     filename = 'xyzoutput.txt'
     print('started parsing file '+str(filename))
-    wrapper = qe_wrapper()
     wrapper.ReadEspressoOutputFile(filename)
 
-    wrapper.write_pp_in()
-    filename = '../../examples/input_pw.in'
-    print('started parsing file '+str(filename))
-    wrapper.ReadEspressoInputFile(filename)
 
