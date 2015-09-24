@@ -17,4 +17,3 @@ install:
 script:
   # - flake8 
   - python -m unittest discover
-  - python setup.py build_sphinx
