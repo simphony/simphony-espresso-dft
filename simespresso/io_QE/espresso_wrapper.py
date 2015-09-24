@@ -228,25 +228,25 @@ class qe_wrapper(object):
                 line = '&CONTROL\n'  #calculation
                 f.write(line)
                 if CUBA.TORQUE in SP:
-                    line = '\t calculation=\''+str(SP[CUBA.TORQUE])+'\'\n'   #calculation
+                    line = '\t calculation='+str(SP[CUBA.TORQUE])   #calculation
                     f.write(line)
                 if CUBA.ZETA_POTENTIAL in SP:
-                    line = '\t restart_mode=\''+str(SP[CUBA.ZETA_POTENTIAL])+'\'\n' #restart_mode
+                    line = '\t restart_mode='+str(SP[CUBA.ZETA_POTENTIAL])+'\n' #restart_mode
                     f.write(line)
                 if CUBA.YOUNG_MODULUS in SP:
-                    line = '\t pseudo_dir=\''+str(SP[CUBA.YOUNG_MODULUS])+'\'\n'  #pseudo dir
+                    line = '\t pseudo_dir='+str(SP[CUBA.YOUNG_MODULUS])+'\n'  #pseudo dir
                     f.write(line)
                 if CUBA.VOLUME_FRACTION in SP:
-                    line = '\t prefix=\''+str(SP[CUBA.VOLUME_FRACTION])+'\'\n'  #prefix
+                    line = '\t prefix='+str(SP[CUBA.VOLUME_FRACTION])+'\n'  #prefix
                     f.write(line)
                 if CUBA.AMPHIPHILICITY in SP:
                     line = '\t tprnfor='+str(SP[CUBA.AMPHIPHILICITY])+'\n'  #tprnfor
                     f.write(line)
                 if CUBA.NUMBER_OF_TIME_STEPS in SP:
-                    line = '\t max_seconds='+str(SP[CUBA.NUMBER_OF_TIME_STEPS])+'\n'
+                    line = '\t max_seconds='+str(int(SP[CUBA.NUMBER_OF_TIME_STEPS]))+'\n'
                     f.write(line)
                 if CUBA.DIRECTION in SP:
-                    line = '\t outdir=\''+str(SP[CUBA.DIRECTION])+'\'\n'  #outdir
+                    line = '\t outdir='+str(SP[CUBA.DIRECTION])+'\n'  #outdir
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -266,6 +266,13 @@ class qe_wrapper(object):
                     f.write(line)
 
                  # here goes nat and ntype
+                n_atoms = self.count_particles()
+                line = '\t nat='+str(n_atoms)+'\n'  #outdir
+                f.write(line)
+                if CUBA.SCALING_COEFFICIENT in SP:
+                    line = '\t ntyp='+str(SP[CUBA.SCALING_COEFFICIENT])+'\n'  #outdir
+                    f.write(line)
+
 
 
                 if CUBA.LN_OF_RESTITUTION_COEFFICIENT in SP:
@@ -275,7 +282,7 @@ class qe_wrapper(object):
                     line = '\t ecutrho='+str(SP[CUBA.POISSON_RATIO])+'\n'
                     f.write(line)
                 if CUBA.LATTICE_SPACING in SP:
-                    line = '\t input_dft=\''+str(SP[CUBA.LATTICE_SPACING])+'\'\n'  #outdir
+                    line = '\t input_dft='+str(SP[CUBA.LATTICE_SPACING])+'\n'  #outdir
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -285,7 +292,7 @@ class qe_wrapper(object):
                 line = '&ELECTRONS\n'  #calculation
                 f.write(line)
                 if CUBA.SMOOTHING_LENGTH in SP:
-                    line = '\t mixing_mode=\''+str(SP[CUBA.SMOOTHING_LENGTH])+'\'\n'
+                    line = '\t mixing_mode='+str(SP[CUBA.SMOOTHING_LENGTH])+'\n'
                     f.write(line)
                 if CUBA.PHASE_INTERACTION_STRENGTH in SP:
                     line = '\t mixing_beta='+str(SP[CUBA.PHASE_INTERACTION_STRENGTH])+'\n'
@@ -312,14 +319,16 @@ class qe_wrapper(object):
                 line = 'ATOMIC_SPECIES\n'  #calculation
                 f.write(line)
 
+                #ATOMIC SPECIES
                 if CUBA.CHEMICAL_SPECIE in SP:
                     for i in range(0,len(SP[CUBA.CHEMICAL_SPECIE])):
                         line = '\t'+str(SP[CUBA.CHEMICAL_SPECIE][i])+' '+\
-                               str(SP[CUBA.MASS][i])+' \''+str(SP[CUBA.FRICTION_COEFFICIENT][i])+'\'\n'
+                               str(SP[CUBA.MASS][i])+' '+str(SP[CUBA.FRICTION_COEFFICIENT][i])+'\n'
                         f.write(line)
                 line = '\n'
                 f.write(line)
 
+                #K POINTS
                 if CUBA.PROBABILITY_COEFFICIENT in SP:
                     line ='K_POINTS '+str(SP[CUBA.PROBABILITY_COEFFICIENT])+'\n'
                     f.write(line)
@@ -334,15 +343,15 @@ class qe_wrapper(object):
                     line ='ATOMIC_POSITIONS '+str(SP[CUBA.KINEMATIC_VISCOSITY])+'\n'
                     f.write(line)
 
-                #this is until setting/getting particles from particle_container works
 
-
+                multiplier = 10**10  #QE wants coords. in Angstroms
                 for particle in pc.iter_particles():
                     atom_type = particle.data
+                 #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
                     atom = atom_type[CUBA.CHEMICAL_SPECIE]
-                    print('atom:'+str(atom))
-                    line =str(atom)+' '+str(particle.coordinates[0])+' '+\
-                          str(particle.coordinates[1])+' '+str(particle.coordinates[2]) + '\n'
+                    print('atom:'+str(atom)+' data:'+str(atom_type)+' ')
+                    line =str(atom)+' '+str(multiplier*particle.coordinates[0])+' '+\
+                          str(multiplier*particle.coordinates[1])+' '+str(multiplier*particle.coordinates[2]) + '\n'
                     f.write(line)
 
             except:
@@ -422,11 +431,11 @@ class qe_wrapper(object):
         self.celldm=[None,None,None]
         state = _ReadState.UNKNOWN
     #    BC = DataContainer()   #boundary conditions
-        CM = DataContainer()   #computational method
-        SP = DataContainer()   #System Parameters and Conditions
-        SD = DataContainer()  #state data
-        pc = Particles('quantum_espresso_particles')
-        dc = DataContainer()
+  #      CM = DataContainer()   #computational method
+        SP = self.SP   #System Parameters and Conditions
+  #      SD = DataContainer()  #state data
+        pc = self.pc
+ #       dc = DataContainer()
         with open(file_name, 'r') as f:
             line_number = 0
             file_iter = iter(f)
@@ -555,6 +564,7 @@ class qe_wrapper(object):
                 n_atoms = int(values[1])
             elif "ntyp" in line:
                 n_atom_types = int(values[1])
+                SP[CUBA.SCALING_COEFFICIENT] = n_atom_types
             elif "ecutwfc" in line:
                 ecutwfc = float(values[1])
                 SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT] = ecutwfc
@@ -678,12 +688,18 @@ class qe_wrapper(object):
             if len(particle_list):
                 pc.add_particles(particle_list)
                   #  part_container.add_particle(p)
-
+                n=self.count_particles()
+                print('n_particles='+str(n))
         except StopIteration:
             return('EOF')
 
         return pc
 
+    def count_particles(self):
+        n=0
+        for particle in self.pc.iter_particles():
+            n+=1
+        return n
 
     def test_start_qe(self,in_filename,out_filename,path_to_espresso='/usr/bin/pw.x'):
 #        name_in = './test_pw.in'
