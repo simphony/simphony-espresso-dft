@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 
-class qe_wrapper(object):
+class qe_functions(object):
     '''
     functions for reading and writing quantum espresso input and output files
     '''
