@@ -1,0 +1,19 @@
+language: python
+python:
+  - "2.7"
+
+env:
+  - SIMPHONY_VERSION=0.2.0
+  - SIMPHONY_VERSION=master
+matrix:
+  allow_failures:
+    - env: SIMPHONY_VERSION=master
+
+install:
+  - pip install -r dev_requirements.txt
+  - pip install git+https://github.com/simphony/simphony-common.git@${SIMPHONY_VERSION}#egg=simphony
+  - python setup.py develop
+
+script:
+  # - flake8 
+  - python -m unittest discover

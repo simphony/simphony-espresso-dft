@@ -3,15 +3,15 @@ __author__ = 'jeremy'
 __author__ = 'jeremy'
 
 import unittest
-import espresso_input_file_read
 import subprocess
 import logging
 import sys
+
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.core.keywords import KEYWORDS
 from simphony.cuds.particles import Particle, Particles
-import espresso_input_file_write
+from simespresso.io_QE import espresso_input_file_write
 
 class OutcomesTest(unittest.TestCase):
 
