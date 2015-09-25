@@ -11,17 +11,23 @@ from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.core.keywords import KEYWORDS
 from simphony.cuds.particles import Particle, Particles
-from simespresso.io_QE import espresso_input_file_write
+from simespresso.io_QE import espresso_class
+#import simespresso.io_QE.espresso_class
+#import io_QE.espresso_class
+
 
 class OutcomesTest(unittest.TestCase):
 
 
     def test_espresso_data_file_write(self):
-        print('starting test of data file handler')
-        espresso_input_filename = 'test_pw.in'
-        SP = DataContainer()
-        pc = Particles('quantum_espresso_particles')
+        wrp = espresso_class.qe_functions()
+        print('starting test of qe input file write')
+        espresso_input_filename = 'pw_generated.in'
+        wrp.SP = DataContainer()
+        wrp.pc = Particles('quantum_espresso_particles')
         #write parameters for a particular working input file
+        SP=wrp.SP
+        pc=wrp.pc
         SP[CUBA.TORQUE] = 'scf'  #calculation
         SP[CUBA.ZETA_POTENTIAL] = 'from_scratch' #restart_mode
         SP[CUBA.YOUNG_MODULUS] = './'  #pseudo dir
@@ -47,29 +53,27 @@ class OutcomesTest(unittest.TestCase):
         SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = [1,4,1,0,0,0] #K_POINTS
         SP[CUBA.KINEMATIC_VISCOSITY] = '(angstrom)'#ATOMIC_POSITIONS
 
-        espresso_input_file_write.WriteEspressoInputFile(espresso_input_filename,SP,pc)
-        p1 = Particle([1.0,2.0,3.0])
+        p1 = Particle([1.0* 1e-10,2.0* 1e-10,3.0* 1e-10])
         p1.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p2 = Particle([2.0,3.0,4.0])
+        p2 = Particle([2.0* 1e-10,3.0* 1e-10,4.0* 1e-10])
         p2.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p3 = Particle([3.0,4.0,5.0])
+        p3 = Particle([3.0* 1e-10,4.0* 1e-10,5.0* 1e-10])
         p3.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p4 = Particle([4.0,5.0,6.0])
+        p4 = Particle([4.0* 1e-10,5.0* 1e-10,6.0* 1e-10])
         p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
         pc.add_particles([p1,p2,p3,p4])
 
-
-        espresso_input_file_write.WriteEspressoInputFile(espresso_input_filename,SP,pc)
+        wrp.WriteEspressoInputFile(espresso_input_filename)
 
     def test_start_qe(self):
-        name_in = './test_pw.in'
-        name_out = './test_pw.out'
+        wrapper = espresso_class.qe_functions()
+        espresso_input_filename = 'pw_generated.in'
+        name_out = 'pwtest.out'
         path_to_espresso = '/usr/bin/pw.x'
-        command = 'mpirun -np 2 '+path_to_espresso+' < '+name_in +' > '+name_out
-       # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
-        subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
+        wrapper.start_qe(espresso_input_filename,name_out,path_to_espresso=path_to_espresso)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
-
-

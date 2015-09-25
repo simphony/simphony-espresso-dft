@@ -1,15 +1,15 @@
 __author__ = 'jeremy'
 
 import unittest
-import espresso_wrapper
-
+from simespresso.io_QE import espresso_class
 
 class OutcomesTest(unittest.TestCase):
 
     def test_ReadEspressoOutputFile(self):
         filename = 'xyzoutput.txt'
         print('testing parsing file '+str(filename))
-        espresso_wrapper.ReadEspressoOutputFile(filename)
+        qe_wrapper = espresso_class.qe_functions()
+        qe_wrapper.ReadEspressoOutputFile(filename)
 
 
     def test_running_index_to_node_index(self):

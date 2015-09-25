@@ -4,6 +4,7 @@ from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particle, Particles
 from simphony.cuds.lattice import Lattice
 import numpy as np
+import subprocess
 #from simphony.cuds.abstractparticles import ABCParticles
 
 import uuid
@@ -228,7 +229,7 @@ class qe_functions(object):
                 line = '&CONTROL\n'  #calculation
                 f.write(line)
                 if CUBA.TORQUE in SP:
-                    line = '\t calculation='+str(SP[CUBA.TORQUE])   #calculation
+                    line = '\t calculation='+str(SP[CUBA.TORQUE])+'\n'   #calculation
                     f.write(line)
                 if CUBA.ZETA_POTENTIAL in SP:
                     line = '\t restart_mode='+str(SP[CUBA.ZETA_POTENTIAL])+'\n' #restart_mode
@@ -701,13 +702,17 @@ class qe_functions(object):
             n+=1
         return n
 
-    def test_start_qe(self,in_filename,out_filename,path_to_espresso='/usr/bin/pw.x'):
+    def start_qe(self,name_in,name_out,path_to_espresso='/usr/bin/pw.x',mpi=False,mpi_Nprocessors=2):
 #        name_in = './test_pw.in'
 #        name_out = './test_pw.out'
         path_to_espresso = '/usr/bin/pw.x'
-        command = 'mpirun -np 2 '+path_to_espresso+' < '+name_in +' > '+name_out
+        if mpi:
+            command = 'mpirun -np '+str(mpi_Nprocessors)+' '+path_to_espresso+' < '+name_in +' > '+name_out
+        else:
+            command = path_to_espresso+' < '+name_in +' > '+name_out
+
        # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
-        print('qe wrapper attempting to run '+command)
+        print('qe wrapper attempting to run: '+command)
         subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
 
 class _ReadState(Enum):

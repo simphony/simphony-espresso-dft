@@ -3,7 +3,6 @@ __author__ = 'jeremy'
 #kohn sham
 
 
-
 import unittest
 import subprocess
 import logging
@@ -12,8 +11,7 @@ from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
 from simphony.core.keywords import KEYWORDS
 from simphony.cuds.particles import Particle, Particles
-from simespresso.io_QE import espresso_input_file_read
-                               
+from simespresso.io_QE import espresso_class
 
 class OutcomesTest(unittest.TestCase):
 
@@ -24,10 +22,8 @@ class OutcomesTest(unittest.TestCase):
 
     def test_espresso_data_file_read(self):
         print('starting test of data file handler')
-    #   What are the allowed keywords?
-    #    for kw in KEYWORDS:
-    #        print('kw:'+kw+'='+str(KEYWORDS[kw]))
-        particle_container = espresso_input_file_read.ReadEspressoInputFile(self.filename)
+        wrapper = espresso_class.qe_functions()
+        wrapper.ReadEspressoInputFile(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
         expected_atom_positions.append((1.0e-10,2.0e-10,3.0e-10))
@@ -40,11 +36,7 @@ class OutcomesTest(unittest.TestCase):
         expected_atom_species.append('C')
         i = 0
 
-        #look for the above atoms in the particle container.
-        #there is probably some intelligent way to do this but since the particle uid is
-        #generated automatically (always, afaict) I can't find a way to index the particles as they appear in the original file.
-
-        for particle in particle_container.iter_particles():
+        for particle in wrapper.pc.iter_particles():
 #            print('expected:'+str(expected_atom_positions[i])+' actual:'+str(particle))
 #            print('data:'+str(particle.data))
             for expected_atom in expected_atom_positions:
@@ -61,9 +53,8 @@ class OutcomesTest(unittest.TestCase):
                     self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE] == expected_atom_species[i])
   #                  print('cur atom matches')
                     break
-        #we expect an empty list by now since every atom should have been matched and removed from list
-        #of expect atoms
         self.assertTrue(expected_atom_positions==[])
+
 
 _data_file_contents = """&CONTROL
     calculation='scf'
