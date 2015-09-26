@@ -115,9 +115,9 @@ class qe_functions(object):
                 print('eof reached')
                 logging.warning('eof reached')
             except :
-                print("problem with line", line)
+                #print("problem with line", line)
                 logging.warning("problem with line", line)
-                raise
+                return
             #TODO skip all the atom definition lines, eg look for alphabetic characters at beginning of line
             logging.debug('skipping '+str(n_atoms)+' lines')
             for i in range(0,n_atoms+1):
