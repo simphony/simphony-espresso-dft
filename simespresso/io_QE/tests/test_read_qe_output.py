@@ -9,12 +9,12 @@ class OutcomesTest(unittest.TestCase):
 
     def test_ReadEspressoOutputFile(self):
         filename = 'pw.out'
-        print('testing parsing file '+str(filename))
+        print('testing reading of qe output file '+str(filename))
         qe_wrapper = espresso_class.qe_functions()
         qe_wrapper.ReadEspressoOutputFile(filename)
 
 
-    def test_running_index_to_node_index(self):
+    def test_running_index_to_node_inredex(self):
         print('testing espresso_data_file_read')
         n_latticepoints = [10,7,6]
         index = 5

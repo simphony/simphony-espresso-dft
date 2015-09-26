@@ -21,7 +21,7 @@ class OutcomesTest(unittest.TestCase):
             text_file.write(_data_file_contents)
 
     def test_espresso_data_file_read(self):
-        print('starting test of data file handler')
+        print('starting test of qe input file handler')
         wrapper = espresso_class.qe_functions()
         wrapper.ReadEspressoInputFile(self.filename)
         expected_atom_positions = []
