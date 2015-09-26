@@ -1,12 +1,14 @@
 __author__ = 'jeremy'
 
+
 import unittest
 from simespresso.io_QE import espresso_class
+
 
 class OutcomesTest(unittest.TestCase):
 
     def test_ReadEspressoOutputFile(self):
-        filename = 'xyzoutput.txt'
+        filename = 'pw.out'
         print('testing parsing file '+str(filename))
         qe_wrapper = espresso_class.qe_functions()
         qe_wrapper.ReadEspressoOutputFile(filename)

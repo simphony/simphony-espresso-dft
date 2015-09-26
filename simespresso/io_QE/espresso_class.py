@@ -9,6 +9,9 @@ import subprocess
 
 import uuid
 import logging
+
+import os.path
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -38,6 +41,11 @@ class qe_functions(object):
         :param file_name: name of the espresso output file
         :return:
         '''
+
+        if not(os.path.exists(file_name)):
+            logging.debug("file "+str(file_name)+" not found")
+            return(1)
+
         with open(file_name, 'r') as f:
             file_iter = iter(f)
             #first line blank
@@ -118,6 +126,8 @@ class qe_functions(object):
             logging.debug('read '+str(n_lattice_points)+' lattice point lines')
             self.read_densities(n_lattice_points,file_iter,aviz_filename='avizout.xyz')
             #put pc into dc!
+
+
 
     def running_index_to_node_index(self,index,n_latticepoints):
         node_z = index/(n_latticepoints[0]*n_latticepoints[1])
@@ -229,16 +239,16 @@ class qe_functions(object):
                 line = '&CONTROL\n'  #calculation
                 f.write(line)
                 if CUBA.TORQUE in SP:
-                    line = '\t calculation='+str(SP[CUBA.TORQUE])+'\n'   #calculation
+                    line = '\t calculation=\''+str(SP[CUBA.TORQUE])+'\'\n'   #calculation
                     f.write(line)
                 if CUBA.ZETA_POTENTIAL in SP:
-                    line = '\t restart_mode='+str(SP[CUBA.ZETA_POTENTIAL])+'\n' #restart_mode
+                    line = '\t restart_mode=\''+str(SP[CUBA.ZETA_POTENTIAL])+'\'\n' #restart_mode
                     f.write(line)
                 if CUBA.YOUNG_MODULUS in SP:
-                    line = '\t pseudo_dir='+str(SP[CUBA.YOUNG_MODULUS])+'\n'  #pseudo dir
+                    line = '\t pseudo_dir=\''+str(SP[CUBA.YOUNG_MODULUS])+'\'\n'  #pseudo dir
                     f.write(line)
                 if CUBA.VOLUME_FRACTION in SP:
-                    line = '\t prefix='+str(SP[CUBA.VOLUME_FRACTION])+'\n'  #prefix
+                    line = '\t prefix=\''+str(SP[CUBA.VOLUME_FRACTION])+'\'\n'  #prefix
                     f.write(line)
                 if CUBA.AMPHIPHILICITY in SP:
                     line = '\t tprnfor='+str(SP[CUBA.AMPHIPHILICITY])+'\n'  #tprnfor
@@ -247,7 +257,7 @@ class qe_functions(object):
                     line = '\t max_seconds='+str(int(SP[CUBA.NUMBER_OF_TIME_STEPS]))+'\n'
                     f.write(line)
                 if CUBA.DIRECTION in SP:
-                    line = '\t outdir='+str(SP[CUBA.DIRECTION])+'\n'  #outdir
+                    line = '\t outdir=\''+str(SP[CUBA.DIRECTION])+'\'\n'  #outdir
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -283,7 +293,7 @@ class qe_functions(object):
                     line = '\t ecutrho='+str(SP[CUBA.POISSON_RATIO])+'\n'
                     f.write(line)
                 if CUBA.LATTICE_SPACING in SP:
-                    line = '\t input_dft='+str(SP[CUBA.LATTICE_SPACING])+'\n'  #outdir
+                    line = '\t input_dft=\''+str(SP[CUBA.LATTICE_SPACING])+'\'\n'  #outdir
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -293,7 +303,7 @@ class qe_functions(object):
                 line = '&ELECTRONS\n'  #calculation
                 f.write(line)
                 if CUBA.SMOOTHING_LENGTH in SP:
-                    line = '\t mixing_mode='+str(SP[CUBA.SMOOTHING_LENGTH])+'\n'
+                    line = '\t mixing_mode=\''+str(SP[CUBA.SMOOTHING_LENGTH])+'\'\n'
                     f.write(line)
                 if CUBA.PHASE_INTERACTION_STRENGTH in SP:
                     line = '\t mixing_beta='+str(SP[CUBA.PHASE_INTERACTION_STRENGTH])+'\n'
@@ -447,7 +457,7 @@ class qe_functions(object):
     #                   #line = f[line_number]
                     line_number += 1
                     #DEBUG
-                    print('read line:'+str(line))
+                    logging.debug('read line:'+str(line))
                     # skip blank lines
      #               if not line.strip():
      #                   continue
@@ -505,7 +515,7 @@ class qe_functions(object):
         line = f.next()
         while _ReadState.get_state(_ReadState.CONTROL,line) == _ReadState.CONTROL:
             values = [x.strip() for x in line.split('=')]
-            print('line in control section:'+str(line))
+            logging.debug('line in control section:'+str(line))
             if "calculation" in line:
                 values = line.split('=')
                 calculation_type = values[1]
@@ -546,7 +556,7 @@ class qe_functions(object):
         line = f.next()
         while _ReadState.get_state(_ReadState.SYSTEM,line) == _ReadState.SYSTEM:
             values = [x.strip() for x in line.split('=')]
-            print('line in control section:'+str(line))
+            logging.debug('line in control section:'+str(line))
             if "ibrav" in line:  #bravais lattice index
                 ibrav = int(values[1])
                 SP[CUBA.ROLLING_FRICTION] = ibrav
@@ -584,7 +594,7 @@ class qe_functions(object):
         line = f.next()
         while _ReadState.get_state(_ReadState.ELECTRONS,line) == _ReadState.ELECTRONS:
             values = [x.strip() for x in line.split('=')]
-            print('line in electrons section:'+str(line))
+            logging.debug('line in electrons section:'+str(line))
             if "mixing_mode" in line:
                 mixing_mode = values[1]
                 SP[CUBA.SMOOTHING_LENGTH] = mixing_mode
@@ -617,7 +627,7 @@ class qe_functions(object):
         SP[CUBA.FRICTION_COEFFICIENT]=[]
         while _ReadState.get_state(_ReadState.ATOMIC_SPECIES,line) == _ReadState.ATOMIC_SPECIES:
             values = line.split()
-            print('line in atomic species section:'+str(line))
+            logging.debug('line in atomic species section:'+str(line))
     #            print('atomtypes:'+str(self.atomtypes))
 
             if len(values)>0:
@@ -661,7 +671,7 @@ class qe_functions(object):
             SP[CUBA.KINEMATIC_VISCOSITY] = units
             particle_list = []
             while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS,line) == _ReadState.ATOMIC_POSITIONS:
-                print('line in atomic positions section:'+str(line))
+                logging.debug('line in atomic positions section:'+str(line))
                 values = line.split()
                 print('values:'+str(values))
                 atom_pos = [0,0,0]

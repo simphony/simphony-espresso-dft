@@ -37,9 +37,9 @@ class OutcomesTest(unittest.TestCase):
         SP[CUBA.DIRECTION] = './' #outdir
 ###        SP[CUBA.ROLLING_FRICTION] = '.true.' #tprnfor
         SP[CUBA.ROLLING_FRICTION] = 8 #ibrav
-        SP[CUBA.ORIGINAL_POSITION] = [0,1,2] #write to celldm(1),(2),(3)
-        #write n_atoms  nat
-        #write n_atom_types  ntyp
+        SP[CUBA.ORIGINAL_POSITION] = [40,0.1,1.0] #write to celldm(1),(2),(3)
+        #write n_atoms  nat - not needed since natoms can be derived from pc
+        SP[CUBA.SCALING_COEFFICIENT] = 1 #1 atom type
         SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT] = 60.0 #ecutwfc
         SP[CUBA.POISSON_RATIO] = 240 #ecutrho
         SP[CUBA.LATTICE_SPACING] = 'vdw-df-c09' #input_dft
