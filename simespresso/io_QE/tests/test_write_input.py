@@ -62,16 +62,11 @@ class OutcomesTest(unittest.TestCase):
         p4 = Particle([4.0* 1e-10,5.0* 1e-10,6.0* 1e-10])
         p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
         pc.add_particles([p1,p2,p3,p4])
-
         wrp.WriteEspressoInputFile(espresso_input_filename)
 
-    def test_start_qe(self):
-        wrapper = espresso_class.qe_functions()
-        espresso_input_filename = 'pw_generated.in'
-        name_out = 'pwtest.out'
-        path_to_espresso = '/usr/bin/pw.x'
-        wrapper.start_qe(espresso_input_filename,name_out,path_to_espresso=path_to_espresso)
-
+    def test_espresso_ppfile_write(self,ppfilename="testpp.in"):
+        wrp = espresso_class.qe_functions()
+        wrp.WriteEspressoPPFile(self,ppfilename="testpp.in"):
 
 
 

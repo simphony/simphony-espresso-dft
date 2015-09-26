@@ -391,7 +391,7 @@ class qe_functions(object):
         plotfile = 'output.charge'
         outfile = 'density.dat'
         lines=['&inputpp',
-               'prefix =\'NANO\'',
+               'prefix =\'qe_output\'',
                'filplot=\''+plotfile+'\'',
                'plot_num=0',
                'outdir = '+outdir,

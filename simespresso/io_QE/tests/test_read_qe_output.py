@@ -2,16 +2,20 @@ __author__ = 'jeremy'
 
 
 import unittest
+import os
 from simespresso.io_QE import espresso_class
 
 
 class OutcomesTest(unittest.TestCase):
 
     def test_ReadEspressoOutputFile(self):
-        filename = 'pw.out'
-        print('testing reading of qe output file '+str(filename))
+        file_name = 'pwtest.out'
+        if not(os.path.exists(file_name)):
+            logging.debug("file "+str(file_name)+" not found")
+            return(1)
+        print('testing reading of qe output file '+str(file_name))
         qe_wrapper = espresso_class.qe_functions()
-        qe_wrapper.ReadEspressoOutputFile(filename)
+        qe_wrapper.ReadEspressoOutputFile(file_name)
 
 
     def test_running_index_to_node_inredex(self):
