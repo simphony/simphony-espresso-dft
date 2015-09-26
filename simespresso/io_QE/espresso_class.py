@@ -504,7 +504,7 @@ class qe_functions(object):
                 print('eof reached')
             except Exception:
                 print("problem with line number=", line_number, line)
-                raise
+                return
             #put pc into dc!
 
         return pc

@@ -66,7 +66,7 @@ class OutcomesTest(unittest.TestCase):
 
     def test_espresso_ppfile_write(self,ppfilename="testpp.in"):
         wrp = espresso_class.qe_functions()
-        wrp.WriteEspressoPPFile(self,ppfilename="testpp.in"):
+        wrp.WriteEspressoPPFile(self,ppfilename="testpp.in")
 
 
 
