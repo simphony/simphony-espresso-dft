@@ -11,6 +11,7 @@ class OutcomesTest(unittest.TestCase):
     def test_ReadEspressoOutputFile(self):
         file_name = 'pwtest.out'
         if not(os.path.exists(file_name)):
+            import logging
             logging.debug("file "+str(file_name)+" not found")
             return(1)
         print('testing reading of qe output file '+str(file_name))
