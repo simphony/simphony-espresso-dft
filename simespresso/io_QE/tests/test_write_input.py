@@ -1,7 +1,5 @@
 __author__ = 'jeremy'
 
-__author__ = 'jeremy'
-
 import unittest
 import subprocess
 import logging
@@ -9,7 +7,6 @@ import sys
 
 from simphony.core.data_container import DataContainer
 from simphony.core.cuba import CUBA
-from simphony.core.keywords import KEYWORDS
 from simphony.cuds.particles import Particle, Particles
 from simespresso.io_QE import espresso_class
 #import simespresso.io_QE.espresso_class
@@ -66,7 +63,7 @@ class OutcomesTest(unittest.TestCase):
 
     def test_espresso_ppfile_write(self,ppfilename="testpp.in"):
         wrp = espresso_class.qe_functions()
-        wrp.WriteEspressoPPFile(self,ppfilename="testpp.in")
+        wrp.WriteEspressoPPFile(ppfilename="testpp.in")
 
 
 
