@@ -4,7 +4,7 @@ __author__ = 'jeremy'
 import unittest
 import os
 from simespresso.io_QE import espresso_class
-
+import logging
 
 class OutcomesTest(unittest.TestCase):
 
@@ -22,6 +22,7 @@ class OutcomesTest(unittest.TestCase):
         print('testing espresso_data_file_read')
         n_latticepoints = [10,7,6]
         index = 5
+        espresso_wrapper = espresso_class.qe_functions()
         indices = espresso_wrapper.running_index_to_node_index(index,n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices==[5,0,0])
