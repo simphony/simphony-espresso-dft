@@ -23,7 +23,7 @@ class OutcomesTest(unittest.TestCase):
     def test_espresso_data_file_read(self):
         print('starting test of qe input file handler')
         wrapper = espresso_class.qe_functions()
-        wrapper.ReadEspressoInputFile(self.filename)
+        wrapper.read_espresso_input_file(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
         expected_atom_positions.append((1.0e-10,2.0e-10,3.0e-10))

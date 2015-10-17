@@ -28,7 +28,7 @@ class qe_functions(object):
 
 
 
-    def ReadEspressoOutputFile(self,file_name):
+    def read_espresso_output_file(self,file_name):
         '''
         This function parses  Espresso output files which usually will have a name like 'name.charge'.
         This file has the structure shown at http://phycomp.technion.ac.il/~sbgrosso/QE_charge_density/node18.html
@@ -222,7 +222,7 @@ class qe_functions(object):
         return charge_density
 
 
-    def WriteEspressoInputFile(self,file_name):
+    def write_espresso_input_file(self,file_name):
         """
         :param file_name: name of the input file to write
         :return:
@@ -366,7 +366,7 @@ class qe_functions(object):
                     f.write(line)
 
             except:
-                    ('error in write block of WriteEspressoInputFile')
+                    ('error in write block of write_espresso_input_file')
                     raise
         print('finished writing file')
         f.closed
@@ -382,7 +382,7 @@ class qe_functions(object):
         f.write(line)
         return
 
-    def WriteEspressoPPFile(self,ppfilename="testpp.in"):
+    def write_espresso_pp_file(self,ppfilename="testpp.in"):
         '''
         this writes an auxiliary required file determined the plot parameters
         :return:
@@ -409,7 +409,7 @@ class qe_functions(object):
                 pp.write(str(line)+'\n')
         print('finished writing file')
 
-    def ReadEspressoInputFile(self,file_name):
+    def read_espresso_input_file(self,file_name):
         """  This class parses  Espresso data files, either input or output
         (produced by the espresso command  write_data) and calls a handler
         which processes the parsed information.
@@ -778,17 +778,17 @@ if __name__ == "__main__":
 #    filename = 'xyzoutput.txt.bak'
     filename = '../../examples/input_pw.in'
     print('started parsing qe input file '+str(filename))
-    wrapper.ReadEspressoInputFile(filename)
+    wrapper.read_espresso_input_file(filename)
 
     new_inputfilename =  '../../examples/new_input_pw.in'
-    wrapper.WriteEspressoInputFile(new_inputfilename)
+    wrapper.write_espresso_input_file(new_inputfilename)
 
     ppfilename = 'testpp.in'
     print('started writing qe input file '+str(ppfilename))
-    wrapper.WriteEspressoPPFile()
+    wrapper.write_espresso_pp_file()
 
     filename = 'xyzoutput.txt'
     print('started parsing file '+str(filename))
-    wrapper.ReadEspressoOutputFile(filename)
+    wrapper.read_espresso_output_file(filename)
 
 

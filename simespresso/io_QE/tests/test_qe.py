@@ -18,7 +18,7 @@ class OutcomesTest(unittest.TestCase):
     def test_espresso_data_file_read(self):
         print('starting test of qe input file handler')
         wrapper = espresso_class.qe_functions()
-        wrapper.ReadEspressoInputFile(self.filename)
+        wrapper.read_espresso_input_file(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
         expected_atom_positions.append((1.0e-10,2.0e-10,3.0e-10))
@@ -97,14 +97,14 @@ class OutcomesTest(unittest.TestCase):
         p4 = Particle([4.0* 1e-10,5.0* 1e-10,6.0* 1e-10])
         p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
         pc.add_particles([p1,p2,p3,p4])
-        wrp.WriteEspressoInputFile(espresso_input_filename)
+        wrp.write_espresso_input_file(espresso_input_filename)
 
     def test_espresso_ppfile_write(self,ppfilename="testpp.in"):
         wrp = espresso_class.qe_functions()
-        wrp.WriteEspressoPPFile(ppfilename="testpp.in")
+        wrp.write_espresso_pp_file(ppfilename="testpp.in")
 
 
-    def test_ReadEspressoOutputFile(self):
+    def test_read_espresso_output_file(self):
         file_name = 'pwtest.out'
         if not(os.path.exists(file_name)):
             import logging
@@ -113,7 +113,7 @@ class OutcomesTest(unittest.TestCase):
             return(1)
         print('testing reading of qe output file '+str(file_name))
         qe_wrapper = espresso_class.qe_functions()
-        qe_wrapper.ReadEspressoOutputFile(file_name)
+        qe_wrapper.read_espresso_output_file(file_name)
 
 
     def test_running_index_to_node_inredex(self):

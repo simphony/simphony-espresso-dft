@@ -59,11 +59,11 @@ class OutcomesTest(unittest.TestCase):
         p4 = Particle([4.0* 1e-10,5.0* 1e-10,6.0* 1e-10])
         p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
         pc.add_particles([p1,p2,p3,p4])
-        wrp.WriteEspressoInputFile(espresso_input_filename)
+        wrp.write_espresso_input_file(espresso_input_filename)
 
     def test_espresso_ppfile_write(self,ppfilename="testpp.in"):
         wrp = espresso_class.qe_functions()
-        wrp.WriteEspressoPPFile(ppfilename="testpp.in")
+        wrp.write_espresso_pp_file(ppfilename="testpp.in")
 
 
 

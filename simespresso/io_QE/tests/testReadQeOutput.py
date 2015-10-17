@@ -8,7 +8,7 @@ import logging
 
 class OutcomesTest(unittest.TestCase):
 
-    def test_ReadEspressoOutputFile(self):
+    def test_read_espresso_output_file(self):
         file_name = 'pwtest.out'
         if not(os.path.exists(file_name)):
             import logging
@@ -17,7 +17,7 @@ class OutcomesTest(unittest.TestCase):
             return(1)
         print('testing reading of qe output file '+str(file_name))
         qe_wrapper = espresso_class.qe_functions()
-        qe_wrapper.ReadEspressoOutputFile(file_name)
+        qe_wrapper.read_espresso_output_file(file_name)
 
 
     def test_running_index_to_node_inredex(self):
