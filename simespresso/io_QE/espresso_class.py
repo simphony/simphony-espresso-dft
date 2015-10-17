@@ -524,11 +524,13 @@ class qe_functions(object):
                 SP[CUBA.ZETA_POTENTIAL] = restart_mode
             elif "pseudo_dir" in line:
                 pseudo_dir = values[1]
+                #TODO - shouldnt be in cuba , also maybe determine this from the ppfile location
                 #THIS IS A HACK . Use of YOUNG MODULUS for pseudo_dir
                 SP[CUBA.YOUNG_MODULUS] = pseudo_dir
             elif "prefix" in line:
                 prefix = values[1]
                 #THIS IS A HACK . Use of VOLUME FRACTION for prefix
+                #TODO - also shouldnt be in cuba
                 SP[CUBA.VOLUME_FRACTION] = prefix
             elif "tprnfor" in line:  #calculate forces
                 tprnfor = values[1]
