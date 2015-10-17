@@ -371,16 +371,7 @@ class qe_functions(object):
         print('finished writing file')
         f.closed
 
-    def kluge(self,f):
-        line =' C 1.0 2.0 3.0 \n'
-        f.write(line)
-        line =' C 3.0 3.0 4.0 \n'
-        f.write(line)
-        line =' C 3.0 4.0 5.0 \n'
-        f.write(line)
-        line =' C 4.0 5.0 6.0 \n'
-        f.write(line)
-        return
+
 
     def write_espresso_pp_file(self,ppfilename="testpp.in"):
         '''
