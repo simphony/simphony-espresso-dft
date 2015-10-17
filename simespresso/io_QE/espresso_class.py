@@ -715,7 +715,8 @@ class qe_functions(object):
     def start_qe(self,name_in,name_out,path_to_espresso='/usr/bin/pw.x',mpi=False,mpi_Nprocessors=2):
 #        name_in = './test_pw.in'
 #        name_out = './test_pw.out'
-        path_to_espresso = '/usr/bin/pw.x'
+        if path_to_espresso is None:
+            path_to_espresso = '/usr/bin/pw.x'   #this appears to be the default install location for espresso
         if mpi:
             command = 'mpirun -np '+str(mpi_Nprocessors)+' '+path_to_espresso+' < '+name_in +' > '+name_out
         else:
