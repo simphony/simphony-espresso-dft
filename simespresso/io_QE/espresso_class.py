@@ -516,6 +516,11 @@ class qe_functions(object):
             elif "restart_mode" in line:
                 restart_mode = values[1]
                 #THIS IS A HACK . Use of ZETA POTENTIAL for restart mode
+                #
+
+                #TODO change restart mode to check if qe was interrupted previously - should not be a cuba keyword
+                #set restart mode='restart' if qe was interrupted as described here
+                #http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp27692160
                 SP[CUBA.ZETA_POTENTIAL] = restart_mode
             elif "pseudo_dir" in line:
                 pseudo_dir = values[1]
