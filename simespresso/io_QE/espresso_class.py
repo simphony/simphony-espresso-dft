@@ -714,7 +714,8 @@ class qe_functions(object):
 #        name_in = './test_pw.in'
 #        name_out = './test_pw.out'
         if path_to_espresso is None:
-            path_to_espresso = '/usr/bin/pw.x'   #this appears to be the default install location for espresso
+    #        path_to_espresso = '/usr/bin/pw.x'   #this appears to be the default install location for espresso
+            pass #I'll assume if no path given then pw.x is on path
         if mpi:
             command = 'mpirun -np '+str(mpi_Nprocessors)+' '+path_to_espresso+' < '+name_in +' > '+name_out
         else:
