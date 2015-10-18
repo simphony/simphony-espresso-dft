@@ -48,68 +48,68 @@ class qe_functions(object):
 
         with open(file_name, 'r') as f:
             file_iter = iter(f)
-            #first line blank
-            line = file_iter.next()
 
-            #read first four lines of the header
             try:
-                    #2nd line : gridsize x,y,z twice , natoms natomtypes
-                    line = file_iter.next()
-                    logging.debug('read line2:'+str(line))
-                    values = line.split()
-                    ints = [int(val) for val in values]
-                    n_lattice_points = ints[0:3]
-                    n_atoms = ints[6]
-                    print('nlattice points:'+str(n_lattice_points)+' n_atoms:'+str(n_atoms))
+                #read first four lines of the header
+                #first line blank
+                line = file_iter.next()
+                #2nd line : gridsize x,y,z twice , natoms natomtypes
+                line = file_iter.next()
+                logging.debug('read line2:'+str(line))
+                values = line.split()
+                ints = [int(val) for val in values]
+                n_lattice_points = ints[0:3]
+                n_atoms = ints[6]
+                print('nlattice points:'+str(n_lattice_points)+' n_atoms:'+str(n_atoms))
 
-                    #3rd line : bravais lattice, celldm[0],[1],[2]
-                    line = file_iter.next()
-                    logging.debug('read line3:'+str(line))
-                    values = line.split()
-                    floats = [float(val) for val in values]
-                    bravais = int(floats[0])
-                    celldm = floats[1:4]
-    #                SP[CUBA.ORIGINAL_POSITION] = [celldm[0],celldm[1],celldm[2]]
-                    print('bravais:'+str(bravais)+' celldm:'+str(celldm))
-                    # see http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp82064
-                    if bravais == 0:
-                        Ltype = 'free'
-                    if bravais == 1:
-                        Ltype = 'cubic P(sc)'
-                    if bravais == 2:
-                        Ltype = 'cubic F(fcc)'
-                    if bravais == 3:
-                        Ltype = 'cubic I(bcc)'
-                    if bravais == 4:
-                        Ltype = 'orthorhombic'
-                    if bravais == 5:
-                        Ltype = 'trigonal'
-                    if bravais == 6:
-                        Ltype = 'tetragonal P(st)'
-                    if bravais == 7:
-                        Ltype = 'tetragonal I(bct)'
-                    if bravais == 8:
-                        Ltype = 'orthorhombic P'
-                    if bravais == 9:
-                        Ltype = 'orthorhombic bco'
-                    if bravais == 10:
-                        Ltype = 'orthorhombic fc'
-                    if bravais == 11:
-                        Ltype = 'orthorhombic bc'
-                    if bravais == 12:
-                        Ltype = 'monoclinic P unique axis c'
-                    if bravais == 13:
-                        Ltype = 'monoclinic base centered'
-                    if bravais == 14:
-                        Ltype = 'triclinic'
+                #3rd line : bravais lattice, celldm[0],[1],[2]
+                line = file_iter.next()
+                logging.debug('read line3:'+str(line))
+                values = line.split()
+                floats = [float(val) for val in values]
+                bravais = int(floats[0])
+                celldm = floats[1:4]
+#                SP[CUBA.ORIGINAL_POSITION] = [celldm[0],celldm[1],celldm[2]]
+                print('bravais:'+str(bravais)+' celldm:'+str(celldm))
+                # see http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp82064
+                if bravais == 0:
+                    Ltype = 'free'
+                if bravais == 1:
+                    Ltype = 'cubic P(sc)'
+                if bravais == 2:
+                    Ltype = 'cubic F(fcc)'
+                if bravais == 3:
+                    Ltype = 'cubic I(bcc)'
+                if bravais == 4:
+                    Ltype = 'orthorhombic'
+                if bravais == 5:
+                    Ltype = 'trigonal'
+                if bravais == 6:
+                    Ltype = 'tetragonal P(st)'
+                if bravais == 7:
+                    Ltype = 'tetragonal I(bct)'
+                if bravais == 8:
+                    Ltype = 'orthorhombic P'
+                if bravais == 9:
+                    Ltype = 'orthorhombic bco'
+                if bravais == 10:
+                    Ltype = 'orthorhombic fc'
+                if bravais == 11:
+                    Ltype = 'orthorhombic bc'
+                if bravais == 12:
+                    Ltype = 'monoclinic P unique axis c'
+                if bravais == 13:
+                    Ltype = 'monoclinic base centered'
+                if bravais == 14:
+                    Ltype = 'triclinic'
 
-                    self.L = Lattice('quantum espresso lattice',Ltype,celldm,n_lattice_points,[0,0,0])
+                self.L = Lattice('quantum espresso lattice',Ltype,celldm,n_lattice_points,[0,0,0])
 
-                    #4th line - don't care
-                    line = file_iter.next()
-                    logging.debug('read line4:'+str(line))
-                    values = line.split()
-                    floats = [float(val) for val in values]
+                #4th line - don't care
+                line = file_iter.next()
+                logging.debug('read line4:'+str(line))
+                values = line.split()
+                floats = [float(val) for val in values]
 
             except StopIteration:
                 print('eof reached')
