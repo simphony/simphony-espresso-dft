@@ -46,7 +46,7 @@ class qe_functions(object):
             logging.debug("file "+str(file_name)+" not found")
             return(1)
 
-        with open(file_name, 'r') as f:
+        with open(file_name, 'r') as f :
             file_iter = iter(f)
 
             try:
