@@ -557,7 +557,7 @@ class qe_functions(object):
             logging.debug('line in control section:'+str(line))
             if "ibrav" in line:  #bravais lattice index
                 ibrav = int(values[1])
-                SP[CUBA.ROLLING_FRICTION] = ibrav
+                SP[CUBA.ROLLING_FRICTION]  = ibrav
             elif "celldm(1)" in line:
                 self.celldm[0] = float(values[1])
     #            SP[CUBA.ORIGINAL_POSITION] = celldm[0]
