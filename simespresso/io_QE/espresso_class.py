@@ -732,8 +732,8 @@ class qe_functions(object):
         else:
             command = path_to_espresso+' < '+name_in +' > '+name_out
 
-        if not os.path.isfile(filename):
-            logging.warning(filename+' is not on path')
+        if not os.path.isfile(path_to_espresso):
+            logging.warning(path_to_espresso+' is not on path')
             return None
        # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
         print('qe wrapper attempting to run: '+command)
