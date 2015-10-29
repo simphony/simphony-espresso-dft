@@ -15,5 +15,5 @@ install:
   - python setup.py develop
 
 script:
-  - flake8
+  - flake8 .
   - python -m unittest discover
