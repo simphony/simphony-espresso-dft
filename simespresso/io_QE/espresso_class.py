@@ -243,8 +243,8 @@ class qe_functions(object):
         #write parameters for a particular working input file
 
         print('attempting to write '+file_name)
-        with open(file_name, 'w') as f:
-            try:
+        try:
+            with open(file_name, 'w') as f:
                 #CONTROL section
                 #apparently a comma is not required at the end of every line
                 line = '&CONTROL\n'  #calculation
@@ -376,9 +376,9 @@ class qe_functions(object):
                           str(multiplier*particle.coordinates[1])+' '+str(multiplier*particle.coordinates[2]) + '\n'
                     f.write(line)
 
-            except:
-                    ('error in write block of write_espresso_input_file')
-                    raise
+        except:
+                ('error in write block of write_espresso_input_file')
+                raise
         print('finished writing file')
         f.closed
 
