@@ -125,7 +125,8 @@ class qe_functions(object):
             except :
                 #print("problem with line", line)
                 if(line):
-                    logging.warning("problem with line", line)
+                    print(str(line))
+                    logging.warning("problem with line", str(line))
                 else:
                     logging.warning("no line obtained")
                 return
