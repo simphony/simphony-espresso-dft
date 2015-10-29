@@ -58,6 +58,10 @@ class qe_functions(object):
                 logging.debug('read line2:'+str(line))
                 values = line.split()
                 ints = [int(val) for val in values]
+                for val in ints:
+                    if not isinstance(val,'int'):
+                        logging.debug('got non-integer value in espresso output file line 2')
+                        return None
                 n_lattice_points = ints[0:3]
                 n_atoms = ints[6]
                 print('nlattice points:'+str(n_lattice_points)+' n_atoms:'+str(n_atoms))
@@ -66,6 +70,10 @@ class qe_functions(object):
                 line = file_iter.next()
                 logging.debug('read line3:'+str(line))
                 values = line.split()
+                for val in values:
+                    if not isinstance(val,'float') and not isinstance(val,'int'):
+                        logging.debug('got non-float, non-integer value in espresso output file line 2')
+                        return None
                 floats = [float(val) for val in values]
                 bravais = int(floats[0])
                 celldm = floats[1:4]
@@ -116,7 +124,10 @@ class qe_functions(object):
                 logging.warning('eof reached')
             except :
                 #print("problem with line", line)
-                logging.warning("problem with line", line)
+                if(line):
+                    logging.warning("problem with line", line)
+                else:
+                    logging.warning("no line obtained")
                 return
             #TODO skip all the atom definition lines, eg look for alphabetic characters at beginning of line
             logging.debug('skipping '+str(n_atoms)+' lines')
@@ -721,6 +732,9 @@ class qe_functions(object):
         else:
             command = path_to_espresso+' < '+name_in +' > '+name_out
 
+        if not os.path.isfile(filename):
+            logging.warning(filename+' is not on path')
+            return None
        # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
         print('qe wrapper attempting to run: '+command)
         #alternative would be to use subprocess.check_call()  -  however this would give the same info as the

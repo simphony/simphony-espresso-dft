@@ -9,13 +9,14 @@ import logging
 class OutcomesTest(unittest.TestCase):
 
     def test_read_espresso_output_file(self):
+
         file_name = 'pwtest.out'
+        print('testing reading of qe output file '+str(file_name))
         if not(os.path.exists(file_name)):
             import logging
          #   logging.debug("file "+str(file_name)+" not found")
             print("file "+str(file_name)+" not found")
             return(1)
-        print('testing reading of qe output file '+str(file_name))
         qe_wrapper = espresso_class.qe_functions()
         qe_wrapper.read_espresso_output_file(file_name)
 
