@@ -40,9 +40,9 @@ class qe_functions(object):
         :param file_name: name of the espresso output file
         :return:
         '''
-        if not(os.path.exists(file_name)):
-            logging.debug("file "+str(file_name)+" not found")
-            return(1)
+        if not (os.path.exists(file_name)):
+            logging.debug("file " + str(file_name) + " not found")
+            return (1)
 
         with open(file_name, 'r') as f:
             file_iter = iter(f)
@@ -52,7 +52,7 @@ class qe_functions(object):
                 line = file_iter.next()
                 # 2nd line : gridsize x,y,z twice , natoms natomtypes
                 line = file_iter.next()
-                logging.debug('read line2:'+str(line))
+                logging.debug('read line2:' + str(line))
                 values = line.split()
                 ints = [int(val) for val in values]
                 for val in ints:
@@ -66,7 +66,7 @@ class qe_functions(object):
 
                 # 3rd line : bravais lattice, celldm[0],[1],[2]
                 line = file_iter.next()
-                logging.debug('read line3:'+str(line))
+                logging.debug('read line3:' + str(line))
                 values = line.split()
                 for val in values:
                     if not isinstance(val, 'float') and not \
@@ -77,7 +77,7 @@ class qe_functions(object):
                 bravais = int(floats[0])
                 celldm = floats[1:4]
 #                SP[CUBA.ORIGINAL_POSITION] = [celldm[0],celldm[1],celldm[2]]
-                print('bravais:'+str(bravais)+' celldm:'+str(celldm))
+                print('bravais:' + str(bravais) + ' celldm:' + str(celldm))
                 # see http://www.quantum-espresso.org/
                 # wp-content/uploads/Doc/INPUT_PW.html#idp82064
                 if bravais == 0:
@@ -116,16 +116,15 @@ class qe_functions(object):
 
                 # 4th line - don't care
                 line = file_iter.next()
-                logging.debug('read line4:'+str(line))
+                logging.debug('read line4:' + str(line))
                 values = line.split()
-                floats = [float(val) for val in values]
 
             except StopIteration:
                 print('eof reached')
                 logging.warning('eof reached')
             except:
                 # print("problem with line", line)
-                if(line):
+                if (line):
                     print(str(line))
                     logging.warning("problem with line", str(line))
                 else:
@@ -134,17 +133,16 @@ class qe_functions(object):
             # TODO skip all the atom definition lines,
             # eg look for alphabetic characters at beginning of line
             logging.debug('skipping ' + str(n_atoms) + ' lines')
-            for i in range(0, n_atoms+1):
-                    line = file_iter.next()
+            for i in range(0, n_atoms + 1):
+                line = file_iter.next()
 
             logging.debug('read ' + str(n_lattice_points) +
                           ' lattice point lines')
             self.read_densities(n_lattice_points, file_iter,
                                 aviz_filename='avizout.xyz')
-            # put pc into dc!
 
     def running_index_to_node_index(self, index, n_latticepoints):
-        node_z = index/(n_latticepoints[0] * n_latticepoints[1])
+        node_z = index / (n_latticepoints[0] * n_latticepoints[1])
         node_y = (index / n_latticepoints[0]) % n_latticepoints[1]
         node_x = index % n_latticepoints[0]
         return [node_x, node_y, node_z]
@@ -208,7 +206,7 @@ class qe_functions(object):
                       .format(x_count, y_count, z_count, str(line)))
                 values = line.split()
                 charges = [float(val) for val in values]
-    #            print('charges:'+str(charges))
+                #            print('charges:'+str(charges))
 
                 for charge in charges:
                     charge_density[x_count, y_count, z_count] = charge
@@ -226,10 +224,11 @@ class qe_functions(object):
 
         except StopIteration:
             print('EOF')
-        if x_count<x_points or y_count<y_points or z_count < z_points:
+        if x_count < x_points or y_count < y_points or z_count < z_points:
             logging.debug('Got fewer points than expected:read {0} of {1} x, '
                           '{2} of {3} y, {4} of {5} z'.
-                          format(x_count, x_points, y_count, y_points, z_count, z_points))
+                          format(x_count, x_points, y_count,
+                                 y_points, z_count, z_points))
         return charge_density
 
     def write_espresso_input_file(self, file_name):
@@ -239,52 +238,50 @@ class qe_functions(object):
         """
         SP = self.SP
         pc = self.pc
-        #write parameters for a particular working input file
+        # write parameters for a particular working input file
 
-        print('attempting to write '+file_name)
+        print('attempting to write ' + file_name)
         try:
             with open(file_name, 'w') as f:
                 # CONTROL section
-                #apparently a comma is not required at the end of every line
-                line = '&CONTROL\n'  #calculation
+                # apparently a comma is not required at the end of every line
+                line = '&CONTROL\n'
                 f.write(line)
                 if CUBA.TORQUE in SP:
                     line = '\t calculation=\'' + str(SP[CUBA.TORQUE]) + '\'\n'
-                    #calculation
                     f.write(line)
                 if CUBA.ZETA_POTENTIAL in SP:
                     line = '\t restart_mode=\'' + str(SP[CUBA.ZETA_POTENTIAL]) + '\'\n'
-                    #restart_mode
+                    # restart_mode
                     f.write(line)
                 if CUBA.YOUNG_MODULUS in SP:
                     line = '\t pseudo_dir=\'' + str(SP[CUBA.YOUNG_MODULUS]) + '\'\n'
-                    #pseudo dir
+                    # pseudo dir
                     f.write(line)
                 if CUBA.VOLUME_FRACTION in SP:
                     line = '\t prefix=\'' + str(SP[CUBA.VOLUME_FRACTION]) + '\'\n'
-#prefix
+                    # prefix
                     f.write(line)
                 if CUBA.AMPHIPHILICITY in SP:
                     line = '\t tprnfor=' + str(SP[CUBA.AMPHIPHILICITY]) + '\n'
-#tprnfor
+                    # tprnfor
                     f.write(line)
                 if CUBA.NUMBER_OF_TIME_STEPS in SP:
                     line = '\t max_seconds=' + str(int(SP[CUBA.NUMBER_OF_TIME_STEPS])) + '\n'
                     f.write(line)
                 if CUBA.DIRECTION in SP:
                     line = '\t outdir=\'' + str(SP[CUBA.DIRECTION]) + '\'\n'
-#outdir
+                    # outdir
                     f.write(line)
                 line = '/\n'
                 f.write(line)
 
                 # SYSTEM section
                 line = '&SYSTEM\n'
-                #calculation
                 f.write(line)
                 if CUBA.ROLLING_FRICTION in SP:
                     line = '\t ibrav=' + str(SP[CUBA.ROLLING_FRICTION]) + '\n'
-#outdir
+                    # outdir
                     f.write(line)
                 if CUBA.ORIGINAL_POSITION in SP:
                     line = '\t celldm(1)=' + str(SP[CUBA.ORIGINAL_POSITION][0]) + '\n'
@@ -297,7 +294,7 @@ class qe_functions(object):
                 # here goes nat and ntype
                 n_atoms = self.count_particles()
                 line = '\t nat=' + str(n_atoms) + '\n'
-#outdir
+                # outdir
                 f.write(line)
                 if CUBA.SCALING_COEFFICIENT in SP:
                     line = '\t ntyp=' + str(SP[CUBA.SCALING_COEFFICIENT]) \
@@ -313,7 +310,7 @@ class qe_functions(object):
                     f.write(line)
                 if CUBA.LATTICE_SPACING in SP:
                     line = '\t input_dft=\'' + str(SP[CUBA.LATTICE_SPACING]) \
-                           +'\'\n'
+                           + '\'\n'
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -337,64 +334,62 @@ class qe_functions(object):
 
                 # IONS section
                 line = '&IONS\n'
-                #calculation
                 f.write(line)
                 line = '/\n'
                 f.write(line)
 
                 # CELL section
                 line = '&CELL\n'
-                #calculation
                 f.write(line)
                 line = '/\n'
                 f.write(line)
 
                 # CELL section
                 line = 'ATOMIC_SPECIES\n'
-                #calculation
                 f.write(line)
 
-                #ATOMIC SPECIES
+                # ATOMIC SPECIES
                 if CUBA.CHEMICAL_SPECIE in SP:
-                    for i in range(0,len(SP[CUBA.CHEMICAL_SPECIE])):
-                        line = '\t'+str(SP[CUBA.CHEMICAL_SPECIE][i])+' '+\
-                               str(SP[CUBA.MASS][i])+' '+str(SP[CUBA.FRICTION_COEFFICIENT][i])+'\n'
+                    for i in range(0, len(SP[CUBA.CHEMICAL_SPECIE])):
+                        line = '\t' + str(SP[CUBA.CHEMICAL_SPECIE][i]) + ' ' + \
+                               str(SP[CUBA.MASS][i]) + ' ' + str(SP[CUBA.FRICTION_COEFFICIENT][i]) + '\n'
                         f.write(line)
                 line = '\n'
                 f.write(line)
 
-#K POINTS
+                # K POINTS
                 if CUBA.PROBABILITY_COEFFICIENT in SP:
-                    line ='K_POINTS '+str(SP[CUBA.PROBABILITY_COEFFICIENT])+'\n'
+                    line = 'K_POINTS ' + str(SP[CUBA.PROBABILITY_COEFFICIENT]) + '\n'
                     f.write(line)
                 if CUBA.EQUATION_OF_STATE_COEFFICIENT in SP:
                     line = ''
                     for k_point in SP[CUBA.EQUATION_OF_STATE_COEFFICIENT]:
-                        line = line+str(k_point)+' '
+                        line = line + str(k_point) + ' '
                     f.write(line)
                 f.write('\n\n')
 
                 if CUBA.KINEMATIC_VISCOSITY in SP:
-                    line ='ATOMIC_POSITIONS '+str(SP[CUBA.KINEMATIC_VISCOSITY])+'\n'
+                    line = 'ATOMIC_POSITIONS ' + str(SP[CUBA.KINEMATIC_VISCOSITY]) + '\n'
                     f.write(line)
 
                 multiplier = 10 ** 10
-                #QE wants coords. in Angstroms
+                # QE wants coords. in Angstroms
                 for particle in pc.iter_particles():
                     atom_type = particle.data
                     #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
                     atom = atom_type[CUBA.CHEMICAL_SPECIE]
-                    print('atom:'+str(atom)+' data:'+str(atom_type)+' ')
-                    line =str(atom)+' '+str(multiplier*particle.coordinates[0])+' '+\
-                          str(multiplier*particle.coordinates[1])+' '+str(multiplier*particle.coordinates[2]) + '\n'
+                    print('atom:' + str(atom) + ' data:' + str(atom_type) + ' ')
+                    line = str(atom) + ' ' + str(multiplier * particle.coordinates[0]) + ' ' + \
+                           str(multiplier * particle.coordinates[1]) + ' ' + \
+                           str(multiplier * particle.coordinates[2]) + '\n'
                     f.write(line)
         except:
-                ('error in write block of write_espresso_input_file')
-                raise
+            ('error in write block of write_espresso_input_file')
+            raise
         print('finished writing file')
         f.closed
 
-    def write_espresso_pp_file(self,ppfilename="testpp.in"):
+    def write_espresso_pp_file(self, ppfilename="testpp.in"):
         '''
         this writes an auxiliary required file determined the plot parameters
         :return:
@@ -403,25 +398,25 @@ class qe_functions(object):
         plotfile = 'output.charge'
         outfile = 'density.dat'
         lines = ['&inputpp',
-               'prefix =\'qe_output\'',
-               'filplot=\''+plotfile+'\'',
-               'plot_num=0',
-               'outdir = '+outdir,
-               '/',
-                '&plot',
-               'nfile = 1',
-                'filepp(1) = \''+plotfile+'\'',
-               'weight(1) = 1.0',
-                'iflag = 3',
-                'output_format = 6',
-                'fileout = \''+outfile+'\''  ]
-        with open(ppfilename,'w') as pp:
+                 'prefix =\'qe_output\'',
+                 'filplot=\'' + plotfile + '\'',
+                 'plot_num=0',
+                 'outdir = ' + outdir,
+                 '/',
+                 '&plot',
+                 'nfile = 1',
+                 'filepp(1) = \'' + plotfile + '\'',
+                 'weight(1) = 1.0',
+                 'iflag = 3',
+                 'output_format = 6',
+                 'fileout = \'' + outfile + '\'']
+        with open(ppfilename, 'w') as pp:
             for line in lines:
-                print'line:'+str(line)
-                pp.write(str(line)+'\n')
+                print'line:' + str(line)
+                pp.write(str(line) + '\n')
         print('finished writing file')
 
-    def read_espresso_input_file(self,file_name):
+    def read_espresso_input_file(self, file_name):
         """  This class parses  Espresso data files, either input or output
         (produced by the espresso command  write_data) and calls a handler
         which processes the parsed information.
@@ -450,50 +445,51 @@ class qe_functions(object):
             SP[CUBA.AMPHIPHILICITY] = tprnfor
             SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
             SP[CUBA.OUTDIR] = outdir
+        file_name : name of qe input file
             """
-        self.celldm=[None,None,None]
+        self.celldm = [None, None, None]
         state = _ReadState.UNKNOWN
-    #    BC = DataContainer()   #boundary conditions
-  #      CM = DataContainer()   #computational method
-        SP = self.SP   #System Parameters and Conditions
-  #      SD = DataContainer()  #state data
+        #       BC = DataContainer()   #boundary conditions
+        #       CM = DataContainer()   #computational method
+        SP = self.SP  # System Parameters and Conditions
+        #       SD = DataContainer()  #state data
         pc = self.pc
- #       dc = DataContainer()
+        #       dc = DataContainer()
         with open(file_name, 'r') as f:
             line_number = 0
             file_iter = iter(f)
             line = file_iter.next()
             try:
                 while line is not None:
-                    #file_iter.hasnext():
-    #                   #line = f[line_number]
+                    #                   file_iter.hasnext():
+                    #                   line = f[line_number]
                     line_number += 1
-                    #DEBUG
-                    logging.debug('read line:'+str(line))
+                    # DEBUG
+                    logging.debug('read line:' + str(line))
                     # skip blank lines
-     #               if not line.strip():
-     #                   continue
+                    #                   if not line.strip():
+                    #                       continue
 
-                    state = _ReadState.get_state(state,line)
+                    state = _ReadState.get_state(state, line)
                     if state is _ReadState.CONTROL:
                         print('reading control section')
-                        line = self.process_control(file_iter,SP)
+                        line = self.process_control(file_iter, SP)
                         continue
                     elif state is _ReadState.SYSTEM:
                         print('reading system')
-                        line = self.process_system(file_iter,SP)
+                        line = self.process_system(file_iter, SP)
                         continue
                     elif state is _ReadState.ELECTRONS:
                         print('reading electrons')
-                        line = self.process_electrons(file_iter,SP)
+                        line = self.process_electrons(file_iter, SP)
                         continue
                     elif state is _ReadState.IONS:
                         print('reading ions')
-                        line = self.process_ions(file_iter,SP)
+                        line = self.process_ions(file_iter, SP)
                         continue
                     elif state is _ReadState.CELL:
                         print('reading ions')
-                        line = self.process_ions(file_iter,SP)
+                        line = self.process_ions(file_iter, SP)
                         continue
                     elif state is _ReadState.ATOMIC_SPECIES:
                         print('reading atomic species')
@@ -510,13 +506,13 @@ class qe_functions(object):
                         pc = self.process_atomic_positions(file_iter, pc, SP, units=values[1])
                     break
 
-                    line = file_iter.next()
+                #                    line = file_iter.next()
             except StopIteration:
                 print('eof reached')
             except Exception:
                 print("problem with line number=", line_number, line)
                 return
-#put pc into dc!
+            # put pc into dc!
         return pc
 
     def process_control(self, f, SP):
@@ -524,52 +520,52 @@ class qe_functions(object):
         line = f.next()
         while _ReadState.get_state(_ReadState.CONTROL, line) == _ReadState.CONTROL:
             values = [x.strip() for x in line.split('=')]
-            logging.debug('line in control section:'+str(line))
+            logging.debug('line in control section:' + str(line))
             if "calculation" in line:
                 values = line.split('=')
                 calculation_type = values[1]
-                #THIS IS A HACK . Use of ZETA POTENTIAL for calculation_type is because attempts to use
-                #CUBAExtension were unsuccessful.
+                # THIS IS A HACK . Use of ZETA POTENTIAL for calculation_type is because attempts to use
+                # CUBAExtension were unsuccessful.
                 SP[CUBA.TORQUE] = calculation_type
             elif "restart_mode" in line:
                 restart_mode = values[1]
                 # TODO change restart mode to check if qe was interrupted previously - should not be a cuba keyword
                 # set restart mode='restart' if qe was interrupted as described here
-                #http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp27692160
+                # http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp27692160
                 SP[CUBA.ZETA_POTENTIAL] = restart_mode
             elif "pseudo_dir" in line:
                 pseudo_dir = values[1]
                 # TODO - shouldnt be in cuba , also maybe determine this from the ppfile location
-#THIS IS A HACK . Use of YOUNG MODULUS for pseudo_dir
+                # THIS IS A HACK . Use of YOUNG MODULUS for pseudo_dir
                 SP[CUBA.YOUNG_MODULUS] = pseudo_dir
             elif "prefix" in line:
                 prefix = values[1]
-                #THIS IS A HACK . Use of VOLUME FRACTION for prefix
-#TODO - also shouldnt be in cuba
+                # THIS IS A HACK . Use of VOLUME FRACTION for prefix
+                # TODO - also shouldnt be in cuba
                 SP[CUBA.VOLUME_FRACTION] = prefix
-            elif "tprnfor" in line:  # calculate forces
+            elif "tprnfor" in line:
                 tprnfor = values[1]
-#THIS IS A HACK . Using AMPHILICITY for tprnfor
+                # THIS IS A HACK . Using AMPHILICITY for tprnfor
                 SP[CUBA.AMPHIPHILICITY] = tprnfor
             elif "max_seconds" in line:
                 max_seconds = float(values[1])
-#THIS IS A HACK . Using NUMBER_OF_TIME_STEPS for max_seconds
+                # THIS IS A HACK . Using NUMBER_OF_TIME_STEPS for max_seconds
                 SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
             elif "outdir" in line:
                 outdir = values[1]
-#THIS IS A HACK . Using DIRECTION for outdir
+                # THIS IS A HACK . Using DIRECTION for outdir
                 SP[CUBA.DIRECTION] = outdir
 
             line = f.next()
         return line
 
-    def process_system(self,f,SP):
-        self.celldm=[None, None, None]
+    def process_system(self, f, SP):
+        self.celldm = [None, None, None]
         print('processing system section')
         line = f.next()
-        while _ReadState.get_state(_ReadState.SYSTEM,line) == _ReadState.SYSTEM:
+        while _ReadState.get_state(_ReadState.SYSTEM, line) == _ReadState.SYSTEM:
             values = [x.strip() for x in line.split('=')]
-            logging.debug('line in control section:'+str(line))
+            logging.debug('line in control section:' + str(line))
             if "ibrav" in line:
                 ibrav = int(values[1])
                 SP[CUBA.ROLLING_FRICTION] = ibrav
@@ -593,7 +589,8 @@ class qe_functions(object):
                 ecutwfc = float(values[1])
                 SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT] = ecutwfc
             elif "ecutrho" in line:
-                ecutrho = float(values[1]) #maybe int
+                ecutrho = float(values[1])
+                # maybe int
                 SP[CUBA.POISSON_RATIO] = ecutrho
             elif "input_dft" in line:
                 input_dft = values[1]
@@ -604,9 +601,9 @@ class qe_functions(object):
     def process_electrons(self, f, SP):
         print('processing eletrons section')
         line = f.next()
-        while _ReadState.get_state(_ReadState.ELECTRONS,line) == _ReadState.ELECTRONS:
+        while _ReadState.get_state(_ReadState.ELECTRONS, line) == _ReadState.ELECTRONS:
             values = [x.strip() for x in line.split('=')]
-            logging.debug('line in electrons section:'+str(line))
+            logging.debug('line in electrons section:' + str(line))
             if "mixing_mode" in line:
                 mixing_mode = values[1]
                 SP[CUBA.SMOOTHING_LENGTH] = mixing_mode
@@ -614,20 +611,21 @@ class qe_functions(object):
                 mixing_beta = float(values[1])
                 SP[CUBA.PHASE_INTERACTION_STRENGTH] = mixing_beta
             elif "conv_thr" in line:
-                conv_thr = values[1] #numbers like 1.0d-7 might have to be converted to float
+                conv_thr = values[1]
+                # numbers like 1.0d-7 might have to be converted to float
                 SP[CUBA.DEBYE_LENGTH] = conv_thr
             line = f.next()
         return line
 
     def process_ions(self, f, SP):
         print('processing ions section')
-        line = f.next()
+        f.next()
         line = f.next()
         return line
 
     def process_cell(self, f, SP):
         print('processing cell section')
-        line = f.next()
+        f.next()
         line = f.next()
         return line
 
@@ -642,10 +640,10 @@ class qe_functions(object):
             logging.debug('line in atomic species section:' + str(line))
 #            print('atomtypes:'+str(self.atomtypes))
 
-            if len(values)>0:
+            if len(values) > 0:
                 if values[0] in atomtypes:
-                    print("atom type:"+values[0])
-#self.dc(CHEMICAL_SPECIE = values[0])
+                    print("atom type:" + values[0])
+                    # self.dc(CHEMICAL_SPECIE = values[0])
                     SP[CUBA.CHEMICAL_SPECIE].append(values[0])
                     mass = float(values[1])
                     SP[CUBA.MASS].append(mass)
@@ -654,52 +652,54 @@ class qe_functions(object):
             line = f.next()
         return line
 
-    def process_k_points(self,f,SP,mode='automatic'):
-        #skip line
+    def process_k_points(self, f, SP, mode='automatic'):
+        # skip line
         print('processing k_points section')
         line = f.next()
-    #    SP[CUBAExtension.K_POINTS_MODE] = mode
+        #    SP[CUBAExtension.K_POINTS_MODE] = mode
         i = 0
 
         SP[CUBA.PROBABILITY_COEFFICIENT] = mode
 
-        while _ReadState.get_state(_ReadState.K_POINTS,line) == _ReadState.K_POINTS:
-    #        print('line:'+str(line))
+        while _ReadState.get_state(_ReadState.K_POINTS, line) == _ReadState.K_POINTS:
+            #        print('line:'+str(line))
             values = line.split()
             if len(values):
                 K_points = (values)
-                print('k points:'+str(K_points))
+                print('k points:' + str(K_points))
                 SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = K_points
 
             line = f.next()
         return line
 
-    #I am not sure whether to use datacontainer or particlecontainer - maybe PC goes in DC?
     def process_atomic_positions(self, f, pc, SP, units='(angstrom)'):
         print('processing atomic_positions section')
         try:
             line = f.next()
             SP[CUBA.KINEMATIC_VISCOSITY] = units
             particle_list = []
-            while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS,line) == _ReadState.ATOMIC_POSITIONS:
-                logging.debug('line in atomic positions section:'+str(line))
+            while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS, line) \
+                    == _ReadState.ATOMIC_POSITIONS:
+                logging.debug('line in atomic positions section:' + str(line))
                 values = line.split()
-                print('values:'+str(values))
+                print('values:' + str(values))
                 atom_pos = [0, 0, 0]
                 i = 0
                 if values[0] in atomtypes:
                     atomtype = values[0]
                     atom_id = i
-                    atom_pos[0] = float(values[1]) * 1e-10  #store position in meters; original in Angstrom
+                    # store position in meters; original in Angstrom
+                    atom_pos[0] = float(values[1]) * 1e-10
                     atom_pos[1] = float(values[2]) * 1e-10
                     atom_pos[2] = float(values[3]) * 1e-10
                     s = str(i)
-                    #make uid using string of index
-                    #uidstring =
-                    #uid = uuid.UUID(uidstring)
+                    # make uid using string of index
+                    # uidstring =
+                    # uid = uuid.UUID(uidstring)
 
-                    p = Particle([atom_pos[0],atom_pos[1],atom_pos[2]])  #,uuid.UUID(int=i)
-                    print('uid:'+str(p.uid))
+                    p = Particle([atom_pos[0], atom_pos[1], atom_pos[2]])
+                    # ,uuid.UUID(int=i)
+                    print('uid:' + str(p.uid))
                     p.data[CUBA.CHEMICAL_SPECIE] = atomtype
                     particle_list.append(p)
                     try:
@@ -709,38 +709,39 @@ class qe_functions(object):
                         break
             if len(particle_list):
                 pc.add_particles(particle_list)
-                  #  part_container.add_particle(p)
-                n=self.count_particles()
-                print('n_particles='+str(n))
+                #  part_container.add_particle(p)
+                n = self.count_particles()
+                print('n_particles=' + str(n))
         except StopIteration:
-            return('EOF')
+            return ('EOF')
 
         return pc
 
     def count_particles(self):
-        n=0
+        n = 0
         for particle in self.pc.iter_particles():
-            n+=1
+            n += 1
         return n
 
-    def start_qe(self,name_in,name_out,path_to_espresso='/usr/bin/pw.x',mpi=False,mpi_Nprocessors=2):
+    def start_qe(self, name_in, name_out, path_to_espresso='/usr/bin/pw.x', mpi=False, mpi_Nprocessors=2):
 #        name_in = './test_pw.in'
 #        name_out = './test_pw.out'
         if path_to_espresso is None:
-    #        path_to_espresso = '/usr/bin/pw.x'   #this appears to be the default install location for espresso
-            pass #I'll assume if no path given then pw.x is on path
+            #        path_to_espresso = '/usr/bin/pw.x'   #this appears to be the default install location for espresso
+            pass
+        # I'll assume if no path given then pw.x is on path
         if mpi:
-            command = 'mpirun -np '+str(mpi_Nprocessors)+' '+path_to_espresso+' < '+name_in +' > '+name_out
+            command = 'mpirun -np ' + str(mpi_Nprocessors) + ' ' + path_to_espresso + ' < ' + name_in + ' > ' + name_out
         else:
-            command = path_to_espresso+' < '+name_in +' > '+name_out
+            command = path_to_espresso + ' < ' + name_in + ' > ' + name_out
 
         if not os.path.isfile(path_to_espresso):
-            logging.warning(path_to_espresso+' is not on path')
+            logging.warning(path_to_espresso + ' is not on path')
             return None
-       # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
-        print('qe wrapper attempting to run: '+command)
-        #alternative would be to use subprocess.check_call()  -  however this would give the same info as the
-        # try/except, while taking twice as long in the case of success, iiuc
+        # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
+print('qe wrapper attempting to run: ' + command)
+# alternative would be to use subprocess.check_call()  -  however this would give the same info as the
+# try/except, while taking twice as long in the case of success, iiuc
         try:
             subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
         except:
@@ -749,14 +750,14 @@ class qe_functions(object):
 
 class _ReadState(Enum):
     UNKNOWN, UNSUPPORTED, \
-        CONTROL,\
-        SYSTEM, \
-        ELECTRONS, \
-        IONS, \
-        CELL, \
-        ATOMIC_SPECIES, \
-        K_POINTS, \
-        ATOMIC_POSITIONS = range(10)
+    CONTROL, \
+    SYSTEM, \
+    ELECTRONS, \
+    IONS, \
+    CELL, \
+    ATOMIC_SPECIES, \
+    K_POINTS, \
+    ATOMIC_POSITIONS = range(10)
 
     @staticmethod
     def get_state(current_state, line):
@@ -780,7 +781,7 @@ class _ReadState(Enum):
             new_state = _ReadState.K_POINTS
         elif "ATOMIC_POSITIONS" in line:
             new_state = _ReadState.ATOMIC_POSITIONS
-  #      print('current state:'+str(new_state))
+        #      print('current state:'+str(new_state))
         return new_state
 
 atomtypes = ["C", "H", "He", "N", "O", "Na", "Mg"]
@@ -789,16 +790,16 @@ if __name__ == "__main__":
     wrapper = qe_wrapper()
 #    filename = 'xyzoutput.txt.bak'
     filename = '../../examples/input_pw.in'
-    print('started parsing qe input file '+str(filename))
+    print('started parsing qe input file ' + str(filename))
     wrapper.read_espresso_input_file(filename)
 
-    new_inputfilename =  '../../examples/new_input_pw.in'
+    new_inputfilename = '../../examples/new_input_pw.in'
     wrapper.write_espresso_input_file(new_inputfilename)
 
     ppfilename = 'testpp.in'
-    print('started writing qe input file '+str(ppfilename))
+    print('started writing qe input file ' + str(ppfilename))
     wrapper.write_espresso_pp_file()
 
     filename = 'xyzoutput.txt'
-    print('started parsing file '+str(filename))
+    print('started parsing file ' + str(filename))
     wrapper.read_espresso_output_file(filename)
