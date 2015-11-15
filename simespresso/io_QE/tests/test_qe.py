@@ -42,7 +42,7 @@ class OutcomesTest(unittest.TestCase):
                 match = True
                 for dimension in range(0, 3):
                     if(expected_atom[dimension] !=
-                           particle.coordinates[dimension]):
+                            particle.coordinates[dimension]):
                         match = False
                         # print('no match:'+str(expected_atom[dimension])+
                         # '!='+str(particle.coordinates[dimension]))
