@@ -50,26 +50,27 @@ class qe_functions(object):
             try:
                 # read first four lines of the header - first line blank
                 line = file_iter.next()
-                #2nd line : gridsize x,y,z twice , natoms natomtypes
+                # 2nd line : gridsize x,y,z twice , natoms natomtypes
                 line = file_iter.next()
                 logging.debug('read line2:'+str(line))
                 values = line.split()
                 ints = [int(val) for val in values]
                 for val in ints:
                     if not isinstance(val, 'int'):
-                        logging.debug('got non-integer value in espresso output file line 2')
+                        logging.debug('got non-integer value in output file line 2')
                         return None
                 n_lattice_points = ints[0:3]
                 n_atoms = ints[6]
-                print('nlattice points:'+str(n_lattice_points)+' n_atoms:'+str(n_atoms))
+                print('n_points:' + str(n_lattice_points) + ' n_atoms:' + str(n_atoms))
 
                 #3rd line : bravais lattice, celldm[0],[1],[2]
                 line = file_iter.next()
                 logging.debug('read line3:'+str(line))
                 values = line.split()
                 for val in values:
-                    if not isinstance(val,'float') and not isinstance(val,'int'):
-                        logging.debug('got non-float, non-integer value in espresso output file line 2')
+                    if not isinstance(val, 'float') and not \
+                            isinstance(val, 'int'):
+                        logging.debug('got non-float/integer value line 2')
                         return None
                 floats = [float(val) for val in values]
                 bravais = int(floats[0])
@@ -108,7 +109,8 @@ class qe_functions(object):
                 if bravais == 14:
                     Ltype = 'triclinic'
 
-                self.L = Lattice('quantum espresso lattice',Ltype,celldm,n_lattice_points,[0,0,0])
+                self.L = Lattice('quantum espresso lattice',
+                                 Ltype, celldm, n_lattice_points, [0, 0, 0])
 
                 #4th line - don't care
                 line = file_iter.next()
