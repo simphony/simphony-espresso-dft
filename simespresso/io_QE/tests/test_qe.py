@@ -33,24 +33,24 @@ class OutcomesTest(unittest.TestCase):
         i = 0
 
         for particle in wrapper.pc.iter_particles():
-            #print('expected:'+str(expected_atom_positions[i])+
+            # print('expected:'+str(expected_atom_positions[i])+
             # ' actual:'+str(particle))
-            #print('data:'+str(particle.data))
+            # print('data:'+str(particle.data))
             for expected_atom in expected_atom_positions:
-                #print('cur atom '+str(expected_atom)+
+                # print('cur atom '+str(expected_atom)+
                 # ' trying to match '+str(particle.coordinates))
                 match = True
                 for dimension in range(0,3):
                     if(expected_atom[dimension]!=particle.coordinates[dimension]):
                         match = False
-                        #print('no match:'+str(expected_atom[dimension])+
+                        # print('no match:'+str(expected_atom[dimension])+
                         # '!='+str(particle.coordinates[dimension]))
                         break
 
                 if match == True:
                     expected_atom_positions.remove(expected_atom)
                     self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE] == expected_atom_species[i])
-                    #print('cur atom matches')
+                    # print('cur atom matches')
                     break
         self.assertTrue(expected_atom_positions == [])
 
@@ -76,8 +76,7 @@ class OutcomesTest(unittest.TestCase):
         SP[CUBA.NUMBER_OF_TIME_STEPS] = 82000
         # max_seconds
         SP[CUBA.DIRECTION] = './'
-#outdir
-        ###        SP[CUBA.ROLLING_FRICTION] = '.true.' #tprnfor
+        # SP[CUBA.ROLLING_FRICTION] = '.true.' #tprnfor
         SP[CUBA.ROLLING_FRICTION] = 8
         # ibrav
         SP[CUBA.ORIGINAL_POSITION] = [40, 0.1, 1.0]
@@ -94,14 +93,14 @@ class OutcomesTest(unittest.TestCase):
         SP[CUBA.SMOOTHING_LENGTH] = 'local-TF'
         # mixing_mode
         SP[CUBA.PHASE_INTERACTION_STRENGTH] = 0.8
-#mixing_beta
+        # mixing_beta
         SP[CUBA.DEBYE_LENGTH] = '1.0d-7'
-#conv_thr
+        # conv_thr
         SP[CUBA.CHEMICAL_SPECIE] = ['C']
         SP[CUBA.MASS] = [12.0107]
         SP[CUBA.FRICTION_COEFFICIENT] = ['06-C.GGA.fhi.UPF']
-        SP[CUBA.PROBABILITY_COEFFICIENT] = 'automatic' #mode
-        SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = [1, 4, 1, 0, 0, 0]  #K_POINTS
+        SP[CUBA.PROBABILITY_COEFFICIENT] = 'automatic' # mode
+        SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = [1, 4, 1, 0, 0, 0]  # K_POINTS
         SP[CUBA.KINEMATIC_VISCOSITY] = '(angstrom)'  # ATOMIC_POSITIONS
 
         p1 = Particle([1.0* 1e-10, 2.0* 1e-10, 3.0* 1e-10])
@@ -122,7 +121,7 @@ class OutcomesTest(unittest.TestCase):
     def test_read_espresso_output_file(self):
         file_name = 'pwtest.out'
         if not(os.path.exists(file_name)):
-#   logging.debug("file "+str(file_name)+" not found")
+        # logging.debug("file "+str(file_name)+" not found")
             print("file "+str(file_name)+" not found")
             return(1)
         print('testing reading of qe output file '+str(file_name))
