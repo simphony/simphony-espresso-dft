@@ -580,7 +580,7 @@ class qe_functions(object):
         print('processing system section')
         line = f.next()
         while _ReadState.get_state(_ReadState.SYSTEM, line) == \
-            _ReadState.SYSTEM:
+                _ReadState.SYSTEM:
             values = [x.strip() for x in line.split('=')]
             logging.debug('line in control section:' + str(line))
             if "ibrav" in line:
@@ -745,12 +745,8 @@ class qe_functions(object):
         return n
 
     def start_qe(self, name_in, name_out, path_to_espresso='/usr/bin/pw.x',
-        mpi=False, mpi_Nprocessors=2):
-#        name_in = './test_pw.in'
-#        name_out = './test_pw.out'
+            mpi=False, mpi_Nprocessors=2):
         if path_to_espresso is None:
-#        path_to_espresso = '/usr/bin/pw.x'
-# #this appears to be the default install location for espresso
             pass
 # I'll assume if no path given then pw.x is on path
         if mpi:
@@ -763,31 +759,23 @@ class qe_functions(object):
             return None
 # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
 print('qe wrapper attempting to run: ' + command)
-# alternative would be to use subprocess.check_call()  -  however this would give the same info as the
+# alternative would be to use subprocess.check_call()  -
+# however this would give the same info as the
 # try/except, while taking twice as long in the case of success, iiuc
         try:
-            subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
+            subprocess.Popen(command, shell=True,
+                             stdout=subprocess.PIPE).stdout.read()
         except:
             e = sys.exc_info()[0]
             print("<p>Error: %s</p>" % e)
 
 class _ReadState(Enum):
-    UNKNOWN, UNSUPPORTED, \
-    CONTROL, \
-    SYSTEM, \
-    ELECTRONS, \
-    IONS, \
-    CELL, \
-    ATOMIC_SPECIES, \
-    K_POINTS, \
-    ATOMIC_POSITIONS = range(10)
+    UNKNOWN, UNSUPPORTED, CONTROL, SYSTEM, ELECTRONS, IONS, CELL, \
+    ATOMIC_SPECIES, K_POINTS, ATOMIC_POSITIONS = range(10)
 
     @staticmethod
     def get_state(current_state, line):
-        """ Reads line and returns state
-        """
         new_state = current_state
-
         if "&CONTROL" in line:
             new_state = _ReadState.CONTROL
         elif "&SYSTEM" in line:
