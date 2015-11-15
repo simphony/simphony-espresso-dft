@@ -5,16 +5,10 @@ from simphony.cuds.particles import Particle, Particles
 from simphony.cuds.lattice import Lattice
 import numpy as np
 import subprocess
-
-
-
 import logging
-
 import os.path
 
 logging.basicConfig(level=logging.DEBUG)
-
-
 
 class qe_functions(object):
     '''
@@ -24,8 +18,6 @@ class qe_functions(object):
     def __init__(self):
         self.SP = DataContainer()   #System Parameters and Conditions
         self.pc =  Particles('quantum_espresso_particles')
-
-
 
     def read_espresso_output_file(self,file_name):
         '''
@@ -46,7 +38,6 @@ class qe_functions(object):
         :param file_name: name of the espresso output file
         :return:
         '''
-
         if not(os.path.exists(file_name)):
             logging.debug("file "+str(file_name)+" not found")
             return(1)
@@ -142,8 +133,6 @@ class qe_functions(object):
             logging.debug('read '+str(n_lattice_points)+' lattice point lines')
             self.read_densities(n_lattice_points,file_iter,aviz_filename='avizout.xyz')
             #put pc into dc!
-
-
 
     def running_index_to_node_index(self,index,n_latticepoints):
         node_z = index/(n_latticepoints[0]*n_latticepoints[1])
@@ -300,8 +289,6 @@ class qe_functions(object):
                     line = '\t ntyp='+str(SP[CUBA.SCALING_COEFFICIENT])+'\n'  #outdir
                     f.write(line)
 
-
-
                 if CUBA.LN_OF_RESTITUTION_COEFFICIENT in SP:
                     line = '\t ecutwfc='+str(SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT])+'\n'
                     f.write(line)
@@ -380,14 +367,11 @@ class qe_functions(object):
                     line =str(atom)+' '+str(multiplier*particle.coordinates[0])+' '+\
                           str(multiplier*particle.coordinates[1])+' '+str(multiplier*particle.coordinates[2]) + '\n'
                     f.write(line)
-
         except:
                 ('error in write block of write_espresso_input_file')
                 raise
         print('finished writing file')
         f.closed
-
-
 
     def write_espresso_pp_file(self,ppfilename="testpp.in"):
         '''
@@ -513,9 +497,7 @@ class qe_functions(object):
                 print("problem with line number=", line_number, line)
                 return
             #put pc into dc!
-
         return pc
-
 
     def process_control(self,f,SP):
         print('processing control section')
@@ -602,7 +584,6 @@ class qe_functions(object):
             line = f.next()
         return line
 
-
     def process_electrons(self,f,SP):
         print('processing eletrons section')
         line = f.next()
@@ -675,7 +656,6 @@ class qe_functions(object):
 
             line = f.next()
         return line
-
 
     #I am not sure whether to use datacontainer or particlecontainer - maybe PC goes in DC?
     def process_atomic_positions(self,f,pc,SP,units='(angstrom)'):
@@ -786,10 +766,7 @@ class _ReadState(Enum):
   #      print('current state:'+str(new_state))
         return new_state
 
-
 atomtypes = ["C","H","He","N","O","Na","Mg"]
-
-
 
 if __name__ == "__main__":
     wrapper = qe_wrapper()
@@ -808,5 +785,3 @@ if __name__ == "__main__":
     filename = 'xyzoutput.txt'
     print('started parsing file '+str(filename))
     wrapper.read_espresso_output_file(filename)
-
-
