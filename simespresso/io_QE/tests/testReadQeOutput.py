@@ -24,7 +24,7 @@ class OutcomesTest(unittest.TestCase):
         index = 5
         espresso_wrapper = espresso_class.qe_functions()
         indices = espresso_wrapper.running_index_to_node_index(index,
-            n_latticepoints)
+                    n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [5, 0, 0])
 
