@@ -1,10 +1,10 @@
 __author__ = 'jeremy'
 
-
-import unittest
 import os
+import unittest
+
 from simespresso.io_QE import espresso_class
-import logging
+
 
 class OutcomesTest(unittest.TestCase):
 
@@ -13,13 +13,10 @@ class OutcomesTest(unittest.TestCase):
         file_name = 'pwtest.out'
         print('testing reading of qe output file '+str(file_name))
         if not(os.path.exists(file_name)):
-            import logging
-         #   logging.debug("file "+str(file_name)+" not found")
             print("file "+str(file_name)+" not found")
             return(1)
         qe_wrapper = espresso_class.qe_functions()
         qe_wrapper.read_espresso_output_file(file_name)
-
 
     def test_running_index_to_node_inredex(self):
         print('testing espresso_data_file_read')

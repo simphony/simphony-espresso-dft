@@ -1,6 +1,7 @@
 import logging
 import os.path
 import subprocess
+import sys
 
 import numpy as np
 from enum import Enum
@@ -599,7 +600,9 @@ class qe_functions(object):
 #    SP[CUBA.LATTICE_VECTORS] = celldm
 
             elif "nat" in line:
-                n_atoms = int(values[1])
+#               not actually needed - maybe check if acutal # matches
+#                n_atoms = int(values[1])
+                pass
             elif "ntyp" in line:
                 n_atom_types = int(values[1])
                 SP[CUBA.SCALING_COEFFICIENT] = n_atom_types
@@ -677,7 +680,6 @@ class qe_functions(object):
         print('processing k_points section')
         line = f.next()
         #    SP[CUBAExtension.K_POINTS_MODE] = mode
-        i = 0
 
         SP[CUBA.PROBABILITY_COEFFICIENT] = mode
 
@@ -708,12 +710,11 @@ class qe_functions(object):
                 i = 0
                 if values[0] in atomtypes:
                     atomtype = values[0]
-                    atom_id = i
                     # store position in meters; original in Angstrom
                     atom_pos[0] = float(values[1]) * 1e-10
                     atom_pos[1] = float(values[2]) * 1e-10
                     atom_pos[2] = float(values[3]) * 1e-10
-                    s = str(i)
+                    # s = str(i)
                     # make uid using string of index
                     # uidstring =
                     # uid = uuid.UUID(uidstring)
@@ -773,7 +774,7 @@ class qe_functions(object):
 
 class _ReadState(Enum):
     UNKNOWN, UNSUPPORTED, CONTROL, SYSTEM, ELECTRONS, IONS, CELL, \
-            ATOMIC_SPECIES, K_POINTS, ATOMIC_POSITIONS = range(10)
+        ATOMIC_SPECIES, K_POINTS, ATOMIC_POSITIONS = range(10)
 
     @staticmethod
     def get_state(current_state, line):

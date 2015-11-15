@@ -10,7 +10,7 @@ class OutcomesTest(unittest.TestCase):
 
     def setUp(self):
         self.filename = 'pwtest.in'
-        with open(self.filename,'w') as text_file:
+        with open(self.filename, 'w') as text_file:
             text_file.write(_data_file_contents)
 
     def test_espresso_data_file_read(self):
@@ -32,16 +32,18 @@ class OutcomesTest(unittest.TestCase):
         for particle in wrapper.pc.iter_particles():
             for expected_atom in expected_atom_positions:
                 match = True
-                for dimension in range(0,3):
-                    if(expected_atom[dimension]!=particle.coordinates[dimension]):
+                for dimension in range(0, 3):
+                    if(expected_atom[dimension] !=
+                           particle.coordinates[dimension]):
                         match = False
                         break
 
-                if match == True:
+                if match is True:
                     expected_atom_positions.remove(expected_atom)
-                    self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE] == expected_atom_species[i])
+                    self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE]
+                                    == expected_atom_species[i])
                     break
-        self.assertTrue(expected_atom_positions==[])
+        self.assertTrue(expected_atom_positions == [])
 
 
 _data_file_contents = """&CONTROL
