@@ -161,7 +161,7 @@ class qe_functions(object):
             node.data[CUBA.MASS] = charge
             nodelist.append(node)
         self.L.update_nodes(nodelist)
-        #we have to ask the lattice to update the changed node
+        # we have to ask the lattice to update the changed node
 
         if aviz_filename:
             self.write_aviz_output(charge_density, aviz_filename)
@@ -180,18 +180,18 @@ class qe_functions(object):
                 for i in range(0, n_elements[0]):
                     x = i * base_vector[0]
                     for j in range(0, n_elements[1]):
-                        y= j * base_vector[0]
+                        y = j * base_vector[0]
                         for k in range(0, n_elements[2]):
-                            z= k * base_vector[0]
+                            z = k * base_vector[0]
                             density = xyz_array[i, j, k]
-                            line = 'C '+str(x)+' ' +str(y)+' '+str(z)+' '+str(density)+'\n'
+                            line = 'C ' + str(x) + ' ' + str(y) + ' ' + str(z) + \
+                                   ' ' + str(density) + '\n'
                             f.write(line)
             except:
                 print('error writing aviz file')
         return
 
     def read_xyz(self, n_latticepoints, file_iter):
-        line_numer = 0
         line = file_iter.next()
         x_points = n_latticepoints[0]
         y_points = n_latticepoints[1]
@@ -204,20 +204,21 @@ class qe_functions(object):
         try:
             while line is not None:
                 line_number = line_number + 1
-                print('x{0} y{1} z{2} line:{3}'.format(x_count, y_count, z_count, str(line)))
+                print('x{0} y{1} z{2} line:{3}'
+                      .format(x_count, y_count, z_count, str(line)))
                 values = line.split()
                 charges = [float(val) for val in values]
     #            print('charges:'+str(charges))
 
                 for charge in charges:
                     charge_density[x_count, y_count, z_count] = charge
-                    x_count+=1
-                    if x_count== x_points:
+                    x_count += 1
+                    if x_count == x_points:
                         x_count = 0
-                        y_count+=1
+                        y_count += 1
                         if y_count == y_points:
                             y_count = 0
-                            z_count +=1
+                            z_count += 1
                             if z_count == z_points:
                                 break
 
@@ -228,10 +229,10 @@ class qe_functions(object):
         if x_count<x_points or y_count<y_points or z_count < z_points:
             logging.debug('Got fewer points than expected:read {0} of {1} x, '
                           '{2} of {3} y, {4} of {5} z'.
-                          format(x_count, x_points, y_count, y_points, z_count,z_points))
+                          format(x_count, x_points, y_count, y_points, z_count, z_points))
         return charge_density
 
-    def write_espresso_input_file(self,file_name):
+    def write_espresso_input_file(self, file_name):
         """
         :param file_name: name of the input file to write
         :return:
@@ -248,34 +249,42 @@ class qe_functions(object):
                 line = '&CONTROL\n'  #calculation
                 f.write(line)
                 if CUBA.TORQUE in SP:
-                    line = '\t calculation=\'' + str(SP[CUBA.TORQUE]) + '\'\n'   #calculation
+                    line = '\t calculation=\'' + str(SP[CUBA.TORQUE]) + '\'\n'
+                    #calculation
                     f.write(line)
                 if CUBA.ZETA_POTENTIAL in SP:
-                    line = '\t restart_mode=\'' + str(SP[CUBA.ZETA_POTENTIAL]) + '\'\n' #restart_mode
+                    line = '\t restart_mode=\'' + str(SP[CUBA.ZETA_POTENTIAL]) + '\'\n'
+                    #restart_mode
                     f.write(line)
                 if CUBA.YOUNG_MODULUS in SP:
-                    line = '\t pseudo_dir=\'' + str(SP[CUBA.YOUNG_MODULUS]) + '\'\n'  #pseudo dir
+                    line = '\t pseudo_dir=\'' + str(SP[CUBA.YOUNG_MODULUS]) + '\'\n'
+                    #pseudo dir
                     f.write(line)
                 if CUBA.VOLUME_FRACTION in SP:
-                    line = '\t prefix=\'' + str(SP[CUBA.VOLUME_FRACTION]) + '\'\n'  #prefix
+                    line = '\t prefix=\'' + str(SP[CUBA.VOLUME_FRACTION]) + '\'\n'
+#prefix
                     f.write(line)
                 if CUBA.AMPHIPHILICITY in SP:
-                    line = '\t tprnfor=' + str(SP[CUBA.AMPHIPHILICITY]) + '\n'  #tprnfor
+                    line = '\t tprnfor=' + str(SP[CUBA.AMPHIPHILICITY]) + '\n'
+#tprnfor
                     f.write(line)
                 if CUBA.NUMBER_OF_TIME_STEPS in SP:
                     line = '\t max_seconds=' + str(int(SP[CUBA.NUMBER_OF_TIME_STEPS])) + '\n'
                     f.write(line)
                 if CUBA.DIRECTION in SP:
-                    line = '\t outdir=\'' + str(SP[CUBA.DIRECTION])+'\'\n'  #outdir
+                    line = '\t outdir=\'' + str(SP[CUBA.DIRECTION]) + '\'\n'
+#outdir
                     f.write(line)
                 line = '/\n'
                 f.write(line)
 
-                #SYSTEM section
-                line = '&SYSTEM\n'  #calculation
+                # SYSTEM section
+                line = '&SYSTEM\n'
+                #calculation
                 f.write(line)
                 if CUBA.ROLLING_FRICTION in SP:
-                    line = '\t ibrav='+str(SP[CUBA.ROLLING_FRICTION])+'\n'  #outdir
+                    line = '\t ibrav=' + str(SP[CUBA.ROLLING_FRICTION]) + '\n'
+#outdir
                     f.write(line)
                 if CUBA.ORIGINAL_POSITION in SP:
                     line = '\t celldm(1)=' + str(SP[CUBA.ORIGINAL_POSITION][0]) + '\n'
@@ -285,9 +294,10 @@ class qe_functions(object):
                     line = '\t celldm(3)=' + str(SP[CUBA.ORIGINAL_POSITION][2]) + '\n'
                     f.write(line)
 
-                 # here goes nat and ntype
+                # here goes nat and ntype
                 n_atoms = self.count_particles()
-                line = '\t nat=' + str(n_atoms) + '\n'  #outdir
+                line = '\t nat=' + str(n_atoms) + '\n'
+#outdir
                 f.write(line)
                 if CUBA.SCALING_COEFFICIENT in SP:
                     line = '\t ntyp=' + str(SP[CUBA.SCALING_COEFFICIENT]) \
@@ -325,20 +335,23 @@ class qe_functions(object):
                 line = '/\n'
                 f.write(line)
 
-                #IONS section
-                line = '&IONS\n'  #calculation
+                # IONS section
+                line = '&IONS\n'
+                #calculation
                 f.write(line)
                 line = '/\n'
                 f.write(line)
 
-                #CELL section
-                line = '&CELL\n'  #calculation
+                # CELL section
+                line = '&CELL\n'
+                #calculation
                 f.write(line)
                 line = '/\n'
                 f.write(line)
 
-                #CELL section
-                line = 'ATOMIC_SPECIES\n'  #calculation
+                # CELL section
+                line = 'ATOMIC_SPECIES\n'
+                #calculation
                 f.write(line)
 
                 #ATOMIC SPECIES
@@ -350,7 +363,7 @@ class qe_functions(object):
                 line = '\n'
                 f.write(line)
 
-                #K POINTS
+#K POINTS
                 if CUBA.PROBABILITY_COEFFICIENT in SP:
                     line ='K_POINTS '+str(SP[CUBA.PROBABILITY_COEFFICIENT])+'\n'
                     f.write(line)
@@ -365,11 +378,11 @@ class qe_functions(object):
                     line ='ATOMIC_POSITIONS '+str(SP[CUBA.KINEMATIC_VISCOSITY])+'\n'
                     f.write(line)
 
-
-                multiplier = 10**10  #QE wants coords. in Angstroms
+                multiplier = 10 ** 10
+                #QE wants coords. in Angstroms
                 for particle in pc.iter_particles():
                     atom_type = particle.data
-                 #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
+                    #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
                     atom = atom_type[CUBA.CHEMICAL_SPECIE]
                     print('atom:'+str(atom)+' data:'+str(atom_type)+' ')
                     line =str(atom)+' '+str(multiplier*particle.coordinates[0])+' '+\
@@ -389,7 +402,7 @@ class qe_functions(object):
         outdir = './'
         plotfile = 'output.charge'
         outfile = 'density.dat'
-        lines=['&inputpp',
+        lines = ['&inputpp',
                'prefix =\'qe_output\'',
                'filplot=\''+plotfile+'\'',
                'plot_num=0',
