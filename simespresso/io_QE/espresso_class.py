@@ -19,7 +19,7 @@ class qe_functions(object):
 
     def __init__(self):
         self.SP = DataContainer()
-        self.pc =  Particles('quantum_espresso_particles')
+        self.pc = Particles('quantum_espresso_particles')
 
     def read_espresso_output_file(self, file_name):
         '''
@@ -48,7 +48,7 @@ class qe_functions(object):
             file_iter = iter(f)
 
             try:
-                #read first four lines of the header - first line blank
+                # read first four lines of the header - first line blank
                 line = file_iter.next()
                 #2nd line : gridsize x,y,z twice , natoms natomtypes
                 line = file_iter.next()
