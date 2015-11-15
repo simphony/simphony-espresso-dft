@@ -124,7 +124,7 @@ class qe_functions(object):
                 print('eof reached')
                 logging.warning('eof reached')
             except:
-                #print("problem with line", line)
+                # print("problem with line", line)
                 if(line):
                     print(str(line))
                     logging.warning("problem with line", str(line))
@@ -139,7 +139,8 @@ class qe_functions(object):
 
             logging.debug('read ' + str(n_lattice_points) +
                           ' lattice point lines')
-            self.read_densities(n_lattice_points, file_iter, aviz_filename='avizout.xyz')
+            self.read_densities(n_lattice_points, file_iter,
+                                aviz_filename='avizout.xyz')
             # put pc into dc!
 
     def running_index_to_node_index(self, index, n_latticepoints):
@@ -172,12 +173,12 @@ class qe_functions(object):
 
         with open(aviz_xyzfile, 'w') as f:
             try:
-                line = str(n_size)+'\n'  #calculation
+                line = str(n_size) + '\n'
                 f.write(line)
-                line = 'simphony to aviz xyz file\n'  #calculation
+                line = 'simphony to aviz xyz file\n'
                 f.write(line)
                 for i in range(0, n_elements[0]):
-                    x= i * base_vector[0]
+                    x = i * base_vector[0]
                     for j in range(0, n_elements[1]):
                         y= j * base_vector[0]
                         for k in range(0, n_elements[2]):
