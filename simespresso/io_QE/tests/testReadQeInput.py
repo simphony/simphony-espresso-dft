@@ -1,8 +1,5 @@
 __author__ = 'jeremy'
 
-#kohn sham
-
-
 import unittest
 import subprocess
 import logging

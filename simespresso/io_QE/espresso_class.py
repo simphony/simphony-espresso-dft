@@ -5,9 +5,9 @@ from simphony.cuds.particles import Particle, Particles
 from simphony.cuds.lattice import Lattice
 import numpy as np
 import subprocess
-#from simphony.cuds.abstractparticles import ABCParticles
 
-import uuid
+
+
 import logging
 
 import os.path
@@ -23,21 +23,26 @@ class qe_functions(object):
 
     def __init__(self):
         self.SP = DataContainer()   #System Parameters and Conditions
-#        SP = self.data_container
         self.pc =  Particles('quantum_espresso_particles')
 
 
 
     def read_espresso_output_file(self,file_name):
         '''
-        This function parses  Espresso output files which usually will have a name like 'name.charge'.
-        This file has the structure shown at http://phycomp.technion.ac.il/~sbgrosso/QE_charge_density/node18.html
-        The first line has 8 numbers, the three first numbers are the size of the grid in the three spatial directions,
-        the three following are the same repeated.
-        The seventh number corresponds to the number of atoms and the last one to the number of different type of atoms.
+        This function parses  Espresso output files which usually will have
+        a name like 'name.charge'.
+        This file has the structure shown at
+        http://phycomp.technion.ac.il/~sbgrosso/QE_charge_density/node18.html
+        The first line has 8 numbers, the three first numbers are the size of
+        the grid in the three spatial directions, the three following are the
+        same repeated.
+        The seventh number corresponds to the number of atoms and the last
+        one to the number of different type of atoms.
         Second line - the first number is the type of Bravais lattice,
-        and the three following numbers are the celldimensions defined in the input file of pw.x.
-        The charge density is defined for each point of the grid starting after the atom definitions.
+        and the three following numbers are the celldimensions defined in the
+        input file of pw.x.
+        The charge density is defined for each point of the grid starting
+        after the atom definitions.
         :param file_name: name of the espresso output file
         :return:
         '''
@@ -50,8 +55,7 @@ class qe_functions(object):
             file_iter = iter(f)
 
             try:
-                #read first four lines of the header
-                #first line blank
+                #read first four lines of the header - first line blank
                 line = file_iter.next()
                 #2nd line : gridsize x,y,z twice , natoms natomtypes
                 line = file_iter.next()
@@ -59,7 +63,7 @@ class qe_functions(object):
                 values = line.split()
                 ints = [int(val) for val in values]
                 for val in ints:
-                    if not isinstance(val,'int'):
+                    if not isinstance(val, 'int'):
                         logging.debug('got non-integer value in espresso output file line 2')
                         return None
                 n_lattice_points = ints[0:3]
