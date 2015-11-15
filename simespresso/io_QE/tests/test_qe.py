@@ -40,16 +40,18 @@ class OutcomesTest(unittest.TestCase):
                 # print('cur atom '+str(expected_atom)+
                 # ' trying to match '+str(particle.coordinates))
                 match = True
-                for dimension in range(0,3):
-                    if(expected_atom[dimension]!=particle.coordinates[dimension]):
+                for dimension in range(0, 3):
+                    if(expected_atom[dimension] !=
+                           particle.coordinates[dimension]):
                         match = False
                         # print('no match:'+str(expected_atom[dimension])+
                         # '!='+str(particle.coordinates[dimension]))
                         break
 
-                if match == True:
+                if match is True:
                     expected_atom_positions.remove(expected_atom)
-                    self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE] == expected_atom_species[i])
+                    self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE]
+                                    == expected_atom_species[i])
                     # print('cur atom matches')
                     break
         self.assertTrue(expected_atom_positions == [])
@@ -61,7 +63,7 @@ class OutcomesTest(unittest.TestCase):
         wrp.SP = DataContainer()
         wrp.pc = Particles('quantum_espresso_particles')
         # write parameters for a particular working input file
-        SP=wrp.SP
+        SP = wrp.SP
         pc = wrp.pc
         SP[CUBA.TORQUE] = 'scf'
         # calculation
@@ -99,17 +101,17 @@ class OutcomesTest(unittest.TestCase):
         SP[CUBA.CHEMICAL_SPECIE] = ['C']
         SP[CUBA.MASS] = [12.0107]
         SP[CUBA.FRICTION_COEFFICIENT] = ['06-C.GGA.fhi.UPF']
-        SP[CUBA.PROBABILITY_COEFFICIENT] = 'automatic' # mode
+        SP[CUBA.PROBABILITY_COEFFICIENT] = 'automatic'  # mode
         SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = [1, 4, 1, 0, 0, 0]  # K_POINTS
         SP[CUBA.KINEMATIC_VISCOSITY] = '(angstrom)'  # ATOMIC_POSITIONS
 
-        p1 = Particle([1.0* 1e-10, 2.0* 1e-10, 3.0* 1e-10])
+        p1 = Particle([1.0 * 1e-10, 2.0 * 1e-10, 3.0 * 1e-10])
         p1.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p2 = Particle([2.0* 1e-10, 3.0* 1e-10, 4.0* 1e-10])
+        p2 = Particle([2.0 * 1e-10, 3.0 * 1e-10, 4.0 * 1e-10])
         p2.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p3 = Particle([3.0* 1e-10, 4.0* 1e-10, 5.0* 1e-10])
+        p3 = Particle([3.0 * 1e-10, 4.0 * 1e-10, 5.0 * 1e-10])
         p3.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p4 = Particle([4.0* 1e-10, 5.0* 1e-10, 6.0* 1e-10])
+        p4 = Particle([4.0 * 1e-10, 5.0 * 1e-10, 6.0 * 1e-10])
         p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
         pc.add_particles([p1, p2, p3, p4])
         wrp.write_espresso_input_file(espresso_input_filename)
@@ -121,45 +123,50 @@ class OutcomesTest(unittest.TestCase):
     def test_read_espresso_output_file(self):
         file_name = 'pwtest.out'
         if not(os.path.exists(file_name)):
-        # logging.debug("file "+str(file_name)+" not found")
+            # logging.debug("file "+str(file_name)+" not found")
             print("file "+str(file_name)+" not found")
             return(1)
         print('testing reading of qe output file '+str(file_name))
         qe_wrapper = espresso_class.qe_functions()
         qe_wrapper.read_espresso_output_file(file_name)
 
-
     def test_running_index_to_node_inredex(self):
         print('testing espresso_data_file_read')
         n_latticepoints = [10, 7, 6]
         index = 5
         espresso_wrapper = espresso_class.qe_functions()
-        indices = espresso_wrapper.running_index_to_node_index(index, n_latticepoints)
+        indices = espresso_wrapper.running_index_to_node_index(index,
+                                                               n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
-        self.assertTrue(indices==[5, 0, 0])
+        self.assertTrue(indices == [5, 0, 0])
 
         index = 15
-        indices = espresso_wrapper.running_index_to_node_index(index, n_latticepoints)
+        indices = espresso_wrapper.running_index_to_node_index(index,
+                                                               n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
-        self.assertTrue(indices==[5, 1, 0])
+        self.assertTrue(indices == [5, 1, 0])
 
         index = 23
-        indices = espresso_wrapper.running_index_to_node_index(index, n_latticepoints)
+        indices = espresso_wrapper.running_index_to_node_index(index,
+                                                               n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [3, 2, 0])
 
         index = 70
-        indices = espresso_wrapper.running_index_to_node_index(index, n_latticepoints)
+        indices = espresso_wrapper.running_index_to_node_index(index,
+                                                               n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [0, 0, 1])
 
         index = 75
-        indices = espresso_wrapper.running_index_to_node_index(index, n_latticepoints)
+        indices = espresso_wrapper.running_index_to_node_index(index,
+                                                               n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [5, 0, 1])
 
         index = 150
-        indices = espresso_wrapper.running_index_to_node_index(index, n_latticepoints)
+        indices = espresso_wrapper.running_index_to_node_index(index,
+                                                               n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [0, 1, 2])
 
