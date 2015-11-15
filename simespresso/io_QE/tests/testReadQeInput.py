@@ -34,14 +34,14 @@ class OutcomesTest(unittest.TestCase):
                 match = True
                 for dimension in range(0, 3):
                     if(expected_atom[dimension] !=
-                        particle.coordinates[dimension]):
+                            particle.coordinates[dimension]):
                         match = False
                         break
 
                 if match is True:
                     expected_atom_positions.remove(expected_atom)
                     self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE]
-                                    == expected_atom_species[i])
+                        == expected_atom_species[i])
                     break
         self.assertTrue(expected_atom_positions == [])
 

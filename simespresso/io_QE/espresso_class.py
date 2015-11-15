@@ -600,8 +600,8 @@ class qe_functions(object):
 #    SP[CUBA.LATTICE_VECTORS] = celldm
 
             elif "nat" in line:
-                #               not actually needed - maybe check if acutal # matches
-                #                n_atoms = int(values[1])
+                #not actually needed - maybe check if acutal # matches
+                #n_atoms = int(values[1])
                 pass
             elif "ntyp" in line:
                 n_atom_types = int(values[1])
@@ -707,7 +707,6 @@ class qe_functions(object):
                 values = line.split()
                 print('values:' + str(values))
                 atom_pos = [0, 0, 0]
-                #i = 0
                 if values[0] in atomtypes:
                     atomtype = values[0]
                     # store position in meters; original in Angstrom
