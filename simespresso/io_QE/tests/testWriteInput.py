@@ -16,52 +16,52 @@ class OutcomesTest(unittest.TestCase):
         espresso_input_filename = 'pw_generated.in'
         wrp.SP = DataContainer()
         wrp.pc = Particles('quantum_espresso_particles')
-#write parameters for a particular working input file
+        # write parameters for a particular working input file
         SP = wrp.SP
         pc = wrp.pc
         SP[CUBA.TORQUE] = 'scf'
-        #calculation
+        # calculation
         SP[CUBA.ZETA_POTENTIAL] = 'from_scratch'
-        #restart_mode
+        # restart_mode
         SP[CUBA.YOUNG_MODULUS] = './'
-        #pseudo dir
+        # pseudo dir
         SP[CUBA.VOLUME_FRACTION] = 'NANO'
-        #prefix
+        # prefix
         SP[CUBA.AMPHIPHILICITY] = '.true.'
-        #tprnfor
+        # tprnfor
         SP[CUBA.NUMBER_OF_TIME_STEPS] = 82000
-        #max_seconds
+        # max_seconds
         SP[CUBA.DIRECTION] = './' #
         # outdir
-###        SP[CUBA.ROLLING_FRICTION] = '.true.' #tprnfor
+        ###        SP[CUBA.ROLLING_FRICTION] = '.true.' #tprnfor
         SP[CUBA.ROLLING_FRICTION] = 8
-        #ibrav
+        # ibrav
         SP[CUBA.ORIGINAL_POSITION] = [40,0.1,1.0]
-        #write to celldm(1),(2),(3)
-        #write n_atoms  nat - not needed since natoms can be derived from pc
+        # write to celldm(1),(2),(3)
+        # write n_atoms  nat - not needed since natoms can be derived from pc
         SP[CUBA.SCALING_COEFFICIENT] = 1
-        #1 atom type
+        # 1 atom type
         SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT] = 60.0
-        #ecutwfc
+        # ecutwfc
         SP[CUBA.POISSON_RATIO] = 240
-        #ecutrho
+        # ecutrho
         SP[CUBA.LATTICE_SPACING] = 'vdw-df-c09'
-        #input_dft
+        # input_dft
         SP[CUBA.SMOOTHING_LENGTH] = 'local-TF'
-        #mixing_mode
+        # mixing_mode
         SP[CUBA.PHASE_INTERACTION_STRENGTH] = 0.8
-        #mixing_beta
+        # mixing_beta
         SP[CUBA.DEBYE_LENGTH] = '1.0d-7'
-        #conv_thr
+        # conv_thr
         SP[CUBA.CHEMICAL_SPECIE] = ['C']
         SP[CUBA.MASS] = [12.0107]
         SP[CUBA.FRICTION_COEFFICIENT] = ['06-C.GGA.fhi.UPF']
         SP[CUBA.PROBABILITY_COEFFICIENT] = 'automatic'
-        #mode
+        # mode
         SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = [1, 4, 1, 0, 0, 0]
-        #K_POINTS
+        # K_POINTS
         SP[CUBA.KINEMATIC_VISCOSITY] = '(angstrom)'
-        #ATOMIC_POSITIONS
+        # ATOMIC_POSITIONS
 
         p1 = Particle([1.0* 1e-10, 2.0* 1e-10, 3.0* 1e-10])
         p1.data[CUBA.CHEMICAL_SPECIE] = 'C'
@@ -77,8 +77,6 @@ class OutcomesTest(unittest.TestCase):
     def test_espresso_ppfile_write(self, ppfilename="testpp.in"):
         wrp = espresso_class.qe_functions()
         wrp.write_espresso_pp_file(ppfilename="testpp.in")
-
-
 
 if __name__ == '__main__':
     unittest.main()

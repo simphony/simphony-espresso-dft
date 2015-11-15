@@ -600,8 +600,6 @@ class qe_functions(object):
 #    SP[CUBA.LATTICE_VECTORS] = celldm
 
             elif "nat" in line:
-#not actually needed - maybe check if acutal # matches
-#n_atoms = int(values[1])
                 pass
             elif "ntyp" in line:
                 n_atom_types = int(values[1])

@@ -41,7 +41,7 @@ class OutcomesTest(unittest.TestCase):
                 if match is True:
                     expected_atom_positions.remove(expected_atom)
                     self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE]
-                            == expected_atom_species[i])
+                                    == expected_atom_species[i])
                     break
         self.assertTrue(expected_atom_positions == [])
 

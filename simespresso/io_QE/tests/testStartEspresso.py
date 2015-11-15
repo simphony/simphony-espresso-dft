@@ -14,12 +14,9 @@ class OutcomesTest(unittest.TestCase):
         path_to_espresso = '/usr/bin/pw.x'
         print('qe wrapper attempting to run espresso')
         wrapper = espresso_class.qe_functions()
-        wrapper.start_qe(name_in, name_out, path_to_espresso = path_to_espresso,
-                         mpi = mpi, mpi_Nprocessors = mpi_Nprocessors)
-
+        wrapper.start_qe(name_in, name_out,
+                         path_to_espresso=path_to_espresso,
+                         mpi=mpi, mpi_Nprocessors=mpi_Nprocessors)
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
