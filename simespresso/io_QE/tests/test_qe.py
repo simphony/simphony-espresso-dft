@@ -33,21 +33,24 @@ class OutcomesTest(unittest.TestCase):
         i = 0
 
         for particle in wrapper.pc.iter_particles():
-            #           print('expected:'+str(expected_atom_positions[i])+' actual:'+str(particle))
-            #           print('data:'+str(particle.data))
+            #print('expected:'+str(expected_atom_positions[i])+
+            # ' actual:'+str(particle))
+            #print('data:'+str(particle.data))
             for expected_atom in expected_atom_positions:
-                #              print('cur atom '+str(expected_atom)+' trying to match '+str(particle.coordinates))
+                #print('cur atom '+str(expected_atom)+
+                # ' trying to match '+str(particle.coordinates))
                 match = True
                 for dimension in range(0,3):
                     if(expected_atom[dimension]!=particle.coordinates[dimension]):
                         match = False
-                        #                      print('no match:'+str(expected_atom[dimension])+'!='+str(particle.coordinates[dimension]))
+                        #print('no match:'+str(expected_atom[dimension])+
+                        # '!='+str(particle.coordinates[dimension]))
                         break
 
                 if match == True:
                     expected_atom_positions.remove(expected_atom)
                     self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE] == expected_atom_species[i])
-                    #                 print('cur atom matches')
+                    #print('cur atom matches')
                     break
         self.assertTrue(expected_atom_positions == [])
 

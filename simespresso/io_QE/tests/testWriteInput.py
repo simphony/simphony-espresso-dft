@@ -31,12 +31,12 @@ class OutcomesTest(unittest.TestCase):
         # tprnfor
         SP[CUBA.NUMBER_OF_TIME_STEPS] = 82000
         # max_seconds
-        SP[CUBA.DIRECTION] = './' #
+        SP[CUBA.DIRECTION] = './'
         # outdir
-        ###        SP[CUBA.ROLLING_FRICTION] = '.true.' #tprnfor
+        # SP[CUBA.ROLLING_FRICTION] = '.true.' #tprnfor
         SP[CUBA.ROLLING_FRICTION] = 8
         # ibrav
-        SP[CUBA.ORIGINAL_POSITION] = [40,0.1,1.0]
+        SP[CUBA.ORIGINAL_POSITION] = [40, 0.1, 1.0]
         # write to celldm(1),(2),(3)
         # write n_atoms  nat - not needed since natoms can be derived from pc
         SP[CUBA.SCALING_COEFFICIENT] = 1
@@ -63,13 +63,13 @@ class OutcomesTest(unittest.TestCase):
         SP[CUBA.KINEMATIC_VISCOSITY] = '(angstrom)'
         # ATOMIC_POSITIONS
 
-        p1 = Particle([1.0* 1e-10, 2.0* 1e-10, 3.0* 1e-10])
+        p1 = Particle([1.0 * 1e-10, 2.0 * 1e-10, 3.0 * 1e-10])
         p1.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p2 = Particle([2.0* 1e-10, 3.0* 1e-10, 4.0* 1e-10])
+        p2 = Particle([2.0 * 1e-10, 3.0 * 1e-10, 4.0 * 1e-10])
         p2.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p3 = Particle([3.0* 1e-10, 4.0* 1e-10, 5.0* 1e-10])
+        p3 = Particle([3.0 * 1e-10, 4.0 * 1e-10, 5.0 * 1e-10])
         p3.data[CUBA.CHEMICAL_SPECIE] = 'C'
-        p4 = Particle([4.0* 1e-10, 5.0* 1e-10, 6.0* 1e-10])
+        p4 = Particle([4.0 * 1e-10, 5.0 * 1e-10, 6.0 * 1e-10])
         p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
         pc.add_particles([p1, p2, p3, p4])
         wrp.write_espresso_input_file(espresso_input_filename)
