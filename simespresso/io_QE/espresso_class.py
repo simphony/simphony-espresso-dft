@@ -11,7 +11,6 @@ from simphony.cuds.particles import Particle, Particles
 
 logging.basicConfig(level=logging.DEBUG)
 
-
 class qe_functions(object):
     '''
     functions for reading and writing quantum espresso input and output files
@@ -294,7 +293,6 @@ class qe_functions(object):
                 # here goes nat and ntype
                 n_atoms = self.count_particles()
                 line = '\t nat=' + str(n_atoms) + '\n'
-                # outdir
                 f.write(line)
                 if CUBA.SCALING_COEFFICIENT in SP:
                     line = '\t ntyp=' + str(SP[CUBA.SCALING_COEFFICIENT]) \
@@ -512,7 +510,6 @@ class qe_functions(object):
             except Exception:
                 print("problem with line number=", line_number, line)
                 return
-            # put pc into dc!
         return pc
 
     def process_control(self, f, SP):
@@ -787,19 +784,25 @@ class _ReadState(Enum):
 atomtypes = ["C", "H", "He", "N", "O", "Na", "Mg"]
 
 if __name__ == "__main__":
-    wrapper = qe_wrapper()
+    wrapper = qe_functions()
 #    filename = 'xyzoutput.txt.bak'
-    filename = '../../examples/input_pw.in'
+    #    filename = '../../examples/input_pw.in'
+    filename = 'tests/pw.in'
     print('started parsing qe input file ' + str(filename))
     wrapper.read_espresso_input_file(filename)
+    print('done parsing qe input file ' + str(filename))
 
-    new_inputfilename = '../../examples/new_input_pw.in'
+    print('started writing qe input file ' + str(filename))
+    new_inputfilename = 'tests/new_input_pw.in'
     wrapper.write_espresso_input_file(new_inputfilename)
+    print('done writing qe input file ' + str(new_inputfilename))
 
-    ppfilename = 'testpp.in'
-    print('started writing qe input file ' + str(ppfilename))
+    ppfilename = 'tests/testpp.in'
+    print('started writing qe pp input file ' + str(ppfilename))
     wrapper.write_espresso_pp_file()
+    print('done writing qe pp input file ' + str(ppfilename))
 
-    filename = 'xyzoutput.txt'
-    print('started parsing file ' + str(filename))
+    filename = 'tests/xyzoutput.txt.bak'
+    print('started parsing qe output file ' + str(filename))
     wrapper.read_espresso_output_file(filename)
+    print('finished parsing qe output file ' + str(filename))
