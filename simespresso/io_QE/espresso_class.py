@@ -57,11 +57,12 @@ class qe_functions(object):
                 ints = [int(val) for val in values]
                 for val in ints:
                     if not isinstance(val, 'int'):
-                        logging.debug('got non-integer value in output file line 2')
+                        logging.debug('got noninteger value in output, line 2')
                         return None
                 n_lattice_points = ints[0:3]
                 n_atoms = ints[6]
-                print('n_points:' + str(n_lattice_points) + ' n_atoms:' + str(n_atoms))
+                print('n_points:' + str(n_lattice_points)
+                      + ' n_atoms:' + str(n_atoms))
 
                 #3rd line : bravais lattice, celldm[0],[1],[2]
                 line = file_iter.next()
@@ -77,7 +78,8 @@ class qe_functions(object):
                 celldm = floats[1:4]
 #                SP[CUBA.ORIGINAL_POSITION] = [celldm[0],celldm[1],celldm[2]]
                 print('bravais:'+str(bravais)+' celldm:'+str(celldm))
-                # see http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp82064
+                # see http://www.quantum-espresso.org/
+                # wp-content/uploads/Doc/INPUT_PW.html#idp82064
                 if bravais == 0:
                     Ltype = 'free'
                 if bravais == 1:
@@ -112,7 +114,7 @@ class qe_functions(object):
                 self.L = Lattice('quantum espresso lattice',
                                  Ltype, celldm, n_lattice_points, [0, 0, 0])
 
-                #4th line - don't care
+                # 4th line - don't care
                 line = file_iter.next()
                 logging.debug('read line4:'+str(line))
                 values = line.split()
@@ -121,7 +123,7 @@ class qe_functions(object):
             except StopIteration:
                 print('eof reached')
                 logging.warning('eof reached')
-            except :
+            except:
                 #print("problem with line", line)
                 if(line):
                     print(str(line))
@@ -129,44 +131,38 @@ class qe_functions(object):
                 else:
                     logging.warning("no line obtained")
                 return
-            #TODO skip all the atom definition lines, eg look for alphabetic characters at beginning of line
+            # TODO skip all the atom definition lines,
+            # eg look for alphabetic characters at beginning of line
             logging.debug('skipping '+str(n_atoms)+' lines')
             for i in range(0,n_atoms+1):
                     line = file_iter.next()
 
-            logging.debug('read '+str(n_lattice_points)+' lattice point lines')
-            self.read_densities(n_lattice_points,file_iter,aviz_filename='avizout.xyz')
-            #put pc into dc!
+            logging.debug('read ' + str(n_lattice_points) +' lattice point lines')
+            self.read_densities(n_lattice_points, file_iter, aviz_filename='avizout.xyz')
+            # put pc into dc!
 
-    def running_index_to_node_index(self,index,n_latticepoints):
-        node_z = index/(n_latticepoints[0]*n_latticepoints[1])
-        node_y = (index/n_latticepoints[0])%n_latticepoints[1]
-        node_x = index%n_latticepoints[0]
-        return [node_x,node_y,node_z]
+    def running_index_to_node_index(self, index, n_latticepoints):
+        node_z = index/(n_latticepoints[0] * n_latticepoints[1])
+        node_y = (index / n_latticepoints[0]) % n_latticepoints[1]
+        node_x = index % n_latticepoints[0]
+        return [node_x, node_y, node_z]
 
-    def read_densities(self,n_latticepoints,file_iter,aviz_filename=False):
-        charge_density = self.read_xyz(n_latticepoints,file_iter)
+    def read_densities(self, n_latticepoints, file_iter, aviz_filename=False):
+        charge_density = self.read_xyz(n_latticepoints, file_iter)
         charge_as_list = charge_density.flatten()
         nodelist = []
         for charge_index, charge in enumerate(charge_as_list):
-            node_index = self.running_index_to_node_index(charge_index,n_latticepoints)# TODO convert charge_index to node index
+            node_index = self.running_index_to_node_index(charge_index, n_latticepoints)
+            # TODO convert charge_index to node index
             node = self.L.get_node(node_index)
             node.data[CUBA.MASS] = charge
             nodelist.append(node)
-        self.L.update_nodes(nodelist)  #we have to ask the lattice to update the changed node
-
+        self.L.update_nodes(nodelist)
+        #we have to ask the lattice to update the changed node
 
         if aviz_filename:
             self.write_aviz_output(charge_density,aviz_filename)
-#            self.write_aviz_output(charge_density,aviz_filename,L.base_vect)
-        #return L
 
-    #    iterator = L.iter_nodes(n_latticepoints)
-    #    for i in range(0,n_latticepoints[0]):
-    #        for j in range(0,n_latticepoints[1]):
-    #            for k in range(0,n_latticepoints[2]):
-    #                L.data = charge_density[i,j,k]
-     #               iterator.next()
     def write_aviz_output(self,xyz_array,aviz_xyzfile):
         base_vector = self.L.base_vect
         n_elements = np.shape(xyz_array)
