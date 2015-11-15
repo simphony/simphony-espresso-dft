@@ -34,7 +34,7 @@ class OutcomesTest(unittest.TestCase):
                 match = True
                 for dimension in range(0, 3):
                     if(expected_atom[dimension] !=
-                           particle.coordinates[dimension]):
+                        particle.coordinates[dimension]):
                         match = False
                         break
 
@@ -90,4 +90,3 @@ C        4.0  5.0   6.0
 
 if __name__ == '__main__':
     unittest.main()
-

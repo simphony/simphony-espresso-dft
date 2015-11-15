@@ -1,20 +1,14 @@
 __author__ = 'jeremy'
 
 import unittest
-import subprocess
-import logging
-import sys
 
-from simphony.core.data_container import DataContainer
-from simphony.core.cuba import CUBA
-from simphony.cuds.particles import Particle, Particles
 from simespresso.io_QE import espresso_class
-#import simespresso.io_QE.espresso_class
-#import io_QE.espresso_class
+from simphony.core.cuba import CUBA
+from simphony.core.data_container import DataContainer
+from simphony.cuds.particles import Particle, Particles
 
 
 class OutcomesTest(unittest.TestCase):
-
 
     def test_espresso_data_file_write(self):
         wrp = espresso_class.qe_functions()
