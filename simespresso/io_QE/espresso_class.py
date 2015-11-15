@@ -387,11 +387,12 @@ class qe_functions(object):
                     atom_type = particle.data
                     #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
                     atom = atom_type[CUBA.CHEMICAL_SPECIE]
-                    print('atom:' + str(atom) + ' data:' + str(atom_type) + ' ')
+                    print('atom:' + str(atom) + ' data:' +
+                          str(atom_type) + ' ')
                     line = str(atom) + ' ' + \
-                           str(multiplier * particle.coordinates[0]) + ' ' + \
-                           str(multiplier * particle.coordinates[1]) + ' ' + \
-                           str(multiplier * particle.coordinates[2]) + '\n'
+                        str(multiplier * particle.coordinates[0]) + ' ' + \
+                        str(multiplier * particle.coordinates[1]) + ' ' + \
+                        str(multiplier * particle.coordinates[2]) + '\n'
                     f.write(line)
         except:
             ('error in write block of write_espresso_input_file')
@@ -438,12 +439,12 @@ class qe_functions(object):
 
         0. create/obtain input file such as pp.in from cuds data
         1. run  (using mpi for instance )
-            for file describing simulation
-                mpirun -np 48 /usr/local/espresso/bin/pw.x < input_pw.in > pw.out &
-            once simulation is done, run on file describing desired output
-                mpirun -np 48 /usr/local/espresso/bin/pp.x < input_pp.in > pp.out &
+        for file describing simulation
+        mpirun -np 48 /usr/local/espresso/bin/pw.x < input_pw.in > pw.out &
+        once simulation is done, run on file describing desired output
+        mpirun -np 48 /usr/local/espresso/bin/pp.x < input_pp.in > pp.out &
         2. convert output (which is a charge density file) into simphony format
-            (see charge_density_xyz.cpp)
+        (see charge_density_xyz.cpp)
 
         Parameters
         ----------
@@ -578,7 +579,8 @@ class qe_functions(object):
         self.celldm = [None, None, None]
         print('processing system section')
         line = f.next()
-        while _ReadState.get_state(_ReadState.SYSTEM, line) == _ReadState.SYSTEM:
+        while _ReadState.get_state(_ReadState.SYSTEM, line) == \
+            _ReadState.SYSTEM:
             values = [x.strip() for x in line.split('=')]
             logging.debug('line in control section:' + str(line))
             if "ibrav" in line:
@@ -592,7 +594,8 @@ class qe_functions(object):
 #            SP[CUBA.ORIGINAL_POSITION][1] = celldm[1]
             elif "celldm(3)" in line:
                 self.celldm[2] = float(values[1])
-                SP[CUBA.ORIGINAL_POSITION] = [self.celldm[0], self.celldm[1], self.celldm[2]]
+                SP[CUBA.ORIGINAL_POSITION] = [self.celldm[0],
+                                              self.celldm[1], self.celldm[2]]
 #    SP[CUBA.LATTICE_VECTORS] = celldm
 
             elif "nat" in line:
@@ -742,7 +745,7 @@ class qe_functions(object):
         return n
 
     def start_qe(self, name_in, name_out, path_to_espresso='/usr/bin/pw.x',
-                 mpi=False, mpi_Nprocessors=2):
+        mpi=False, mpi_Nprocessors=2):
 #        name_in = './test_pw.in'
 #        name_out = './test_pw.out'
         if path_to_espresso is None:
