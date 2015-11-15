@@ -1,14 +1,10 @@
 __author__ = 'jeremy'
 
 import unittest
-import subprocess
-import logging
-import sys
-from simphony.core.data_container import DataContainer
-from simphony.core.cuba import CUBA
-from simphony.core.keywords import KEYWORDS
-from simphony.cuds.particles import Particle, Particles
+
 from simespresso.io_QE import espresso_class
+from simphony.core.cuba import CUBA
+
 
 class OutcomesTest(unittest.TestCase):
 
@@ -23,10 +19,10 @@ class OutcomesTest(unittest.TestCase):
         wrapper.read_espresso_input_file(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
-        expected_atom_positions.append((1.0e-10,2.0e-10,3.0e-10))
-        expected_atom_positions.append((2.0e-10,3.0e-10,4.0e-10))
-        expected_atom_positions.append((3.0e-10,4.0e-10,5.0e-10))
-        expected_atom_positions.append((4.0e-10,5.0e-10,6.0e-10))
+        expected_atom_positions.append((1.0e-10, 2.0e-10, 3.0e-10))
+        expected_atom_positions.append((2.0e-10, 3.0e-10, 4.0e-10))
+        expected_atom_positions.append((3.0e-10, 4.0e-10, 5.0e-10))
+        expected_atom_positions.append((4.0e-10, 5.0e-10, 6.0e-10))
         expected_atom_species.append('C')
         expected_atom_species.append('C')
         expected_atom_species.append('C')
@@ -34,21 +30,16 @@ class OutcomesTest(unittest.TestCase):
         i = 0
 
         for particle in wrapper.pc.iter_particles():
-#            print('expected:'+str(expected_atom_positions[i])+' actual:'+str(particle))
-#            print('data:'+str(particle.data))
             for expected_atom in expected_atom_positions:
- #               print('cur atom '+str(expected_atom)+' trying to match '+str(particle.coordinates))
                 match = True
                 for dimension in range(0,3):
                     if(expected_atom[dimension]!=particle.coordinates[dimension]):
                         match = False
- #                       print('no match:'+str(expected_atom[dimension])+'!='+str(particle.coordinates[dimension]))
                         break
 
                 if match == True:
                     expected_atom_positions.remove(expected_atom)
                     self.assertTrue(particle.data[CUBA.CHEMICAL_SPECIE] == expected_atom_species[i])
-  #                  print('cur atom matches')
                     break
         self.assertTrue(expected_atom_positions==[])
 

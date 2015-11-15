@@ -745,12 +745,13 @@ class qe_functions(object):
         return n
 
     def start_qe(self, name_in, name_out, path_to_espresso='/usr/bin/pw.x',
-            mpi=False, mpi_Nprocessors=2):
+                 mpi=False, mpi_Nprocessors=2):
         if path_to_espresso is None:
             pass
 # I'll assume if no path given then pw.x is on path
         if mpi:
-            command = 'mpirun -np ' + str(mpi_Nprocessors) + ' ' + path_to_espresso + ' < ' + name_in + ' > ' + name_out
+            command = 'mpirun -np ' + str(mpi_Nprocessors) + ' ' + \
+                      path_to_espresso + ' < ' + name_in + ' > ' + name_out
         else:
             command = path_to_espresso + ' < ' + name_in + ' > ' + name_out
 
@@ -758,7 +759,7 @@ class qe_functions(object):
             logging.warning(path_to_espresso + ' is not on path')
             return None
 # command = '/usr/bin/pw.x < '+name_in+' > '+name_out
-print('qe wrapper attempting to run: ' + command)
+        print('qe wrapper attempting to run: ' + command)
 # alternative would be to use subprocess.check_call()  -
 # however this would give the same info as the
 # try/except, while taking twice as long in the case of success, iiuc
@@ -769,9 +770,10 @@ print('qe wrapper attempting to run: ' + command)
             e = sys.exc_info()[0]
             print("<p>Error: %s</p>" % e)
 
+
 class _ReadState(Enum):
     UNKNOWN, UNSUPPORTED, CONTROL, SYSTEM, ELECTRONS, IONS, CELL, \
-    ATOMIC_SPECIES, K_POINTS, ATOMIC_POSITIONS = range(10)
+            ATOMIC_SPECIES, K_POINTS, ATOMIC_POSITIONS = range(10)
 
     @staticmethod
     def get_state(current_state, line):
