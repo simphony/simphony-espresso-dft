@@ -766,8 +766,9 @@ class qe_functions(object):
 
         if not os.path.isfile(path_to_espresso):
             logging.warning(path_to_espresso + ' is not on path')
-            return None
-# command = '/usr/bin/pw.x < '+name_in+' > '+name_out
+#           this may be ok if pw.x is defined somewhere on the PATH
+#            return None
+
         print('qe wrapper attempting to run: ' + command)
 # alternative would be to use subprocess.check_call()  -
 # however this would give the same info as the
