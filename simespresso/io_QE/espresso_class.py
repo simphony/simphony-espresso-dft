@@ -541,41 +541,44 @@ class qe_functions(object):
             if "calculation" in line:
                 values = line.split('=')
                 calculation_type = values[1]
-# THIS IS A HACK . Use of ZETA POTENTIAL for calculation_type is
-# because attempts to use  CUBAExtension were unsuccessful.
 #                self.SP[CUBA.TORQUE] = calculation_type
+#               Not sure if this is ok or not...
                 self.SP[calculation_type] = calculation_type
             elif "restart_mode" in line:
-                restart_mode = values[1]
+                self.restart_mode = values[1]
 # TODO change restart mode to check if qe was interrupted previously
 # - should not be a cuba keyword
 # set restart mode='restart' if qe was interrupted as described here
 # http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp27692160
-                self.SP[CUBA.ZETA_POTENTIAL] = restart_mode
+#                self.SP[CUBA.ZETA_POTENTIAL] = restart_mode
             elif "pseudo_dir" in line:
                 pseudo_dir = values[1]
 # TODO - shouldnt be in cuba , also maybe determine this
 # from the ppfile location
 # THIS IS A HACK . Use of YOUNG MODULUS for pseudo_dir
-                self.SP[CUBA.YOUNG_MODULUS] = pseudo_dir
+#                self.SP[CUBA.YOUNG_MODULUS] = pseudo_dir
+                self.pseudopotential_directory = pseudo_dir
             elif "prefix" in line:
                 prefix = values[1]
 # THIS IS A HACK . Use of VOLUME FRACTION for prefix
 # TODO - also shouldnt be in cuba
-                self.SP[CUBA.VOLUME_FRACTION] = prefix
+#                self.SP[CUBA.VOLUME_FRACTION] = prefix
+                self.pseudopotential_prefix = prefix
             elif "tprnfor" in line:
                 tprnfor = values[1]
 # THIS IS A HACK . Using AMPHILICITY for tprnfor
-                self.SP[CUBA.AMPHIPHILICITY] = tprnfor
+#                self.SP[CUBA.AMPHIPHILICITY] = tprnfor
+                self.tprnfor = tprnfor
             elif "max_seconds" in line:
                 max_seconds = float(values[1])
 # THIS IS A HACK . Using NUMBER_OF_TIME_STEPS for max_seconds
-                self.SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
+#                self.SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
+                self.max_seconds = max_seconds
             elif "outdir" in line:
                 outdir = values[1]
                 # THIS IS A HACK . Using DIRECTION for outdir
-                self.SP[CUBA.DIRECTION] = outdir
-
+                self.output_directory = outdir
+#                self.SP[CUBA.DIRECTION] = outdir
             line = f.next()
         return line
 
@@ -590,6 +593,7 @@ class qe_functions(object):
             if "ibrav" in line:
                 ibrav = int(values[1])
                 self.SP[CUBA.ROLLING_FRICTION] = ibrav
+
             elif "celldm(1)" in line:
                 self.celldm[0] = float(values[1])
 #            SP[CUBA.ORIGINAL_POSITION] = celldm[0]
