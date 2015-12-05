@@ -488,39 +488,40 @@ class qe_functions(object):
                     state = _ReadState.get_state(state, line)
                     if state is _ReadState.CONTROL:
                         print('reading control section')
-                        line = self.process_control(file_iter, SP)
+                        line = self.process_control(file_iter)
                         continue
                     elif state is _ReadState.SYSTEM:
                         print('reading system')
-                        line = self.process_system(file_iter, SP)
+                        line = self.process_system(file_iter)
                         continue
                     elif state is _ReadState.ELECTRONS:
                         print('reading electrons')
-                        line = self.process_electrons(file_iter, SP)
+                        line = self.process_electrons(file_iter)
                         continue
                     elif state is _ReadState.IONS:
                         print('reading ions')
-                        line = self.process_ions(file_iter, SP)
+                        line = self.process_ions(file_iter)
                         continue
                     elif state is _ReadState.CELL:
                         print('reading ions')
-                        line = self.process_ions(file_iter, SP)
+                        line = self.process_ions(file_iter)
                         continue
                     elif state is _ReadState.ATOMIC_SPECIES:
                         print('reading atomic species')
-                        line = self.process_atomic_species(file_iter, SP)
+                        line = self.process_atomic_species(file_iter)
                         continue
                     elif state is _ReadState.K_POINTS:
                         print('reading k points')
                         values = line.split()
-                        line = self.process_k_points(file_iter, SP,
+                        line = self.process_k_points(file_iter,
                                                      mode=values[1])
                         continue
                     elif state is _ReadState.ATOMIC_POSITIONS:
                         print('reading atomic positions')
                         values = line.split()
-                        pc = self.process_atomic_positions(file_iter, pc, SP,
+                        pc = self.process_atomic_positions(file_iter, pc,
                                                            units=values[1])
+                        #  take out pc and use self.PC
                     break
 
                 #                    line = file_iter.next()
@@ -531,7 +532,7 @@ class qe_functions(object):
                 return
         return pc
 
-    def process_control(self, f, SP):
+    def process_control(self, f):
         print('processing control section')
         line = f.next()
         while _ReadState.get_state(_ReadState.CONTROL, line) == \
@@ -543,42 +544,42 @@ class qe_functions(object):
                 calculation_type = values[1]
 # THIS IS A HACK . Use of ZETA POTENTIAL for calculation_type is
 # because attempts to use  CUBAExtension were unsuccessful.
-                SP[CUBA.TORQUE] = calculation_type
+                self.SP[CUBA.TORQUE] = calculation_type
             elif "restart_mode" in line:
                 restart_mode = values[1]
 # TODO change restart mode to check if qe was interrupted previously
 # - should not be a cuba keyword
 # set restart mode='restart' if qe was interrupted as described here
 # http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp27692160
-                SP[CUBA.ZETA_POTENTIAL] = restart_mode
+                self.SP[CUBA.ZETA_POTENTIAL] = restart_mode
             elif "pseudo_dir" in line:
                 pseudo_dir = values[1]
 # TODO - shouldnt be in cuba , also maybe determine this
 # from the ppfile location
 # THIS IS A HACK . Use of YOUNG MODULUS for pseudo_dir
-                SP[CUBA.YOUNG_MODULUS] = pseudo_dir
+                self.SP[CUBA.YOUNG_MODULUS] = pseudo_dir
             elif "prefix" in line:
                 prefix = values[1]
 # THIS IS A HACK . Use of VOLUME FRACTION for prefix
 # TODO - also shouldnt be in cuba
-                SP[CUBA.VOLUME_FRACTION] = prefix
+                self.SP[CUBA.VOLUME_FRACTION] = prefix
             elif "tprnfor" in line:
                 tprnfor = values[1]
 # THIS IS A HACK . Using AMPHILICITY for tprnfor
-                SP[CUBA.AMPHIPHILICITY] = tprnfor
+                self.SP[CUBA.AMPHIPHILICITY] = tprnfor
             elif "max_seconds" in line:
                 max_seconds = float(values[1])
 # THIS IS A HACK . Using NUMBER_OF_TIME_STEPS for max_seconds
-                SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
+                self.SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
             elif "outdir" in line:
                 outdir = values[1]
                 # THIS IS A HACK . Using DIRECTION for outdir
-                SP[CUBA.DIRECTION] = outdir
+                self.SP[CUBA.DIRECTION] = outdir
 
             line = f.next()
         return line
 
-    def process_system(self, f, SP):
+    def process_system(self, f):
         self.celldm = [None, None, None]
         print('processing system section')
         line = f.next()
@@ -588,7 +589,7 @@ class qe_functions(object):
             logging.debug('line in control section:' + str(line))
             if "ibrav" in line:
                 ibrav = int(values[1])
-                SP[CUBA.ROLLING_FRICTION] = ibrav
+                self.SP[CUBA.ROLLING_FRICTION] = ibrav
             elif "celldm(1)" in line:
                 self.celldm[0] = float(values[1])
 #            SP[CUBA.ORIGINAL_POSITION] = celldm[0]
@@ -597,7 +598,7 @@ class qe_functions(object):
 #            SP[CUBA.ORIGINAL_POSITION][1] = celldm[1]
             elif "celldm(3)" in line:
                 self.celldm[2] = float(values[1])
-                SP[CUBA.ORIGINAL_POSITION] = [self.celldm[0],
+                self.SP[CUBA.ORIGINAL_POSITION] = [self.celldm[0],
                                               self.celldm[1], self.celldm[2]]
 #    SP[CUBA.LATTICE_VECTORS] = celldm
 
@@ -605,21 +606,21 @@ class qe_functions(object):
                 pass
             elif "ntyp" in line:
                 n_atom_types = int(values[1])
-                SP[CUBA.SCALING_COEFFICIENT] = n_atom_types
+                self.SP[CUBA.SCALING_COEFFICIENT] = n_atom_types
             elif "ecutwfc" in line:
                 ecutwfc = float(values[1])
-                SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT] = ecutwfc
+                self.SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT] = ecutwfc
             elif "ecutrho" in line:
                 ecutrho = float(values[1])
                 # maybe int
-                SP[CUBA.POISSON_RATIO] = ecutrho
+                self.SP[CUBA.POISSON_RATIO] = ecutrho
             elif "input_dft" in line:
                 input_dft = values[1]
-                SP[CUBA.LATTICE_SPACING] = input_dft
+                self.SP[CUBA.LATTICE_SPACING] = input_dft
             line = f.next()
         return line
 
-    def process_electrons(self, f, SP):
+    def process_electrons(self, f):
         print('processing eletrons section')
         line = f.next()
         while _ReadState.get_state(_ReadState.ELECTRONS, line) == \
@@ -628,35 +629,35 @@ class qe_functions(object):
             logging.debug('line in electrons section:' + str(line))
             if "mixing_mode" in line:
                 mixing_mode = values[1]
-                SP[CUBA.SMOOTHING_LENGTH] = mixing_mode
+                self.SP[CUBA.SMOOTHING_LENGTH] = mixing_mode
             elif "mixing_beta" in line:
                 mixing_beta = float(values[1])
-                SP[CUBA.PHASE_INTERACTION_STRENGTH] = mixing_beta
+                self.SP[CUBA.PHASE_INTERACTION_STRENGTH] = mixing_beta
             elif "conv_thr" in line:
                 conv_thr = values[1]
                 # numbers like 1.0d-7 might have to be converted to float
-                SP[CUBA.DEBYE_LENGTH] = conv_thr
+                self.SP[CUBA.DEBYE_LENGTH] = conv_thr
             line = f.next()
         return line
 
-    def process_ions(self, f, SP):
+    def process_ions(self, f):
         print('processing ions section')
         f.next()
         line = f.next()
         return line
 
-    def process_cell(self, f, SP):
+    def process_cell(self, f):
         print('processing cell section')
         f.next()
         line = f.next()
         return line
 
-    def process_atomic_species(self, f, SP):
+    def process_atomic_species(self, f):
         print('processing atomic species section')
         line = f.next()
-        SP[CUBA.CHEMICAL_SPECIE] = []
-        SP[CUBA.MASS] = []
-        SP[CUBA.FRICTION_COEFFICIENT] = []
+        self.SP[CUBA.CHEMICAL_SPECIE] = []
+        self.SP[CUBA.MASS] = []
+        self.SP[CUBA.FRICTION_COEFFICIENT] = []
         while _ReadState.get_state(_ReadState.ATOMIC_SPECIES, line) == \
                 _ReadState.ATOMIC_SPECIES:
             values = line.split()
@@ -667,21 +668,21 @@ class qe_functions(object):
                 if values[0] in atomtypes:
                     print("atom type:" + values[0])
                     # self.dc(CHEMICAL_SPECIE = values[0])
-                    SP[CUBA.CHEMICAL_SPECIE].append(values[0])
+                    self.SP[CUBA.CHEMICAL_SPECIE].append(values[0])
                     mass = float(values[1])
-                    SP[CUBA.MASS].append(mass)
+                    self.SP[CUBA.MASS].append(mass)
                     potential_file = values[2]
-                    SP[CUBA.FRICTION_COEFFICIENT].append(potential_file)
+                    self.SP[CUBA.FRICTION_COEFFICIENT].append(potential_file)
             line = f.next()
         return line
 
-    def process_k_points(self, f, SP, mode='automatic'):
+    def process_k_points(self, f, mode='automatic'):
         # skip line
         print('processing k_points section')
         line = f.next()
         #    SP[CUBAExtension.K_POINTS_MODE] = mode
 
-        SP[CUBA.PROBABILITY_COEFFICIENT] = mode
+        self.SP[CUBA.PROBABILITY_COEFFICIENT] = mode
 
         while _ReadState.get_state(_ReadState.K_POINTS, line) == \
                 _ReadState.K_POINTS:
@@ -690,16 +691,16 @@ class qe_functions(object):
             if len(values):
                 K_points = (values)
                 print('k points:' + str(K_points))
-                SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = K_points
+                self.SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = K_points
 
             line = f.next()
         return line
 
-    def process_atomic_positions(self, f, pc, SP, units='(angstrom)'):
+    def process_atomic_positions(self, f, pc, units='(angstrom)'):
         print('processing atomic_positions section')
         try:
             line = f.next()
-            SP[CUBA.KINEMATIC_VISCOSITY] = units
+            self.SP[CUBA.KINEMATIC_VISCOSITY] = units
             particle_list = []
             while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS, line) \
                     == _ReadState.ATOMIC_POSITIONS:
