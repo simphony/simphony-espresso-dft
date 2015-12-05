@@ -19,10 +19,13 @@ class qe_functions(object):
     '''
 
     def __init__(self):
-        self.SP = DataContainer()  # System Model Equations and Material relations (Governing Equations)
-        self.SD = DataContainer()  # System Material Description and State Data including Boundaries (not conditions)
+        self.SP = DataContainer()  # System Model Equations and Material
+        # relations (Governing Equations)
+        self.SD = DataContainer()  # System Material Description and
+        # State Data including Boundaries (not conditions)
         self.BC = DataContainer()  # Boundary conditions
-        self.CM = DataContainer()  # Computational Methods (numerical and solver aspects only)
+        self.CM = DataContainer()  # Computational Methods
+        # (numerical and solver aspects only)
         self.pc = Particles('quantum_espresso_particles')
 
     def read_espresso_output_file(self, file_name):
