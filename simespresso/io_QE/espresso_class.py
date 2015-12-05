@@ -755,6 +755,7 @@ class qe_functions(object):
 
     def start_qe(self, name_in, name_out, path_to_espresso='./pw.x',
                  mpi=False, mpi_Nprocessors=2):
+        print('starting start_qe')
         if path_to_espresso is None:
             path_to_espresso = './pw.x '
 # I'll assume if no path given then pw.x is on path
@@ -764,8 +765,8 @@ class qe_functions(object):
         else:
             command = path_to_espresso + ' < ' + name_in + ' > ' + name_out
 
-        if not os.path.isfile(path_to_espresso):
-            logging.warning(path_to_espresso + ' is not on path')
+#        if not os.path.isfile(path_to_espresso):
+#            logging.warning(path_to_espresso + ' is not on path')
 #           this may be ok if pw.x is defined somewhere on the PATH
 #            return None
 
