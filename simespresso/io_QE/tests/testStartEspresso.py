@@ -12,7 +12,7 @@ class OutcomesTest(unittest.TestCase):
         mpi = False
         mpi_Nprocessors = 2
         path_to_espresso = 'pw.x'
-        print('qe wrapper attempting to run espresso')
+        print('testing run of espresso')
         wrapper = espresso_class.qe_functions()
         wrapper.start_qe(name_in, name_out,
                          path_to_espresso=path_to_espresso,
