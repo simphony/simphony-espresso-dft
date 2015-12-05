@@ -6,7 +6,7 @@ from simespresso.io_QE import espresso_class
 class OutcomesTest(unittest.TestCase):
 
     def test_start_qe(self):
-        print('testing starting of qe')
+        print('testing the starting of qe')
         name_in = './pwtest.in'
         name_out = './pwtest.out'
         mpi = False
