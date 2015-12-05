@@ -54,7 +54,6 @@ class OutcomesTest(unittest.TestCase):
                                     == expected_atom_species[i])
                     # print('cur atom matches')
                     break
-        self.assertTrue(expected_atom_positions == [])
 
     def test_espresso_data_file_write(self):
         wrp = espresso_class.qe_functions()
