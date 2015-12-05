@@ -473,7 +473,6 @@ class qe_functions(object):
         state = _ReadState.UNKNOWN
         #       BC = DataContainer()   #boundary conditions
         #       CM = DataContainer()   #computational method
-        SP = self.SP  # System Parameters and Conditions
         #       SD = DataContainer()  #state data
         pc = self.pc
         #       dc = DataContainer()
@@ -598,8 +597,10 @@ class qe_functions(object):
 #            SP[CUBA.ORIGINAL_POSITION][1] = celldm[1]
             elif "celldm(3)" in line:
                 self.celldm[2] = float(values[1])
-                self.SP[CUBA.ORIGINAL_POSITION] = [self.celldm[0],
-                                              self.celldm[1], self.celldm[2]]
+                self.SP[CUBA.ORIGINAL_POSITION] = [
+                                                    self.celldm[0],
+                                                    self.celldm[1],
+                                                    self.celldm[2]]
 #    SP[CUBA.LATTICE_VECTORS] = celldm
 
             elif "nat" in line:
