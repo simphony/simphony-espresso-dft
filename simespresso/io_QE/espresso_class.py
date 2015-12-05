@@ -70,7 +70,7 @@ class qe_functions(object):
                 n_lattice_points = ints[0:3]
                 n_atoms = ints[6]
                 logging.debug('n_points:' + str(n_lattice_points)
-                    + ' n_atoms:' + str(n_atoms))
+                        + ' n_atoms:' + str(n_atoms))
 
                 # 3rd line : bravais lattice, celldm[0],[1],[2]
                 line = file_iter.next()
@@ -86,7 +86,7 @@ class qe_functions(object):
                 celldm = floats[1:4]
 #                SP[CUBA.ORIGINAL_POSITION] = [celldm[0],celldm[1],celldm[2]]
                 logging.debug('bravais:' + str(bravais) +
-                    ' celldm:' + str(celldm))
+                        ' celldm:' + str(celldm))
                 # see http://www.quantum-espresso.org/
                 # wp-content/uploads/Doc/INPUT_PW.html#idp82064
                 if bravais == 0:
@@ -122,7 +122,7 @@ class qe_functions(object):
 
                 self.L = Lattice('quantum espresso lattice',
                                  Ltype, celldm, n_lattice_points, [0, 0, 0])
-                self.BC.lattice = self.L  #not clear to me where L goes
+                self.BC.lattice = self.L  # not clear to me where L goes
                 print(self.BC['test'])
 
                 # 4th line - don't care
