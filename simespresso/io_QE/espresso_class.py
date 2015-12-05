@@ -124,9 +124,7 @@ class qe_functions(object):
 
                 self.L = Lattice('quantum espresso lattice',
                                  Ltype, celldm, n_lattice_points, [0, 0, 0])
-                self.BC.lattice = self.L  # not clear to me where L goes
-                print(self.BC['test'])
-
+                self.BC.lattice = self.L
                 # 4th line - don't care
                 line = file_iter.next()
                 logging.debug('read line4:' + str(line))
@@ -485,15 +483,8 @@ class qe_functions(object):
             line = file_iter.next()
             try:
                 while line is not None:
-                    #                   file_iter.hasnext():
-                    #                   line = f[line_number]
                     line_number += 1
-                    # DEBUG
                     logging.debug('read line:' + str(line))
-                    # skip blank lines
-                    #                   if not line.strip():
-                    #                       continue
-
                     state = _ReadState.get_state(state, line)
                     if state is _ReadState.CONTROL:
                         print('reading control section')
