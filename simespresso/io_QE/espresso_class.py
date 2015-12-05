@@ -543,7 +543,8 @@ class qe_functions(object):
                 calculation_type = values[1]
 # THIS IS A HACK . Use of ZETA POTENTIAL for calculation_type is
 # because attempts to use  CUBAExtension were unsuccessful.
-                self.SP[CUBA.TORQUE] = calculation_type
+#                self.SP[CUBA.TORQUE] = calculation_type
+                self.SP[calculation_type] = calculation_type
             elif "restart_mode" in line:
                 restart_mode = values[1]
 # TODO change restart mode to check if qe was interrupted previously
@@ -598,9 +599,9 @@ class qe_functions(object):
             elif "celldm(3)" in line:
                 self.celldm[2] = float(values[1])
                 self.SP[CUBA.ORIGINAL_POSITION] = [
-                                                    self.celldm[0],
-                                                    self.celldm[1],
-                                                    self.celldm[2]]
+                    self.celldm[0],
+                    self.celldm[1],
+                    self.celldm[2]]
 #    SP[CUBA.LATTICE_VECTORS] = celldm
 
             elif "nat" in line:
