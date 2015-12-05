@@ -753,7 +753,7 @@ class qe_functions(object):
             n += 1
         return n
 
-    def start_qe(self, name_in, name_out, path_to_espresso='/usr/bin/pw.x',
+    def start_qe(self, name_in, name_out, path_to_espresso='./pw.x',
                  mpi=False, mpi_Nprocessors=2):
         if path_to_espresso is None:
             path_to_espresso = './pw.x '
