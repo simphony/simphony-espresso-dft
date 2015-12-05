@@ -773,8 +773,11 @@ class qe_functions(object):
 # however this would give the same info as the
 # try/except, while taking twice as long in the case of success, iiuc
         try:
-            subprocess.Popen(command, shell=True,
+            subprocess.check_call(command, shell=True,
                              stdout=subprocess.PIPE).stdout.read()
+
+#            subprocess.Popen(command, shell=True,
+#                             stdout=subprocess.PIPE).stdout.read()
         except:
             e = sys.exc_info()[0]
             print("<p>Error: %s</p>" % e)
