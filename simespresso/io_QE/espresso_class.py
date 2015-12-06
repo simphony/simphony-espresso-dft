@@ -541,7 +541,7 @@ class qe_functions(object):
                 values = line.split('=')
                 calculation_type = values[1]
 #               Not sure if this is ok or not...
-                self.SP[calculation_type] = calculation_type
+                self.calculation_type = calculation_type
             elif "restart_mode" in line:
                 self.restart_mode = values[1]
 # TODO change restart mode to check if qe was interrupted previously
