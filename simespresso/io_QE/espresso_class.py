@@ -257,29 +257,30 @@ class qe_functions(object):
                 # apparently a comma is not required at the end of every line
                 line = '&CONTROL\n'
                 f.write(line)
-                if self.SP[calculation_type] is not None:
-                    line = '\t calculation=\'' + str(self.SP[calculation_type]) + '\'\n'
+                if hasattr(self, 'calculation_type') is not None:
+                    line = '\t calculation=\'' + str(self.calculation_type) \
+                           + '\'\n'
                     f.write(line)
-                if hasattr(self,'restart_mode'):
+                if hasattr(self, 'restart_mode'):
                     line = '\t restart_mode=\'' + str(self.restart_mode)\
                            + '\'\n'
                     f.write(line)
-                if hasattr(self,'pseudopotential_directory'):
+                if hasattr(self, 'pseudopotential_directory'):
                     line = '\t pseudo_dir=\'' + str(self.pseudopotential_directory) \
                            + '\'\n'
                     f.write(line)
-                if hasattr(self,'pseudopotential_prefix'):
+                if hasattr(self, 'pseudopotential_prefix'):
                     line = '\t prefix=\'' + str(self.pseudopotential_prefix) \
                            + '\'\n'
                     f.write(line)
-                if hasattr(self,'tprnfor'):
+                if hasattr(self, 'tprnfor'):
                     line = '\t tprnfor=' + str(self.tprnfor) + '\n'
                     f.write(line)
-                if hasattr(self,'max_seconds'):
+                if hasattr(self, 'max_seconds'):
                     line = '\t max_seconds=' + \
                            str(int(self.max_seconds)) + '\n'
                     f.write(line)
-                if hasattr(self,'output_directory'):
+                if hasattr(self, 'output_directory'):
                     line = '\t outdir=\'' + str(self.output_directory) + '\'\n'
                     f.write(line)
                 line = '/\n'
@@ -288,11 +289,11 @@ class qe_functions(object):
                 # SYSTEM section
                 line = '&SYSTEM\n'
                 f.write(line)
-                if hasattr(self,'ibrav'):
+                if hasattr(self, 'ibrav'):
                     line = '\t ibrav=' + str(self.ibrav) + '\n'
                     # outdir
                     f.write(line)
-                if hasattr(self,'celldm'):
+                if hasattr(self, 'celldm'):
                     line = '\t celldm(1)=' + \
                            str(self.celldm[0]) + '\n'
                     f.write(line)
@@ -307,19 +308,19 @@ class qe_functions(object):
                 n_atoms = self.count_particles()
                 line = '\t nat=' + str(n_atoms) + '\n'
                 f.write(line)
-                if hasattr(self,'n_atom_types'):
+                if hasattr(self, 'n_atom_types'):
                     line = '\t ntyp=' + str(self.n_atom_types) \
                            + '\n'
                     f.write(line)
 
-                if hasattr(self,'ecutwfc'):
+                if hasattr(self, 'ecutwfc'):
                     line = '\t ecutwfc=' + \
                            str(self.ecutwfc) + '\n'
                     f.write(line)
-                if hasattr(self,'ecutrho'):
+                if hasattr(self, 'ecutrho'):
                     line = '\t ecutrho=' + str(self.ecutrho) + '\n'
                     f.write(line)
-                if hasattr(self,'input_dft'):
+                if hasattr(self, 'input_dft'):
                     line = '\t input_dft=\'' + str(self.input_dft) \
                            + '\'\n'
                     f.write(line)
@@ -329,15 +330,15 @@ class qe_functions(object):
                 # ELECTRONS section
                 line = '&ELECTRONS\n'
                 f.write(line)
-                if hasattr(self,'mixing_mode'):
+                if hasattr(self, 'mixing_mode'):
                     line = '\t mixing_mode=\'' + \
                            str(self.mixing_mode) + '\'\n'
                     f.write(line)
-                if hasattr(self,'mixing_beta') in SP:
+                if hasattr(self, 'mixing_beta') in SP:
                     line = '\t mixing_beta=' + \
                            str(self.mixing_beta) + '\n'
                     f.write(line)
-                if hasattr(self,'convergence_threshold'):
+                if hasattr(self, 'convergence_threshold'):
                     line = '\t conv_thr=' + str(self.convergence_threshold) + '\n'
                     f.write(line)
                 line = '/\n'
@@ -371,11 +372,11 @@ class qe_functions(object):
                 f.write(line)
 
                 # K POINTS
-                if hasattr(self,'k_points_mode'):
+                if hasattr(self, 'k_points_mode'):
                     line = 'K_POINTS ' + \
                            str(self.k_points_mode) + '\n'
                     f.write(line)
-                if hasattr(self,'k_point_values'):
+                if hasattr(self, 'k_point_values'):
                     line = ''
                     for k_point in self.k_point_values:
                         line = line + str(k_point) + ' '
@@ -383,7 +384,7 @@ class qe_functions(object):
                 f.write('\n\n')
 
                 # this will apparently always be angstroms iiuc - jr
-                if hasattr(self,'position_units'):
+                if hasattr(self, 'position_units'):
                     line = 'ATOMIC_POSITIONS ' + \
                            str(self.position_units) + '\n'
                     f.write(line)
@@ -577,7 +578,7 @@ class qe_functions(object):
                 self.ibrav = ibrav
 
             elif "celldm(1)" in line:
-                self.celldm=[0,0,0]
+                self.celldm=[0, 0, 0]
                 self.celldm[0] = float(values[1])
             elif "celldm(2)" in line:
                 self.celldm[1] = float(values[1])
