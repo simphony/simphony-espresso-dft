@@ -85,7 +85,6 @@ class qe_functions(object):
                         return None
                 bravais = int(floats[0])
                 celldm = floats[1:4]
-#                SP[CUBA.ORIGINAL_POSITION] = [celldm[0],celldm[1],celldm[2]]
                 logging.debug(
                     'bravais:' + str(bravais) +
                     ' celldm:' + str(celldm))
@@ -166,6 +165,7 @@ class qe_functions(object):
                                                           n_latticepoints)
             # TODO convert charge_index to node index
             node = self.L.get_node(node_index)
+            # TODO check if this is ok
             node.data[CUBA.MASS] = charge
             nodelist.append(node)
         self.L.update_nodes(nodelist)
@@ -257,35 +257,30 @@ class qe_functions(object):
                 # apparently a comma is not required at the end of every line
                 line = '&CONTROL\n'
                 f.write(line)
-                if CUBA.TORQUE in SP:
-                    line = '\t calculation=\'' + str(SP[CUBA.TORQUE]) + '\'\n'
+                if self.SP[calculation_type] is not None:
+                    line = '\t calculation=\'' + str(self.SP[calculation_type]) + '\'\n'
                     f.write(line)
-                if CUBA.ZETA_POTENTIAL in SP:
-                    line = '\t restart_mode=\'' + str(SP[CUBA.ZETA_POTENTIAL])\
+                if hasattr(self,'restart_mode'):
+                    line = '\t restart_mode=\'' + str(self.restart_mode)\
                            + '\'\n'
-                    # restart_mode
                     f.write(line)
-                if CUBA.YOUNG_MODULUS in SP:
-                    line = '\t pseudo_dir=\'' + str(SP[CUBA.YOUNG_MODULUS]) \
+                if hasattr(self,'pseudopotential_directory'):
+                    line = '\t pseudo_dir=\'' + str(self.pseudopotential_directory) \
                            + '\'\n'
-                    # pseudo dir
                     f.write(line)
-                if CUBA.VOLUME_FRACTION in SP:
-                    line = '\t prefix=\'' + str(SP[CUBA.VOLUME_FRACTION]) \
+                if hasattr(self,'pseudopotential_prefix'):
+                    line = '\t prefix=\'' + str(self.pseudopotential_prefix) \
                            + '\'\n'
-                    # prefix
                     f.write(line)
-                if CUBA.AMPHIPHILICITY in SP:
-                    line = '\t tprnfor=' + str(SP[CUBA.AMPHIPHILICITY]) + '\n'
-                    # tprnfor
+                if hasattr(self,'tprnfor'):
+                    line = '\t tprnfor=' + str(self.tprnfor) + '\n'
                     f.write(line)
-                if CUBA.NUMBER_OF_TIME_STEPS in SP:
+                if hasattr(self,'max_seconds'):
                     line = '\t max_seconds=' + \
-                           str(int(SP[CUBA.NUMBER_OF_TIME_STEPS])) + '\n'
+                           str(int(self.max_seconds)) + '\n'
                     f.write(line)
-                if CUBA.DIRECTION in SP:
-                    line = '\t outdir=\'' + str(SP[CUBA.DIRECTION]) + '\'\n'
-                    # outdir
+                if hasattr(self,'output_directory'):
+                    line = '\t outdir=\'' + str(self.output_directory) + '\'\n'
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -293,39 +288,39 @@ class qe_functions(object):
                 # SYSTEM section
                 line = '&SYSTEM\n'
                 f.write(line)
-                if CUBA.ROLLING_FRICTION in SP:
-                    line = '\t ibrav=' + str(SP[CUBA.ROLLING_FRICTION]) + '\n'
+                if hasattr(self,'ibrav'):
+                    line = '\t ibrav=' + str(self.ibrav) + '\n'
                     # outdir
                     f.write(line)
-                if CUBA.ORIGINAL_POSITION in SP:
+                if hasattr(self,'celldm'):
                     line = '\t celldm(1)=' + \
-                           str(SP[CUBA.ORIGINAL_POSITION][0]) + '\n'
+                           str(self.celldm[0]) + '\n'
                     f.write(line)
                     line = '\t celldm(2)=' + \
-                           str(SP[CUBA.ORIGINAL_POSITION][1]) + '\n'
+                           str(self.celldm[1]) + '\n'
                     f.write(line)
                     line = '\t celldm(3)=' + \
-                           str(SP[CUBA.ORIGINAL_POSITION][2]) + '\n'
+                           str(self.celldm[2]) + '\n'
                     f.write(line)
 
                 # here goes nat and ntype
                 n_atoms = self.count_particles()
                 line = '\t nat=' + str(n_atoms) + '\n'
                 f.write(line)
-                if CUBA.SCALING_COEFFICIENT in SP:
-                    line = '\t ntyp=' + str(SP[CUBA.SCALING_COEFFICIENT]) \
+                if hasattr(self,'n_atom_types'):
+                    line = '\t ntyp=' + str(self.n_atom_types) \
                            + '\n'
                     f.write(line)
 
-                if CUBA.LN_OF_RESTITUTION_COEFFICIENT in SP:
+                if hasattr(self,'ecutwfc'):
                     line = '\t ecutwfc=' + \
-                           str(SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT]) + '\n'
+                           str(self.ecutwfc) + '\n'
                     f.write(line)
-                if CUBA.POISSON_RATIO in SP:
-                    line = '\t ecutrho=' + str(SP[CUBA.POISSON_RATIO]) + '\n'
+                if hasattr(self,'ecutrho'):
+                    line = '\t ecutrho=' + str(self.ecutrho) + '\n'
                     f.write(line)
-                if CUBA.LATTICE_SPACING in SP:
-                    line = '\t input_dft=\'' + str(SP[CUBA.LATTICE_SPACING]) \
+                if hasattr(self,'input_dft'):
+                    line = '\t input_dft=\'' + str(self.input_dft) \
                            + '\'\n'
                     f.write(line)
                 line = '/\n'
@@ -334,16 +329,16 @@ class qe_functions(object):
                 # ELECTRONS section
                 line = '&ELECTRONS\n'
                 f.write(line)
-                if CUBA.SMOOTHING_LENGTH in SP:
+                if hasattr(self,'mixing_mode'):
                     line = '\t mixing_mode=\'' + \
-                           str(SP[CUBA.SMOOTHING_LENGTH]) + '\'\n'
+                           str(self.mixing_mode) + '\'\n'
                     f.write(line)
-                if CUBA.PHASE_INTERACTION_STRENGTH in SP:
+                if hasattr(self,'mixing_beta') in SP:
                     line = '\t mixing_beta=' + \
-                           str(SP[CUBA.PHASE_INTERACTION_STRENGTH]) + '\n'
+                           str(self.mixing_beta) + '\n'
                     f.write(line)
-                if CUBA.DEBYE_LENGTH in SP:
-                    line = '\t conv_thr=' + str(SP[CUBA.DEBYE_LENGTH]) + '\n'
+                if hasattr(self,'convergence_threshold'):
+                    line = '\t conv_thr=' + str(self.convergence_threshold) + '\n'
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -365,30 +360,32 @@ class qe_functions(object):
                 f.write(line)
 
                 # ATOMIC SPECIES
+                # label, mass, pseudopotential_file
                 if CUBA.CHEMICAL_SPECIE in SP:
                     for i in range(0, len(SP[CUBA.CHEMICAL_SPECIE])):
                         line = '\t' + str(SP[CUBA.CHEMICAL_SPECIE][i]) + ' ' + \
                                str(SP[CUBA.MASS][i]) + ' ' + \
-                               str(SP[CUBA.FRICTION_COEFFICIENT][i]) + '\n'
+                               str(self.pseudopotential_files[i]) + '\n'
                         f.write(line)
                 line = '\n'
                 f.write(line)
 
                 # K POINTS
-                if CUBA.PROBABILITY_COEFFICIENT in SP:
+                if hasattr(self,'k_points_mode'):
                     line = 'K_POINTS ' + \
-                           str(SP[CUBA.PROBABILITY_COEFFICIENT]) + '\n'
+                           str(self.k_points_mode) + '\n'
                     f.write(line)
-                if CUBA.EQUATION_OF_STATE_COEFFICIENT in SP:
+                if hasattr(self,'k_point_values'):
                     line = ''
-                    for k_point in SP[CUBA.EQUATION_OF_STATE_COEFFICIENT]:
+                    for k_point in self.k_point_values:
                         line = line + str(k_point) + ' '
                     f.write(line)
                 f.write('\n\n')
 
-                if CUBA.KINEMATIC_VISCOSITY in SP:
+                # this will apparently always be angstroms iiuc - jr
+                if hasattr(self,'position_units'):
                     line = 'ATOMIC_POSITIONS ' + \
-                           str(SP[CUBA.KINEMATIC_VISCOSITY]) + '\n'
+                           str(self.position_units) + '\n'
                     f.write(line)
 
                 multiplier = 10 ** 10
@@ -460,13 +457,13 @@ class qe_functions(object):
         ----------
         handler :
            handler will handle the parsed information provided by this class
-            SP[CUBA.TORQUE] = calculation_type
-            SP[CUBA.ZETA_POTENTIAL] = restart_mode
-            SP[CUBA.YOUNG_MODULUS] = pseudo_dir
-            SP[CUBA.VOLUME_FRACTION] = prefix
-            SP[CUBA.AMPHIPHILICITY] = tprnfor
-            SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
-            SP[CUBA.OUTDIR] = outdir
+            calculation_type
+            restart_mode
+            pseudo_dir
+            prefix
+            tprnfor
+            max_seconds
+            outdir
         file_name : name of qe input file
             """
         self.celldm = [None, None, None]
@@ -541,7 +538,6 @@ class qe_functions(object):
             if "calculation" in line:
                 values = line.split('=')
                 calculation_type = values[1]
-#                self.SP[CUBA.TORQUE] = calculation_type
 #               Not sure if this is ok or not...
                 self.SP[calculation_type] = calculation_type
             elif "restart_mode" in line:
@@ -550,35 +546,21 @@ class qe_functions(object):
 # - should not be a cuba keyword
 # set restart mode='restart' if qe was interrupted as described here
 # http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp27692160
-#                self.SP[CUBA.ZETA_POTENTIAL] = restart_mode
             elif "pseudo_dir" in line:
                 pseudo_dir = values[1]
-# TODO - shouldnt be in cuba , also maybe determine this
-# from the ppfile location
-# THIS IS A HACK . Use of YOUNG MODULUS for pseudo_dir
-#                self.SP[CUBA.YOUNG_MODULUS] = pseudo_dir
                 self.pseudopotential_directory = pseudo_dir
             elif "prefix" in line:
                 prefix = values[1]
-# THIS IS A HACK . Use of VOLUME FRACTION for prefix
-# TODO - also shouldnt be in cuba
-#                self.SP[CUBA.VOLUME_FRACTION] = prefix
                 self.pseudopotential_prefix = prefix
             elif "tprnfor" in line:
                 tprnfor = values[1]
-# THIS IS A HACK . Using AMPHILICITY for tprnfor
-#                self.SP[CUBA.AMPHIPHILICITY] = tprnfor
                 self.tprnfor = tprnfor
             elif "max_seconds" in line:
                 max_seconds = float(values[1])
-# THIS IS A HACK . Using NUMBER_OF_TIME_STEPS for max_seconds
-#                self.SP[CUBA.NUMBER_OF_TIME_STEPS] = max_seconds
                 self.max_seconds = max_seconds
             elif "outdir" in line:
                 outdir = values[1]
-                # THIS IS A HACK . Using DIRECTION for outdir
                 self.output_directory = outdir
-#                self.SP[CUBA.DIRECTION] = outdir
             line = f.next()
         return line
 
@@ -592,37 +574,32 @@ class qe_functions(object):
             logging.debug('line in control section:' + str(line))
             if "ibrav" in line:
                 ibrav = int(values[1])
-                self.SP[CUBA.ROLLING_FRICTION] = ibrav
+                self.ibrav = ibrav
 
             elif "celldm(1)" in line:
+                self.celldm=[0,0,0]
                 self.celldm[0] = float(values[1])
-#            SP[CUBA.ORIGINAL_POSITION] = celldm[0]
             elif "celldm(2)" in line:
                 self.celldm[1] = float(values[1])
-#            SP[CUBA.ORIGINAL_POSITION][1] = celldm[1]
             elif "celldm(3)" in line:
                 self.celldm[2] = float(values[1])
-                self.SP[CUBA.ORIGINAL_POSITION] = [
-                    self.celldm[0],
-                    self.celldm[1],
-                    self.celldm[2]]
-#    SP[CUBA.LATTICE_VECTORS] = celldm
+                self.SP[CUBA.LATTICE_VECTORS] = self.celldm
 
             elif "nat" in line:
                 pass
             elif "ntyp" in line:
                 n_atom_types = int(values[1])
-                self.SP[CUBA.SCALING_COEFFICIENT] = n_atom_types
+                self.n_atom_types = n_atom_types
             elif "ecutwfc" in line:
                 ecutwfc = float(values[1])
-                self.SP[CUBA.LN_OF_RESTITUTION_COEFFICIENT] = ecutwfc
+                self.ecutwfc = ecutwfc
             elif "ecutrho" in line:
                 ecutrho = float(values[1])
                 # maybe int
-                self.SP[CUBA.POISSON_RATIO] = ecutrho
+                self.ecutrho = ecutrho
             elif "input_dft" in line:
                 input_dft = values[1]
-                self.SP[CUBA.LATTICE_SPACING] = input_dft
+                self.input_dft = input_dft
             line = f.next()
         return line
 
@@ -635,14 +612,14 @@ class qe_functions(object):
             logging.debug('line in electrons section:' + str(line))
             if "mixing_mode" in line:
                 mixing_mode = values[1]
-                self.SP[CUBA.SMOOTHING_LENGTH] = mixing_mode
+                self.mixing_mode = mixing_mode
             elif "mixing_beta" in line:
                 mixing_beta = float(values[1])
-                self.SP[CUBA.PHASE_INTERACTION_STRENGTH] = mixing_beta
+                self.mixing_beta = mixing_beta
             elif "conv_thr" in line:
-                conv_thr = values[1]
+                convergence_threshold = values[1]
                 # numbers like 1.0d-7 might have to be converted to float
-                self.SP[CUBA.DEBYE_LENGTH] = conv_thr
+                self.convergence_threshold = convergence_threshold
             line = f.next()
         return line
 
@@ -663,7 +640,7 @@ class qe_functions(object):
         line = f.next()
         self.SP[CUBA.CHEMICAL_SPECIE] = []
         self.SP[CUBA.MASS] = []
-        self.SP[CUBA.FRICTION_COEFFICIENT] = []
+        self.pseudopotential_files = []
         while _ReadState.get_state(_ReadState.ATOMIC_SPECIES, line) == \
                 _ReadState.ATOMIC_SPECIES:
             values = line.split()
@@ -678,7 +655,7 @@ class qe_functions(object):
                     mass = float(values[1])
                     self.SP[CUBA.MASS].append(mass)
                     potential_file = values[2]
-                    self.SP[CUBA.FRICTION_COEFFICIENT].append(potential_file)
+                    self.pseudopotential_files.append(potential_file)
             line = f.next()
         return line
 
@@ -686,9 +663,7 @@ class qe_functions(object):
         # skip line
         print('processing k_points section')
         line = f.next()
-        #    SP[CUBAExtension.K_POINTS_MODE] = mode
-
-        self.SP[CUBA.PROBABILITY_COEFFICIENT] = mode
+        self.k_points_mode = mode
 
         while _ReadState.get_state(_ReadState.K_POINTS, line) == \
                 _ReadState.K_POINTS:
@@ -697,16 +672,16 @@ class qe_functions(object):
             if len(values):
                 K_points = (values)
                 print('k points:' + str(K_points))
-                self.SP[CUBA.EQUATION_OF_STATE_COEFFICIENT] = K_points
-
+                self.k_point_values = K_points
             line = f.next()
+
         return line
 
     def process_atomic_positions(self, f, pc, units='(angstrom)'):
         print('processing atomic_positions section')
         try:
             line = f.next()
-            self.SP[CUBA.KINEMATIC_VISCOSITY] = units
+            self.position_units = units
             particle_list = []
             while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS, line) \
                     == _ReadState.ATOMIC_POSITIONS:
@@ -768,7 +743,7 @@ class qe_functions(object):
 #           this may be ok if pw.x is defined somewhere on the PATH
 #            return None
 
-        print('qe wrapper attempting to run: ' + command)
+        print('start_qe attempting to run: ' + command)
 # alternative would be to use subprocess.check_call()  -
 # however this would give the same info as the
 # try/except, while taking twice as long in the case of success, iiuc

@@ -17,7 +17,7 @@ class OutcomesTest(unittest.TestCase):
             text_file.write(_data_file_contents)
 
     def test_espresso_data_file_read(self):
-        print('starting test of qe input file handler')
+        print('TEST OF READING QE INPUT FILE')
         wrapper = espresso_class.qe_functions()
         wrapper.read_espresso_input_file(self.filename)
         expected_atom_positions = []
@@ -56,8 +56,8 @@ class OutcomesTest(unittest.TestCase):
                     break
 
     def test_espresso_data_file_write(self):
+        print('TEST OF WRITING QE INPUT FILE')
         wrp = espresso_class.qe_functions()
-        print('starting test of qe input file write')
         espresso_input_filename = 'pw_generated.in'
         wrp.SP = DataContainer()
         wrp.pc = Particles('quantum_espresso_particles')
@@ -116,10 +116,14 @@ class OutcomesTest(unittest.TestCase):
         wrp.write_espresso_input_file(espresso_input_filename)
 
     def test_espresso_ppfile_write(self, ppfilename="testpp.in"):
+        print('TEST OF WRITING QE PP FILE')
+
         wrp = espresso_class.qe_functions()
         wrp.write_espresso_pp_file(ppfilename="testpp.in")
 
     def test_read_espresso_output_file(self):
+        print('TEST OF READING QE OUTPUT FILE')
+
         file_name = 'pwtest.out'
         if not(os.path.exists(file_name)):
             # logging.debug("file "+str(file_name)+" not found")
@@ -170,13 +174,14 @@ class OutcomesTest(unittest.TestCase):
         self.assertTrue(indices == [0, 1, 2])
 
     def test_start_qe(self):
+        print('TEST OF STARTING QE')
         name_in = './pwtest.in'
         name_out = './pwtest.out'
         mpi = False
         mpi_Nprocessors = 2
         path_to_espresso = 'pw.x'  # /usr/bin/pw.x is not default apparently
-        print('qe wrapper attempting to run espresso')
         wrapper = espresso_class.qe_functions()
+        wrapper.start_qe(name_in, name_out)
         wrapper.start_qe(name_in, name_out, path_to_espresso=path_to_espresso,
                          mpi=mpi, mpi_Nprocessors=mpi_Nprocessors)
 
