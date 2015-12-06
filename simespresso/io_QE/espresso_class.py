@@ -339,7 +339,8 @@ class qe_functions(object):
                            str(self.mixing_beta) + '\n'
                     f.write(line)
                 if hasattr(self, 'convergence_threshold'):
-                    line = '\t conv_thr=' + str(self.convergence_threshold) + '\n'
+                    line = '\t conv_thr=' + str(self.convergence_threshold) \
+                           + '\n'
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -578,7 +579,7 @@ class qe_functions(object):
                 self.ibrav = ibrav
 
             elif "celldm(1)" in line:
-                self.celldm=[0, 0, 0]
+                self.celldm = [0, 0, 0]
                 self.celldm[0] = float(values[1])
             elif "celldm(2)" in line:
                 self.celldm[1] = float(values[1])
