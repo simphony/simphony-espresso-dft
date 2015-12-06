@@ -257,7 +257,7 @@ class qe_functions(object):
                 # apparently a comma is not required at the end of every line
                 line = '&CONTROL\n'
                 f.write(line)
-                if hasattr(self, 'calculation_type') is not None:
+                if hasattr(self, 'calculation_type'):
                     line = '\t calculation=\'' + str(self.calculation_type) \
                            + '\'\n'
                     f.write(line)
