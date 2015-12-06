@@ -364,7 +364,7 @@ class qe_functions(object):
                 # ATOMIC SPECIES
                 # label, mass, pseudopotential_file
                 if CUBA.CHEMICAL_SPECIE in SP \
-                        and hasattr(self,'pseudopotential_files'):
+                        and hasattr(self, 'pseudopotential_files'):
                     for i in range(0, len(SP[CUBA.CHEMICAL_SPECIE])):
                         line = '\t' + str(SP[CUBA.CHEMICAL_SPECIE][i]) + ' ' + \
                                str(SP[CUBA.MASS][i]) + ' ' + \
