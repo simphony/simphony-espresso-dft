@@ -28,6 +28,40 @@ class qe_functions(object):
         # (numerical and solver aspects only)
         self.pc = Particles('quantum_espresso_particles')
 
+    def start_qe2(self, name_in, name_out, path_to_espresso='pw.x',
+                 mpi=False, mpi_Nprocessors=2):
+        print('starting start_qe')
+        if path_to_espresso is None:
+            path_to_espresso = './pw.x '
+# I'll assume if no path given then pw.x is on path
+        if mpi:
+            command = 'mpirun -np ' + str(mpi_Nprocessors) + ' ' + \
+                      path_to_espresso + ' < ' + name_in + ' > ' + name_out
+        else:
+            command = path_to_espresso + ' < ' + name_in + ' > ' + name_out
+
+#        if not os.path.isfile(path_to_espresso):
+#            logging.warning(path_to_espresso + ' is not on path')
+#           this may be ok if pw.x is defined somewhere on the PATH
+#            return None
+
+        print('start_qe2 attempting to run: ' + command)
+# alternative would be to use subprocess.check_call()  -
+# however this would give the same info as the
+# try/except, while taking twice as long in the case of success, iiuc
+        try:
+            subprocess.check_call(
+                command, shell=True,
+                stdout=subprocess.PIPE).stdout.read()
+
+#            subprocess.Popen(command, shell=True,
+#                             stdout=subprocess.PIPE).stdout.read()
+        except:
+            e = sys.exc_info()[0]
+            print("<p>Error: %s</p>" % e)
+
+
+
     def read_espresso_output_file(self, file_name):
         '''
         This function parses  Espresso output files which usually will have
@@ -127,7 +161,6 @@ class qe_functions(object):
                 # 4th line - don't care
                 line = file_iter.next()
                 logging.debug('read line4:' + str(line))
-
             except StopIteration:
                 print('eof reached')
                 logging.warning('eof reached')
@@ -248,6 +281,7 @@ class qe_functions(object):
         """
         SP = self.SP
         pc = self.pc
+#        SD = self.SD
         # write parameters for a particular working input file
 
         print('attempting to write ' + file_name)
@@ -518,7 +552,7 @@ class qe_functions(object):
                     elif state is _ReadState.ATOMIC_POSITIONS:
                         print('reading atomic positions')
                         values = line.split()
-                        pc = self.process_atomic_positions(file_iter, pc,
+                        self.process_atomic_positions(file_iter,
                                                            units=values[1])
                         #  take out pc and use self.PC
                     break
@@ -529,7 +563,7 @@ class qe_functions(object):
             except Exception:
                 print("problem with line number=", line_number, line)
                 return
-        return pc
+        return
 
     def process_control(self, f):
         print('processing control section')
@@ -680,7 +714,7 @@ class qe_functions(object):
 
         return line
 
-    def process_atomic_positions(self, f, pc, units='(angstrom)'):
+    def process_atomic_positions(self, f, units='(angstrom)'):
         print('processing atomic_positions section')
         try:
             line = f.next()
@@ -714,52 +748,19 @@ class qe_functions(object):
                         print('EOF')
                         break
             if len(particle_list):
-                pc.add_particles(particle_list)
+                self.pc.add_particles(particle_list)
                 #  part_container.add_particle(p)
                 n = self.count_particles()
                 print('n_particles=' + str(n))
         except StopIteration:
-            return ('EOF')
-
-        return pc
+            return
+        return
 
     def count_particles(self):
         n = 0
         for particle in self.pc.iter_particles():
             n += 1
         return n
-
-    def start_qe(self, name_in, name_out, path_to_espresso='./pw.x',
-                 mpi=False, mpi_Nprocessors=2):
-        print('starting start_qe')
-        if path_to_espresso is None:
-            path_to_espresso = './pw.x '
-# I'll assume if no path given then pw.x is on path
-        if mpi:
-            command = 'mpirun -np ' + str(mpi_Nprocessors) + ' ' + \
-                      path_to_espresso + ' < ' + name_in + ' > ' + name_out
-        else:
-            command = path_to_espresso + ' < ' + name_in + ' > ' + name_out
-
-#        if not os.path.isfile(path_to_espresso):
-#            logging.warning(path_to_espresso + ' is not on path')
-#           this may be ok if pw.x is defined somewhere on the PATH
-#            return None
-
-        print('start_qe attempting to run: ' + command)
-# alternative would be to use subprocess.check_call()  -
-# however this would give the same info as the
-# try/except, while taking twice as long in the case of success, iiuc
-        try:
-            subprocess.check_call(
-                command, shell=True,
-                stdout=subprocess.PIPE).stdout.read()
-
-#            subprocess.Popen(command, shell=True,
-#                             stdout=subprocess.PIPE).stdout.read()
-        except:
-            e = sys.exc_info()[0]
-            print("<p>Error: %s</p>" % e)
 
 
 class _ReadState(Enum):

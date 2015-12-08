@@ -181,8 +181,8 @@ class OutcomesTest(unittest.TestCase):
         mpi_Nprocessors = 2
         path_to_espresso = 'pw.x'  # /usr/bin/pw.x is not default apparently
         wrapper = espresso_class.qe_functions()
-        wrapper.start_qe(name_in, name_out)
-        wrapper.start_qe(name_in, name_out, path_to_espresso=path_to_espresso,
+#        wrapper.start_qe2(name_in, name_out)
+        wrapper.start_qe2(name_in, name_out, path_to_espresso=path_to_espresso,
                          mpi=mpi, mpi_Nprocessors=mpi_Nprocessors)
 
 _data_file_contents = """&CONTROL
