@@ -28,7 +28,7 @@ class qe_functions(object):
         # (numerical and solver aspects only)
         self.pc = Particles('quantum_espresso_particles')
 
-    def start_qe2(self, name_in, name_out, path_to_espresso='pw.x',
+    def start_qe(self, name_in, name_out, path_to_espresso='pw.x',
                  mpi=False, mpi_Nprocessors=2):
         print('starting start_qe')
         if path_to_espresso is None:
