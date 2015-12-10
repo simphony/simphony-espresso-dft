@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from espresso_class import qe_functions
 
-class ABCModelingEngine(object):  # pragma: no cover
+class ABCModelingEngineForQE(object):  # pragma: no cover
     """Abstract base class for modeling engines in SimPhoNy.
     Through this interface, the user controls and interacts with the
     simulation/calculation (which is being performed by the modeling
@@ -17,9 +17,7 @@ class ABCModelingEngine(object):  # pragma: no cover
     materials : Materials
         materials related to state data
     """
-    __metaclass__ = ABCMeta
 
-    @abstractmethod
     def run(self):
         """ Run the modeling engine
         Run the modeling engine using the configured settings (e.g. CM, BC,
@@ -33,7 +31,6 @@ class ABCModelingEngine(object):  # pragma: no cover
 
         qe_functions.start_qe(self,name_in,name_out,mpi=mpi,mpi_Nprocessors=mpi_Nprocessors)
 
-    @abstractmethod
     def add_dataset(self, container):
         """Add a CUDS container
         Parameters
@@ -48,7 +45,6 @@ class ABCModelingEngine(object):  # pragma: no cover
             If there is already a dataset with the given name.
         """
 
-    @abstractmethod
     def remove_dataset(self, name):
         """ Remove a dataset from the engine
         Parameters
@@ -61,7 +57,6 @@ class ABCModelingEngine(object):  # pragma: no cover
             If there is no dataset with the given name
         """
 
-    @abstractmethod
     def get_dataset(self, name):
         """ Get the dataset
         Parameters
@@ -79,12 +74,10 @@ class ABCModelingEngine(object):  # pragma: no cover
             If there is no dataset with the given name
         """
 
-    @abstractmethod
     def get_dataset_names(self):  # pragma: no cover
         """ Returns a list of the datasets' names in the engine workspace.
         """
 
-    @abstractmethod
     def iter_datasets(self, names=None):  # pragma: no cover
         """ Returns an iterator over a subset or all of the containers.
         Parameters
