@@ -13,7 +13,7 @@ from simphony.cuds.particles import Particle, Particles
 logging.basicConfig(level=logging.DEBUG)
 
 
-class qe_functions(object):
+class qe_wrapper(object):
     '''
     functions for reading and writing quantum espresso input and output files
     '''
