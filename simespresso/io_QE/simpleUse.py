@@ -9,7 +9,11 @@ import logging
 #    from simphony.engine import quantumESPRESSO
 # todo  figure out how to get wrapper into simphony.engine
 # instead of the following
-from simespresso.io_QE import espresso_class
+#from simespresso.io_QE import espresso_class
+#import qeCubaExtensions
+#import espresso_class
+from espresso_class import QeWrapper
+from qeCubaExtensions import qeCUBAExtension
 
 # Create the Cu unit cell, assuming a simple cubic system with 4 basis
 # atoms (for an FCC latticle)
@@ -34,35 +38,24 @@ for base_vector in basis:
     p.data[CUBA.MASS] = 63.546             # this is the atomic mass
     pc.add_particles([p])
     logging.debug('position:'+str(position))
-
 super_cell = [[x*a_latt for x in v] for v in unit_cell]
-pc.data_extension = {espresso_class.CUBAExtension.BOX_VECTORS: super_cell}
+pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
 
 # later (D1.6) the BC should be part of the cuds: mycuds.BOX_VECTORS
 # define the wrapper to use.
 
-wrapper = espresso_class.qe_wrapper()
+wrapper = QeWrapper()
 # Define the BC component of the SimPhoNy application model:
-wrapper.BC_extension[quantumESPRESSO.CUBAExtension.BOX_FACES] = ["periodic",
+wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
                                                         "periodic",
                                                         "periodic"]
-
 pc_w = wrapper.add_dataset(pc)
-
-wrapper.SP_extension[quantumESPRESSO.CUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
+wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
 
 # good for now, this is a standard pseudopotential, later we shall have a better way (actually we have it now but not implemented yet)
-
-wrapper.CM_extension[quantumESPRESSO.CUBAExtension.K_POINT_SAMPLING_METHOD] = CUBA.Monkhorst-Pack
-
-wrapper.CM_extension[quantumESPRESSO.CUBAExtension.K_POINT_SAMPLING] = [3, 3, 3 ]
-
-
-
+wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] = CUBA.Monkhorst-Pack
+wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [3, 3, 3 ]
 wrapper.run()
-
 # the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc within the value of the total energy from the output (log file) of QE
-
 pc = wrapper.get_dataset("Copper")
-
-pc.data_extension[quantumESPRESSO.CUBAExtension.TOTAL_ENERGY] # should print the tot eng
+pc.data_extension[qeCUBAExtension.TOTAL_ENERGY] # should print the tot eng

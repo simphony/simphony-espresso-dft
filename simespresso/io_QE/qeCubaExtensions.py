@@ -2,7 +2,7 @@ from enum import Enum, unique
 
 
 @unique
-class CUBAExtension(Enum):
+class qeCUBAExtension(Enum):
     """ Provisional CUBA keywords specific for Lammps-Md
     These are additional CUBA-Keywords that are not included
     in simphony-common yet. The proposed description for
@@ -14,6 +14,12 @@ class CUBAExtension(Enum):
     number: 101
     shape: [3,3]
     type: double
+    - description: Simulation box faces
+    domain: [MD]
+    key: BOX_FACES
+    name: BoxFaces
+    number: 100
+    shape: [1]
     - description: Simulation box origin
     domain: [MD]
     key: BOX_ORIGIN
@@ -31,5 +37,6 @@ class CUBAExtension(Enum):
 """
 
     BOX_VECTORS = "BOX_VECTORS"
+    BOX_FACES = "BOX_FACES"
     BOX_ORIGIN = "BOX_ORIGIN"
     PAIR_POTENTIALS = "PAIR_POTENTIALS"

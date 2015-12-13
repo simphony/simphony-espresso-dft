@@ -9,11 +9,12 @@ from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony.cuds.lattice import Lattice
 from simphony.cuds.particles import Particle, Particles
+from simphony.cuds.abc_particles import ABCParticles
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-class qe_wrapper(object):
+class QeWrapper(object):
     '''
     functions for reading and writing quantum espresso input and output files
     '''
@@ -28,6 +29,9 @@ class qe_wrapper(object):
         # (numerical and solver aspects only)
         self.pc = Particles('quantum_espresso_particles')
         self.CUBAExtension = {}
+        self.CM_extension = {}
+        self.SP_extension = {}
+        self.BC_extension = {}
 
     def start_qe(self, name_in, name_out, path_to_espresso='pw.x',
                  mpi=False, mpi_Nprocessors=2):
@@ -61,6 +65,40 @@ class qe_wrapper(object):
             e = sys.exc_info()[0]
             print("<p>Error: %s</p>" % e)
 
+    def add_dataset(self,container):
+        """Add a CUDS container
+        Parameters
+        ----------
+        container : {ABCParticles}
+            The CUDS container to add to the engine.
+        Raises
+        ------
+        TypeError:
+            If the container type is not supported (i.e. ABCLattice, ABCMesh).
+        ValueError:
+            If there is already a dataset with the given name.
+        """
+        if not isinstance(container, ABCParticles):
+            raise TypeError(
+                "The type of the dataset container is not supported")
+
+        if container.name in self._data_manager:
+            raise ValueError(
+                'Particle container \'{}\' already exists'.format(
+                    container.name))
+        else:
+            self._data_manager.new_particles(container)
+
+        particle_list = []
+
+#todo - this should eventually look like the following
+#    for particles in wrapper.iter_datasets():
+#        for p in particles.iter_particles():
+#            return p, particles
+
+        for particle in particle_container.iter_particles:
+            particle_list.append(particle)
+        self.pc.add_particles(particle_list)
 
 
     def read_espresso_output_file(self, file_name):
