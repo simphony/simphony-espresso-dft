@@ -4,9 +4,10 @@ from simphony.core.cuba import CUBA
 from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.particles import Particle, Particles
 from simphony.io.h5_cuds import H5CUDS
+import logging
 
 #    from simphony.engine import quantumESPRESSO
-# todo  figure out how to get my wrapper into simphony.engine
+# todo  figure out how to get wrapper into simphony.engine
 # instead of the following
 from simespresso.io_QE import espresso_class
 
@@ -26,15 +27,15 @@ basis = [
     [0.0, 0.5, 0.5] ]
 pc = Particles("Copper")
 for base_vector in basis:
-    position = [component*a_latt for component in base_vector]
+    position = [component * a_latt for component in base_vector]
     p = Particle(coordinates=position)
     p.data[CUBA.CHEMICAL_SPECIE] = ['Cu']  # this should be later an enum...
                                            # like, CUBA.CHEMICAL.ELEMENTS.Cu
     p.data[CUBA.MASS] = 63.546             # this is the atomic mass
     pc.add_particles([p])
-    print position
+    logging.debug('position:'+str(position))
 
-super_cell = [[x*a_latt for x in v] for v in enumerate(unit_cell)]
+super_cell = [[x*a_latt for x in v] for v in unit_cell]
 pc.data_extension = {espresso_class.CUBAExtension.BOX_VECTORS: super_cell}
 
 # later (D1.6) the BC should be part of the cuds: mycuds.BOX_VECTORS

@@ -27,6 +27,7 @@ class qe_wrapper(object):
         self.CM = DataContainer()  # Computational Methods
         # (numerical and solver aspects only)
         self.pc = Particles('quantum_espresso_particles')
+        self.CUBAExtension = {}
 
     def start_qe(self, name_in, name_out, path_to_espresso='pw.x',
                  mpi=False, mpi_Nprocessors=2):
