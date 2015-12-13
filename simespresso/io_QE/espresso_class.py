@@ -82,10 +82,11 @@ class QeWrapper(object):
             raise TypeError(
                 "The type of the dataset container is not supported")
 
-        if container.name in self._data_manager:
-            raise ValueError(
-                'Particle container \'{}\' already exists'.format(
-                    container.name))
+# I haven't implemented this 'data_manager' business
+#        if container.name in self._data_manager:
+#            raise ValueError(
+#                'Particle container \'{}\' already exists'.format(
+#                    container.name))
         else:
             self._data_manager.new_particles(container)
 
