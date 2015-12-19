@@ -11,6 +11,7 @@ from simphony.cuds.lattice import Lattice
 from simphony.cuds.particles import Particle, Particles
 from simphony.cuds.abc_particles import ABCParticles
 
+from  qe_abc_data_manager import QeABCDataManager
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -32,6 +33,8 @@ class QeWrapper(object):
         self.CM_extension = {}
         self.SP_extension = {}
         self.BC_extension = {}
+        self._data_manager = QeABCDataManager()
+
 
     def start_qe(self, name_in, name_out, path_to_espresso='pw.x',
                  mpi=False, mpi_Nprocessors=2):
@@ -88,7 +91,7 @@ class QeWrapper(object):
 #                'Particle container \'{}\' already exists'.format(
 #                    container.name))
         else:
-            self._data_manager.new_particles(container)
+            self._data_manager.new_particles(self._data_manager,container)
 
         particle_list = []
 

@@ -3,7 +3,7 @@ import abc
 
 
 
-class ABCDataManager(object):
+class QeABCDataManager(object):
     """  Class managing Lammps data information
     The class performs communicating the data to and from lammps. The
     class manages data existing in Lammps and allows this data to be
