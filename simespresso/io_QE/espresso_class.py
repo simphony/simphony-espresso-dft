@@ -88,6 +88,30 @@ class QeWrapper(object):
             raise TypeError(
                 "The type of the dataset container is not supported")
 
+#        if container.name in self._data_manager:
+#            raise ValueError(
+#                'Particle container \'{}\' already exists'.format(
+#                    container.name))
+        else:
+            self._data_manager.new_particles(self._data_manager,container)
+
+        particle_list = []
+
+    def get_dataset(self,container_name):
+        """Get a CUDS container
+        Parameters
+        ----------
+        container_name : string
+            Name of the CUDS container to get.
+        Raises
+        ------
+        ValueError:
+            If there is no dataset with the given name.
+        """
+        if not isinstance(container_name, ABCParticles):
+            raise TypeError(
+                "The type of the dataset container is not supported")
+
 # I haven't implemented this 'data_manager' business
 #        if container.name in self._data_manager:
 #            raise ValueError(
