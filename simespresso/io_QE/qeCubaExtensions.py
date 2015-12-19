@@ -34,9 +34,33 @@ class qeCUBAExtension(Enum):
     number: 104
     shape: [20]
     type: string
-"""
+    - description: Pseudopotentials
+    domain: [MD]
+    key: PAIR_POTENTIALS
+    name: PairPotentials
+    number: 200
+    shape: [20]
+    type: string
+    - description: kpoint sampling method
+    domain: [MD]
+    key: K_POINT_SAMPLING_METHOD
+    name: K_point_sampling_method
+    number: 210
+    shape: [20]
+    type: string
+    - description: k point sampling
+    domain: [MD]
+    key: K_POINT_SAMPLING
+    name: K_point_sampling
+    number:220
+    shape: [3]
+    type: double
+    """
 
     BOX_VECTORS = "BOX_VECTORS"
     BOX_FACES = "BOX_FACES"
     BOX_ORIGIN = "BOX_ORIGIN"
     PAIR_POTENTIALS = "PAIR_POTENTIALS"
+    PSEUDO_POTENTIAL = "PSEUDO_POTENTIAL"
+    K_POINT_SAMPLING_METHOD = "K_POINT_SAMPLING_METHOD"
+    K_POINT_SAMPLING = "K_POINT_SAMPLING"

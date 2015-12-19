@@ -2,9 +2,10 @@ import logging
 import os.path
 import subprocess
 import sys
-
+import uuid
 import numpy as np
 from enum import Enum
+
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony.cuds.lattice import Lattice
@@ -12,6 +13,7 @@ from simphony.cuds.particles import Particle, Particles
 from simphony.cuds.abc_particles import ABCParticles
 
 from  qe_abc_data_manager import QeABCDataManager
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -33,8 +35,9 @@ class QeWrapper(object):
         self.CM_extension = {}
         self.SP_extension = {}
         self.BC_extension = {}
-        self._data_manager = QeABCDataManager()
-
+#        self._data_manager = QeABCDataManager()
+        self.datasets = {}
+        self.dataset_names = []
 
     def start_qe(self, name_in, name_out, path_to_espresso='pw.x',
                  mpi=False, mpi_Nprocessors=2):
@@ -805,6 +808,41 @@ class QeWrapper(object):
             n += 1
         return n
 
+    def add_dataset(self, container):
+        """Add a CUDS container
+        Parameters
+        ----------
+        container : {ABCParticles}
+            The CUDS container to add to the engine.
+        Raises
+        ------
+        TypeError:
+            If the container type is not supported (i.e. ABCLattice, ABCMesh).
+        ValueError:
+            If there is already a dataset with the given name.
+        """
+        if not isinstance(container, ABCParticles):
+            raise TypeError(
+                "The type of the dataset container is not supported")
+
+        if container.name in self.dataset_names:
+            raise ValueError(
+                'Particle container \'{}\' already exists'.format(
+                    container.name))
+        else:
+#            self._data_manager.new_particles(container)
+#            uname = uuid.uuid4()
+            self.datasets[container.name] = container
+            self.dataset_names.append(container.name)
+#            particles = container
+#            self._unames[particles.name] = uname
+#            self._names[uname] = particles.name
+
+#            lammps_pc = LammpsParticles(self, uname)
+#            self._lpcs[uname] = lammps_pc
+
+#            self._handle_new_particles(uname, particles)
+#            return lammps_pc
 
 class _ReadState(Enum):
     UNKNOWN, UNSUPPORTED, CONTROL, SYSTEM, ELECTRONS, IONS, CELL, \
@@ -835,7 +873,7 @@ class _ReadState(Enum):
 atomtypes = ["C", "H", "He", "N", "O", "Na", "Mg"]
 
 if __name__ == "__main__":
-    wrapper = qe_functions()
+    wrapper = QeWrapper()
 #    filename = 'xyzoutput.txt.bak'
 #    filename = '../../examples/input_pw.in'
     filename = 'tests/pw.in'
