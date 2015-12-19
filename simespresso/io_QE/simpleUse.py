@@ -52,9 +52,12 @@ wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
 pc_w = wrapper.add_dataset(pc)
 wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
 
-# good for now, this is a standard pseudopotential, later we shall have a better way (actually we have it now but not implemented yet)
-wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] = CUBA.Monkhorst-Pack
-wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [3, 3, 3 ]
+# good for now, this is a standard pseudopotential,
+# later we shall have a better way (actually we have it now
+# but not implemented yet)
+wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] = "Monkhorst-Pack"
+#can we define CUBA.Monkhorst-Pack please
+wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [3, 3, 3]
 wrapper.run()
 # the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc within the value of the total energy from the output (log file) of QE
 pc = wrapper.get_dataset("Copper")

@@ -39,8 +39,8 @@ class QeWrapper(object):
         self.datasets = {}
         self.dataset_names = []
 
-    def start_qe(self, name_in, name_out, path_to_espresso='pw.x',
-                 mpi=False, mpi_Nprocessors=2):
+    def run(self, name_in="input.pw", name_out="qe_output",
+            path_to_espresso='pw.x',mpi=False, mpi_Nprocessors=2):
         print('starting start_qe')
         if path_to_espresso is None:
             path_to_espresso = './pw.x '
