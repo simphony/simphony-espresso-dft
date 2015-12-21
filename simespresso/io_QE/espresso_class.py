@@ -1,25 +1,33 @@
 import logging
+import os
 import os.path
 import subprocess
 import sys
-import uuid
+
 import numpy as np
 from enum import Enum
-
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
+from simphony.cuds.abc_modeling_engine import ABCModelingEngine
+from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.lattice import Lattice
 from simphony.cuds.particles import Particle, Particles
-from simphony.cuds.abc_particles import ABCParticles
-
-from  qe_abc_data_manager import QeABCDataManager
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-class QeWrapper(object):
+class QeWrapper(ABCModelingEngine):
     '''
     functions for reading and writing quantum espresso input and output files
+    wrapper must define:
+        add_dataset(self, container):
+        remove_dataset(self, name):
+        get_dataset(self, name):
+        get_dataset_names(self):
+        iter_datasets(self, names=None):
+        run(self)
+        _combine(data_container, data_container_extension)
+           ?? not sure about this one
     '''
 
     def __init__(self):
@@ -35,41 +43,39 @@ class QeWrapper(object):
         self.CM_extension = {}
         self.SP_extension = {}
         self.BC_extension = {}
-#        self._data_manager = QeABCDataManager()
         self.datasets = {}
-        self.dataset_names = []
 
-    def run(self, name_in="input.pw", name_out="qe_output",
-            path_to_espresso='pw.x',mpi=False, mpi_Nprocessors=2):
+        #data for running qe
+        self.pwname_in="input.pw"
+        self.output_filename="qe_output",
+        self.path_to_espresso='pw.x'
+        self.mpi=False
+        self.mpi_Nprocessors=2
+
+
+    def run(self):
         print('starting start_qe')
-        if path_to_espresso is None:
-            path_to_espresso = './pw.x '
-# I'll assume if no path given then pw.x is on path
-        if mpi:
-            command = 'mpirun -np ' + str(mpi_Nprocessors) + ' ' + \
-                      path_to_espresso + ' < ' + name_in + ' > ' + name_out
+        if not which(self.path_to_espresso):
+            raise ValueError(
+                'espresso command not found (looking for '
+                            + self.path_to_espresso+')')
+        if self.mpi:
+            command = 'mpirun -np ' + str(self.mpi_Nprocessors) + ' ' + \
+                      self.path_to_espresso + ' < ' + self.pwname_in + ' > ' \
+                      + self.output_filename
         else:
-            command = path_to_espresso + ' < ' + name_in + ' > ' + name_out
-
-#        if not os.path.isfile(path_to_espresso):
-#            logging.warning(path_to_espresso + ' is not on path')
-#           this may be ok if pw.x is defined somewhere on the PATH
-#            return None
-
-        print('start_qe2 attempting to run: ' + command)
-# alternative would be to use subprocess.check_call()  -
-# however this would give the same info as the
-# try/except, while taking twice as long in the case of success, iiuc
+            command = self.path_to_espresso + ' < ' + self.pwname_in + ' > ' \
+                      + self.output_filename
+        logging.debug('attempting to run command: ' + command)
         try:
-            subprocess.check_call(
-                command, shell=True,
+            subprocess.check_call(command, shell=True,
                 stdout=subprocess.PIPE).stdout.read()
-
 #            subprocess.Popen(command, shell=True,
 #                             stdout=subprocess.PIPE).stdout.read()
         except:
             e = sys.exc_info()[0]
-            print("<p>Error: %s</p>" % e)
+            logging.debug()
+            raise ValueError('espresso command gave error %s' % e)
 
     def add_dataset(self,container):
         """Add a CUDS container
@@ -86,18 +92,33 @@ class QeWrapper(object):
         """
         if not isinstance(container, ABCParticles):
             raise TypeError(
-                "The type of the dataset container is not supported")
+                "This type of dataset container is not supported")
 
-#        if container.name in self._data_manager:
-#            raise ValueError(
-#                'Particle container \'{}\' already exists'.format(
-#                    container.name))
+        if container.name in self.get_dataset_names():
+            raise ValueError(
+                'Particle container \'{}\' already exists'.format(
+                    container.name))
         else:
-            self._data_manager.new_particles(self._data_manager,container)
+            self.datasets[container.name] = container
 
-        particle_list = []
+    def remove_dataset(self,dataset_name):
+        """remove dataset
+        Parameters
+        ----------
+        dataset_name : name container to remove
+        Raises
+        ------
+        ValueError:
+            If there is no dataset with the given name.
+        """
+        if not dataset.name in self.dataset_names:
+            raise ValueError(
+                'Particle container \'{}\' does not exist'.format(
+                    dataset_name))
+        else:
+            del self.datasets[dataset.name]
 
-    def get_dataset(self,container_name):
+    def get_dataset(self,dataset_name):
         """Get a CUDS container
         Parameters
         ----------
@@ -108,28 +129,22 @@ class QeWrapper(object):
         ValueError:
             If there is no dataset with the given name.
         """
-        if not isinstance(container_name, ABCParticles):
-            raise TypeError(
-                "The type of the dataset container is not supported")
-
-# I haven't implemented this 'data_manager' business
-#        if container.name in self._data_manager:
-#            raise ValueError(
-#                'Particle container \'{}\' already exists'.format(
-#                    container.name))
+        if not dataset.name in self.get_dataset_names():
+            logging.debug('Container name '+str(dataset_name)+' not found.')
+            return None
         else:
-            self._data_manager.new_particles(self._data_manager,container)
+            dataset = self.datasets[dataset_name]
+            return dataset
 
-        particle_list = []
+    def get_dataset_names(self):
+        """Get names of datasets in container
+        """
+        dataset_names = [name for name in self.datasets]
+        return dataset_names
 
-#todo - this should eventually look like the following
-#    for particles in wrapper.iter_datasets():
-#        for p in particles.iter_particles():
-#            return p, particles
+    def iter_datasets(self, names=None):
+        #not sure what the names param is for
 
-        for particle in particle_container.iter_particles:
-            particle_list.append(particle)
-        self.pc.add_particles(particle_list)
 
 
     def read_espresso_output_file(self, file_name):
@@ -893,6 +908,22 @@ class _ReadState(Enum):
             new_state = _ReadState.ATOMIC_POSITIONS
         #      print('current state:'+str(new_state))
         return new_state
+
+def which(name):
+    found = 0
+    for path in os.getenv("PATH").split(os.path.pathsep):
+        full_path = path + os.sep + name
+        if os.path.exists(full_path):
+            """
+            if os.stat(full_path).st_mode & stat.S_IXUSR:
+                found = 1
+                print(full_path)
+            """
+            found = 1
+            print(full_path)
+    # Return a UNIX-style exit code so it can be checked by calling scripts.
+    # Programming shortcut to toggle the value of found: 1 => 0, 0 => 1.
+    sys.exit(1 - found)
 
 atomtypes = ["C", "H", "He", "N", "O", "Na", "Mg"]
 
