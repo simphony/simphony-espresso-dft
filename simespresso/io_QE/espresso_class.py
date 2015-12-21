@@ -27,7 +27,8 @@ class QeWrapper(ABCModelingEngine):
         iter_datasets(self, names=None):
         run(self)
         _combine(data_container, data_container_extension)
-           ?? not sure about this one
+           ?? not sure about last one - it doe not appear in
+           common/abc_modeling_engine
     '''
 
     def __init__(self):
@@ -143,8 +144,24 @@ class QeWrapper(ABCModelingEngine):
         return dataset_names
 
     def iter_datasets(self, names=None):
-        #not sure what the names param is for
-
+        """ Returns an iterator over a subset or all of the containers.
+        Parameters
+        ----------
+        names : sequence of str, optional
+            names of specific containers to be iterated over. If names is not
+            given, then all containers will be iterated over.
+        """
+        if names is None:
+            for name in self.get_dataset_names:
+                yield self.get_dataset(name)
+        else:
+            for name in names:
+                if name in self.get_dataset_names:
+                    yield self.get_dataset(name)
+                else:
+                    raise ValueError(
+                        'Particle container \'{}\` does not exist'.format(
+                            name))
 
 
     def read_espresso_output_file(self, file_name):
@@ -864,7 +881,7 @@ class QeWrapper(ABCModelingEngine):
             raise TypeError(
                 "The type of the dataset container is not supported")
 
-        if container.name in self.dataset_names:
+        if container.name in self.get_dataset_names():
             raise ValueError(
                 'Particle container \'{}\' already exists'.format(
                     container.name))
@@ -872,7 +889,6 @@ class QeWrapper(ABCModelingEngine):
 #            self._data_manager.new_particles(container)
 #            uname = uuid.uuid4()
             self.datasets[container.name] = container
-            self.dataset_names.append(container.name)
 #            particles = container
 #            self._unames[particles.name] = uname
 #            self._names[uname] = particles.name

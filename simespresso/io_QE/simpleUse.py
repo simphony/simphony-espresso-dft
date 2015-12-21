@@ -60,5 +60,9 @@ wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] = "Monkhorst-Pack"
 wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [3, 3, 3]
 wrapper.run()
 # the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc within the value of the total energy from the output (log file) of QE
-pc = wrapper.get_dataset("Copper")
-pc.data_extension[qeCUBAExtension.TOTAL_ENERGY] # should print the tot eng
+names = wrapper.get_dataset_names()
+extracted_pc = wrapper.get_dataset("Copper")
+print('checking particles:')
+for particle in extracted_pc:
+    print('particle:'+str(particle))
+extracted_pc.data_extension[qeCUBAExtension.TOTAL_ENERGY] # should print the tot eng
