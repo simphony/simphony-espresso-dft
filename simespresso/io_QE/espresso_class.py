@@ -55,8 +55,10 @@ class QeWrapper(ABCModelingEngine):
 
 
     def run(self):
-        print('starting start_qe')
+        print('starting qe engine')
+        print('path to espresso:'+self.path_to_espresso)
         if not which(self.path_to_espresso):
+            logging.debug('no path to espresso')
             raise ValueError(
                 'espresso command not found (looking for '
                             + self.path_to_espresso+')')
