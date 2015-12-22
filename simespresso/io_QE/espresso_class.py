@@ -47,8 +47,31 @@ class QeWrapper(ABCModelingEngine):
         self.datasets = {}
 
         #data for running qe
-        self.pwname_in="input.pw"
-        self.output_filename="qe_output",
+        #control
+        self.calculation_type = 'scf'
+        self.restart_mode = 'from_scratch'
+        self.pseudopotential_directory = './'
+        self.pseudopotential_prefix = 'simphony_pp'
+        self.tprnfor = '.true.'
+        self. max_seconds = 3600*24
+        self.output_directory = './'
+
+        #system
+        self.celldm = []  #This should  come from lattice vectors
+        self.ibrav = 8  #this should also be defined in cuba
+        self.n_atom_types = 0 #comes from pc
+        self.ecutwfc = 60.0  #find reasonable default
+        self.ecutrho = 240 #find reasonable default
+        self.input_dft = '' #maybe give a default
+
+        #electrons
+        self.mixing_mode = 'local-TF'
+        self.mixing_beta = 0.8 # good default?
+        self.convergence_threshold = 1.0**-7
+
+        #other info
+        self.input_pwname="input.pw"
+        self.output_filename="qe_output"
         self.path_to_espresso='pw.x'
         self.mpi=False
         self.mpi_Nprocessors=2
@@ -56,7 +79,9 @@ class QeWrapper(ABCModelingEngine):
 
     def run(self):
         print('starting qe engine')
+        self.write_espresso_input_file(self.input_pwname)
         print('path to espresso:'+self.path_to_espresso)
+#        print(which(self.path_to_espresso))
         if not which(self.path_to_espresso):
             logging.debug('no path to espresso')
             raise ValueError(
@@ -67,7 +92,7 @@ class QeWrapper(ABCModelingEngine):
                       self.path_to_espresso + ' < ' + self.pwname_in + ' > ' \
                       + self.output_filename
         else:
-            command = self.path_to_espresso + ' < ' + self.pwname_in + ' > ' \
+            command = self.path_to_espresso + ' < ' + self.input_pwname + ' > ' \
                       + self.output_filename
         logging.debug('attempting to run command: ' + command)
         try:
@@ -77,7 +102,7 @@ class QeWrapper(ABCModelingEngine):
 #                             stdout=subprocess.PIPE).stdout.read()
         except:
             e = sys.exc_info()[0]
-            logging.debug()
+            logging.debug('espresso command gave error %s' % e)
             raise ValueError('espresso command gave error %s' % e)
 
     def add_dataset(self,container):
@@ -132,7 +157,7 @@ class QeWrapper(ABCModelingEngine):
         ValueError:
             If there is no dataset with the given name.
         """
-        if not dataset.name in self.get_dataset_names():
+        if not dataset_name in self.get_dataset_names():
             logging.debug('Container name '+str(dataset_name)+' not found.')
             return None
         else:
@@ -378,13 +403,16 @@ class QeWrapper(ABCModelingEngine):
                                  y_points, z_count, z_points))
         return charge_density
 
-    def write_espresso_input_file(self, file_name):
+    def write_espresso_input_file(self, file_name,dataset_name = None):
         """
         :param file_name: name of the input file to write
         :return:
         """
         SP = self.SP
-        pc = self.pc
+        if dataset_name is  None:
+            dataset_name = self.get_dataset_names()[0]
+        pc = self.get_dataset(dataset_name)
+
 #        SD = self.SD
         # write parameters for a particular working input file
 
@@ -539,7 +567,7 @@ class QeWrapper(ABCModelingEngine):
                           str(atom_type) + ' ')
                     line = str(atom) + ' ' + \
                         str(multiplier * particle.coordinates[0]) + ' ' + \
-                        str(multiplier * particle.coordinates[1]) + ' ' + \
+                        (multiplier * particle.coordinates[1]) + ' ' + \
                         str(multiplier * particle.coordinates[2]) + '\n'
                     f.write(line)
         except:
@@ -796,7 +824,6 @@ class QeWrapper(ABCModelingEngine):
                     mass = float(values[1])
                     self.SP[CUBA.MASS].append(mass)
                     potential_file = values[2]
-                    self.pseudopotential_files.append(potential_file)
             line = f.next()
         return line
 
@@ -944,6 +971,24 @@ def which(name):
     sys.exit(1 - found)
 
 atomtypes = ["C", "H", "He", "N", "O", "Na", "Mg"]
+
+def which(program):
+    import os
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
 
 if __name__ == "__main__":
     wrapper = QeWrapper()
