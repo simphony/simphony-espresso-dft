@@ -3,15 +3,19 @@ import os
 import os.path
 import subprocess
 import sys
-
 import numpy as np
 from enum import Enum
+import math
+
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.lattice import Lattice
 from simphony.cuds.particles import Particle, Particles
+
+from qeCubaExtensions import qeCUBAExtension
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -57,17 +61,18 @@ class QeWrapper(ABCModelingEngine):
         self.output_directory = './'
 
         #system
-        self.celldm = []  #This should  come from lattice vectors
+        self.celldm = [1, 1, 1]  #This should  come from lattice vectors
+        #  if the user only specificies atom positions, what should this be
         self.ibrav = 8  #this should also be defined in cuba
         self.n_atom_types = 0 #comes from pc
         self.ecutwfc = 60.0  #find reasonable default
         self.ecutrho = 240 #find reasonable default
-        self.input_dft = '' #maybe give a default
+        self.input_dft = 'vdw-df-c09' #maybe give a default
 
         #electrons
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
-        self.convergence_threshold = 1.0**-7
+        self.convergence_threshold = 1.0*10**-7
 
         #other info
         self.input_pwname="input.pw"
@@ -474,11 +479,10 @@ class QeWrapper(ABCModelingEngine):
                 n_atoms = self.count_particles()
                 line = '\t nat=' + str(n_atoms) + '\n'
                 f.write(line)
-                if hasattr(self, 'n_atom_types'):
-                    line = '\t ntyp=' + str(self.n_atom_types) \
-                           + '\n'
-                    f.write(line)
-
+                n_atom_types = self.count_atom_types(pc)
+                logging.debug('n_atom_types:'+str(n_atom_types))
+                line = '\t ntyp=' + str(n_atom_types) + '\n'
+                f.write(line)
                 if hasattr(self, 'ecutwfc'):
                     line = '\t ecutwfc=' + \
                            str(self.ecutwfc) + '\n'
@@ -500,13 +504,17 @@ class QeWrapper(ABCModelingEngine):
                     line = '\t mixing_mode=\'' + \
                            str(self.mixing_mode) + '\'\n'
                     f.write(line)
-                if hasattr(self, 'mixing_beta') in SP:
+                if hasattr(self, 'mixing_beta'):
                     line = '\t mixing_beta=' + \
                            str(self.mixing_beta) + '\n'
                     f.write(line)
                 if hasattr(self, 'convergence_threshold'):
-                    line = '\t conv_thr=' + str(self.convergence_threshold) \
-                           + '\n'
+                    logging.debug('conv thresh:'+str(self.convergence_threshold))
+                    logdecimal = math.log10(self.convergence_threshold)
+                    base = 10 ** (logdecimal - int(logdecimal))
+                    logging.debug('exp:'+str(logdecimal))
+                    logging.debug('base:'+str(base))
+                    line = '\t conv_thr=' + str(base)+'d'+str(int(logdecimal))+ '\n'
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -523,11 +531,20 @@ class QeWrapper(ABCModelingEngine):
                 line = '/\n'
                 f.write(line)
 
-                # CELL section
+                # ATOMIC SPECIES section
                 line = 'ATOMIC_SPECIES\n'
                 f.write(line)
+                # C 12.0107 06-C.GGA.fhi.UPF
+                for atomtype in self.what_atom_types():
+                    potential_file = self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL]
+                    mass = str(atomtype.SP[CUBA.MASS][i]) + ' '
+                    #todo - take care of possible isotopes - same atom, different mass
+                    particle = self.get_particles()
+                    line =atomtype + ' ' + potential_file + '\n'
+                    logging.debug(line)
+                    f.write(line)
 
-                # ATOMIC SPECIES
+                # ATOMIC POSITIONS
                 # label, mass, pseudopotential_file
                 if CUBA.CHEMICAL_SPECIE in SP \
                         and hasattr(self, 'pseudopotential_files'):
@@ -551,23 +568,24 @@ class QeWrapper(ABCModelingEngine):
                     f.write(line)
                 f.write('\n\n')
 
+                # ATOMIC POSITIONS
                 # this will apparently always be angstroms iiuc - jr
-                if hasattr(self, 'position_units'):
-                    line = 'ATOMIC_POSITIONS ' + \
-                           str(self.position_units) + '\n'
-                    f.write(line)
+                line = 'ATOMIC_POSITIONS ' + \
+                        str(self.position_units) + '\n'
+                f.write(line)
 
-                multiplier = 10 ** 10
+                multiplier = 10.0 ** 10
+                multiplier = 1.0
                 # QE wants coords. in Angstroms
                 for particle in pc.iter_particles():
                     atom_type = particle.data
                     #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
-                    atom = atom_type[CUBA.CHEMICAL_SPECIE]
-                    print('atom:' + str(atom) + ' data:' +
+                    atom = atom_type[CUBA.CHEMICAL_SPECIE][0]
+                    logging.debug('atom:' + str(atom) + ' data:' +
                           str(atom_type) + ' ')
                     line = str(atom) + ' ' + \
                         str(multiplier * particle.coordinates[0]) + ' ' + \
-                        (multiplier * particle.coordinates[1]) + ' ' + \
+                        str(multiplier * particle.coordinates[1]) + ' ' + \
                         str(multiplier * particle.coordinates[2]) + '\n'
                     f.write(line)
         except:
@@ -887,11 +905,90 @@ class QeWrapper(ABCModelingEngine):
             return
         return
 
-    def count_particles(self):
+    def count_particles(self,pc=None):
+        '''
+        Take a particular pc to count, otherwise count all datasets
+        '''
         n = 0
-        for particle in self.pc.iter_particles():
-            n += 1
+        if pc is None:
+            names = self.get_dataset_names()
+            for name in names:
+                n += self.count_particles(self.get_dataset(name))
+            return n
+        else:
+            for particle in pc.iter_particles():
+                n += 1
         return n
+
+    def get_particles(self,pc=None):
+        '''
+        Take a particular pc to count, otherwise count all datasets
+        '''
+        atomtypes = set([])
+        n_atom_types = 0
+        if pc is None:
+            names = self.get_dataset_names()
+            for name in names:
+                n_atom_types += self.count_atom_types(self.get_dataset(name))
+            return n_atom_types
+        else:
+            for particle in pc.iter_particles():
+                atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                atomtype = atomtype_list[0]
+                logging.debug('0.atomtype:'+str(atomtype))
+                atomtypes.add(atomtype)
+            logging.debug('1.atomtypes:'+str(atomtypes))
+            n_atom_types = len(atomtypes)
+        return n_atom_types
+
+    def count_atom_types(self,pc=None):
+        '''
+        Take a particular pc to count, otherwise count all datasets
+        '''
+        atomtypes = set([])
+        n_atom_types = 0
+        if pc is None:
+            names = self.get_dataset_names()
+            for name in names:
+                n_atom_types += self.count_atom_types(self.get_dataset(name))
+            return n_atom_types
+        else:
+            for particle in pc.iter_particles():
+                atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                atomtype = atomtype_list[0]
+                logging.debug('0.atomtype:'+str(atomtype))
+                atomtypes.add(atomtype)
+            logging.debug('1.atomtypes:'+str(atomtypes))
+            n_atom_types = len(atomtypes)
+        return n_atom_types
+
+    def what_atom_types(self,pc=None):
+        atomtype_set = self.what_atom_types_set(pc=pc)
+        logging.debug('2.atomtypes:'+str(atomtype_set))
+        return [atomtype for atomtype in atomtype_set]
+
+
+    def what_atom_types_set(self,pc=None):
+        '''
+        Take a particular pc to count, otherwise count all datasets
+        '''
+        atomtypes = set([])
+        if pc is None:
+            names = self.get_dataset_names()
+            for name in names:
+                more_atoms = self.what_atom_types_set(self.get_dataset(name))
+                logging.debug('2.5.more atoms:'+str(more_atoms))
+                for atomtype in more_atoms:
+                    atomtypes.add(atomtype)
+            return atomtypes
+        else:
+            for particle in pc.iter_particles():
+                atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                atomtype = atomtype_list[0]
+                logging.debug('3.atomtype:'+str(atomtype))
+                atomtypes.add(atomtype)
+            logging.debug('4.atomtypes:'+str(atomtypes))
+        return atomtypes
 
     def add_dataset(self, container):
         """Add a CUDS container
@@ -989,6 +1086,8 @@ def which(program):
                 return exe_file
 
     return None
+
+
 
 if __name__ == "__main__":
     wrapper = QeWrapper()
