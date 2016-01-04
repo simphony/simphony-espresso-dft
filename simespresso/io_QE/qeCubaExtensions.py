@@ -64,3 +64,4 @@ class qeCUBAExtension(Enum):
     PSEUDO_POTENTIAL = "PSEUDO_POTENTIAL"
     K_POINT_SAMPLING_METHOD = "K_POINT_SAMPLING_METHOD"
     K_POINT_SAMPLING = "K_POINT_SAMPLING"
+    #add 'extra results field with total energy, iter, delta E

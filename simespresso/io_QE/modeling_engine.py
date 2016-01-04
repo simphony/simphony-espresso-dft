@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from espresso_class import qe_functions
+from data_handler import qe_functions
 
 class ABCModelingEngineForQE(object):  # pragma: no cover
     """Abstract base class for modeling engines in SimPhoNy.

@@ -12,7 +12,7 @@ import logging
 #from simespresso.io_QE import espresso_class
 #import qeCubaExtensions
 #import espresso_class
-from espresso_class import QeWrapper
+from data_handler import QeWrapper
 from qeCubaExtensions import qeCUBAExtension
 
 # Create the Cu unit cell, assuming a simple cubic system with 4 basis
@@ -56,8 +56,9 @@ wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
 # later we shall have a better way (actually we have it now
 # but not implemented yet)
 wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] = "Monkhorst-Pack"
+wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] = "automatic"
 #can we define CUBA.Monkhorst-Pack please
-wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [3, 3, 3]
+wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [3, 3, 3, 0, 0, 0]
 wrapper.run()
 # the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc within the value of the total energy from the output (log file) of QE
 names = wrapper.get_dataset_names()

@@ -15,12 +15,12 @@ from simphony.cuds.lattice import Lattice
 from simphony.cuds.particles import Particle, Particles
 
 from qeCubaExtensions import qeCUBAExtension
-import data_handler
+
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-class QeWrapper(ABCModelingEngine):
+class qe_data_handler(ABCModelingEngine):
     '''
     functions for reading and writing quantum espresso input and output files
     wrapper must define:
@@ -34,12 +34,61 @@ class QeWrapper(ABCModelingEngine):
            ?? not sure about last one - it doe not appear in
            common/abc_modeling_engine
     '''
+    #multiple wrappers  - scf, forces, relax, md
+
 
     def __init__(self):
-        self.datahandler=data_handler.qe_data_handler()
+        self.SP = DataContainer()  # System Model Equations and Material
+        # relations (Governing Equations)
+        self.SD = DataContainer()  # System Material Description and
+        # State Data including Boundaries (not conditions)
+        self.BC = DataContainer()  # Boundary conditions
+        self.CM = DataContainer()  # Computational Methods
+        # (numerical and solver aspects only)
+        self.pc = Particles('quantum_espresso_particles')
+        self.CUBAExtension = {}
+        self.CM_extension = {}
+        self.SP_extension = {}
+        self.BC_extension = {}
+        self.datasets = {}
+
+        #data for running qe
+        #control
+        self.calculation_type = 'scf'
+        self.restart_mode = 'from_scratch'
+        self.pseudopotential_directory = './'
+        self.pseudopotential_prefix = 'simphony_pp'
+        self.tprnfor = '.true.'
+        self. max_seconds = 3600*24
+        self.output_directory = './'
+
+        #system
+        self.celldm = [1, 1, 1]  #This should  come from lattice vectors
+        #  if the user only specificies atom positions, what should this be
+        self.ibrav = 8  #this should also be defined in cuba
+        self.n_atom_types = 0 #comes from pc
+        self.ecutwfc = 60.0  #find reasonable default
+        self.ecutrho = 240 #find reasonable default
+        self.input_dft = 'vdw-df-c09' #maybe give a default
+
+        #electrons
+        self.mixing_mode = 'local-TF'
+        self.mixing_beta = 0.8 # good default?
+        self.convergence_threshold = 1.0*10**-7
+
+        #other info
+        self.position_units ="angstrom"
+        self.input_pwname="input.pw"
+        self.output_filename="qe_output"
+        self.path_to_espresso='pw.x'
+        self.mpi=False
+        self.mpi_Nprocessors=2
 
 
     def run(self):
+        #write qe input file according to info in datasets
+        #mapping of dataset atoms to file !!! uuids to line numbers
+        #make temp directory like ammmps
         print('starting qe engine')
         self.write_espresso_input_file(self.input_pwname)
         print('path to espresso:'+self.path_to_espresso)
@@ -81,9 +130,6 @@ class QeWrapper(ABCModelingEngine):
             If there is already a dataset with the given name.
         """
         if not isinstance(container, ABCParticles):
-            #if we allow lattice or mesh this allows for charge density
-            #also would need several, one for each energy state
-            # currently lattice lacks  enough metadata for this
             raise TypeError(
                 "This type of dataset container is not supported")
 
@@ -93,7 +139,8 @@ class QeWrapper(ABCModelingEngine):
                     container.name))
         else:
             self.datasets[container.name] = container
-
+            #make sure that this is  a copy (eg deepcopy)
+            #funciton to test this
     def remove_dataset(self,dataset_name):
         """remove dataset
         Parameters
@@ -175,6 +222,7 @@ class QeWrapper(ABCModelingEngine):
         :param file_name: name of the espresso output file
         :return:
         '''
+        #should read total energy, iteration, deltaE, etc
         if not (os.path.exists(file_name)):
             logging.debug("file " + str(file_name) + " not found")
             return (1)
