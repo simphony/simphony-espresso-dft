@@ -1,12 +1,11 @@
 import logging
+import math
 import os
 import os.path
-import subprocess
 import sys
+
 import numpy as np
 from enum import Enum
-import math
-
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
@@ -16,23 +15,17 @@ from simphony.cuds.particles import Particle, Particles
 
 from qeCubaExtensions import qeCUBAExtension
 
-
 logging.basicConfig(level=logging.DEBUG)
 
+@contextlib.contextmanager
+def _temp_directory():
+    temp_dir = tempfile.mkdtemp()
+    yield temp_dir
+    shutil.rmtree(temp_dir)
 
 class qe_data_handler(ABCModelingEngine):
     '''
     functions for reading and writing quantum espresso input and output files
-    wrapper must define:
-        add_dataset(self, container):
-        remove_dataset(self, name):
-        get_dataset(self, name):
-        get_dataset_names(self):
-        iter_datasets(self, names=None):
-        run(self)
-        _combine(data_container, data_container_extension)
-           ?? not sure about last one - it doe not appear in
-           common/abc_modeling_engine
     '''
     #multiple wrappers  - scf, forces, relax, md
 
@@ -51,6 +44,7 @@ class qe_data_handler(ABCModelingEngine):
         self.SP_extension = {}
         self.BC_extension = {}
         self.datasets = {}
+        self.combined_dataset=DataContainer()
 
         #data for running qe
         #control
@@ -83,125 +77,46 @@ class qe_data_handler(ABCModelingEngine):
         self.path_to_espresso='pw.x'
         self.mpi=False
         self.mpi_Nprocessors=2
+        self.mapping=[]
 
+    def pcs_to_single_pc(self,pcs):
+        particle_list = []
+        mapping = []
+        i = 0
+        for dataset in pcs:
+              for particle in dataset.iter_particles():
+#                    particle_copy=copy.deepcopy(particle)
+                    particle_list.append(particle)
+                    mapentry = [dataset.name,particle,i]
+                    mapping.append(mapentry)
+                    i += 1
+        if len(particle_list):
+#            self.pc.add_particles(particle_list)
+            self.mapping = mapping
 
-    def run(self):
-        #write qe input file according to info in datasets
-        #mapping of dataset atoms to file !!! uuids to line numbers
-        #make temp directory like ammmps
-        print('starting qe engine')
-        self.write_espresso_input_file(self.input_pwname)
-        print('path to espresso:'+self.path_to_espresso)
-#        print(which(self.path_to_espresso))
-        if not which(self.path_to_espresso):
-            logging.debug('no path to espresso')
-            raise ValueError(
-                'espresso command not found (looking for '
-                            + self.path_to_espresso+')')
-        if self.mpi:
-            command = 'mpirun -np ' + str(self.mpi_Nprocessors) + ' ' + \
-                      self.path_to_espresso + ' < ' + self.pwname_in + ' > ' \
-                      + self.output_filename
-        else:
-            command = self.path_to_espresso + ' < ' + self.input_pwname + ' > ' \
-                      + self.output_filename
-        logging.debug('attempting to run command: ' + command)
-        try:
-            subprocess.check_call(command, shell=True,
-                stdout=subprocess.PIPE).stdout.read()
-#            subprocess.Popen(command, shell=True,
-#                             stdout=subprocess.PIPE).stdout.read()
-        except:
-            e = sys.exc_info()[0]
-            logging.debug('espresso command gave error %s' % e)
-            raise ValueError('espresso command gave error %s' % e)
-
-    def add_dataset(self,container):
-        """Add a CUDS container
-        Parameters
-        ----------
-        container : {ABCParticles}
-            The CUDS container to add to the engine.
-        Raises
-        ------
-        TypeError:
-            If the container type is not supported (i.e. ABCLattice, ABCMesh).
-        ValueError:
-            If there is already a dataset with the given name.
-        """
-        if not isinstance(container, ABCParticles):
-            raise TypeError(
-                "This type of dataset container is not supported")
-
-        if container.name in self.get_dataset_names():
-            raise ValueError(
-                'Particle container \'{}\' already exists'.format(
-                    container.name))
-        else:
-            self.datasets[container.name] = container
-            #make sure that this is  a copy (eg deepcopy)
-            #funciton to test this
-    def remove_dataset(self,dataset_name):
-        """remove dataset
-        Parameters
-        ----------
-        dataset_name : name container to remove
-        Raises
-        ------
-        ValueError:
-            If there is no dataset with the given name.
-        """
-        if not dataset.name in self.dataset_names:
-            raise ValueError(
-                'Particle container \'{}\' does not exist'.format(
-                    dataset_name))
-        else:
-            del self.datasets[dataset.name]
-
-    def get_dataset(self,dataset_name):
-        """Get a CUDS container
-        Parameters
-        ----------
-        container_name : string
-            Name of the CUDS container to get.
-        Raises
-        ------
-        ValueError:
-            If there is no dataset with the given name.
-        """
-        if not dataset_name in self.get_dataset_names():
-            logging.debug('Container name '+str(dataset_name)+' not found.')
-            return None
-        else:
-            dataset = self.datasets[dataset_name]
-            return dataset
-
-    def get_dataset_names(self):
-        """Get names of datasets in container
-        """
-        dataset_names = [name for name in self.datasets]
-        return dataset_names
-
-    def iter_datasets(self, names=None):
-        """ Returns an iterator over a subset or all of the containers.
-        Parameters
-        ----------
-        names : sequence of str, optional
-            names of specific containers to be iterated over. If names is not
-            given, then all containers will be iterated over.
-        """
-        if names is None:
-            for name in self.get_dataset_names:
-                yield self.get_dataset(name)
-        else:
-            for name in names:
-                if name in self.get_dataset_names:
-                    yield self.get_dataset(name)
-                else:
-                    raise ValueError(
-                        'Particle container \'{}\` does not exist'.format(
-                            name))
-
+    def single_pc_to_pcs(self,pcs):
+        pcs={} #dict of pcs
+        for entry in self.mapping:    def single_pc_to_pcs(self,pcs):
+        pcs={} #dict of pcs
+        for entry in self.mapping:
+            pc_name = entry[0]
+            particle = entry[1]
+            if pc_name in pcs:
+                pcs[pc_name].add_particles([particle])
+                #check if list needed for single particle
+            else:
+                pcs[pc_name] = Particles(pc_name)
+                pcs[pc_name].add_particles([particle])
+                #check if list needed
+            pc_name = entry[0]
+            particle = entry[1]
+            if pc_name in pcs:
+                pcs[pc_name].add_particles([particle])
+                #check if list needed for single particle
+            else:
+                pcs[pc_name] = Particles(pc_name)
+                pcs[pc_name].add_particles([particle])
+                #check if list needed
 
     def read_espresso_output_file(self, file_name):
         '''
