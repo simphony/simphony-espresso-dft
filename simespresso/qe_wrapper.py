@@ -181,28 +181,3 @@ def _combine(data_container, data_container_extension):
     result.update(data_container) #combines result,data_container to 1 dict
     return result
 
-
-#simple tests
-if __name__ == "__main__":
-    wrapper = QeWrapper()
-#    filename = 'xyzoutput.txt.bak'
-#    filename = '../../examples/input_pw.in'
-    filename = 'tests/pw.in'
-    print('started parsing qe input file ' + str(filename))
-    wrapper.read_espresso_input_file(filename)
-    print('done parsing qe input file ' + str(filename))
-
-    print('started writing qe input file ' + str(filename))
-    new_inputfilename = 'tests/new_input_pw.in'
-    wrapper.write_espresso_input_file(new_inputfilename)
-    print('done writing qe input file ' + str(new_inputfilename))
-
-    ppfilename = 'tests/testpp.in'
-    print('started writing qe pp input file ' + str(ppfilename))
-    wrapper.write_espresso_pp_file()
-    print('done writing qe pp input file ' + str(ppfilename))
-
-    filename = 'tests/xyzoutput.txt.bak'
-    print('started parsing qe output file ' + str(filename))
-    wrapper.read_espresso_output_file(filename)
-    print('finished parsing qe output file ' + str(filename))

@@ -90,8 +90,6 @@ class QeDataHandler(ABCModelingEngine):
 
     def single_pc_to_pcs(self,pcs):
         pcs={} #dict of pcs
-        for entry in self.mapping:    def single_pc_to_pcs(self,pcs):
-        pcs={} #dict of pcs
         for entry in self.mapping:
             pc_name = entry[0]
             particle = entry[1]
@@ -1003,3 +1001,28 @@ def which(program):
     return None
 
 
+
+#simple tests
+if __name__ == "__main__":
+    wrapper = QeDataHandler()
+#    filename = 'xyzoutput.txt.bak'
+#    filename = '../../examples/input_pw.in'
+    filename = 'tests/pw.in'
+    print('started parsing qe input file ' + str(filename))
+    wrapper.read_espresso_input_file(filename)
+    print('done parsing qe input file ' + str(filename))
+
+    print('started writing qe input file ' + str(filename))
+    new_inputfilename = 'tests/new_input_pw.in'
+    wrapper.write_espresso_input_file(new_inputfilename)
+    print('done writing qe input file ' + str(new_inputfilename))
+
+    ppfilename = 'tests/testpp.in'
+    print('started writing qe pp input file ' + str(ppfilename))
+    wrapper.write_espresso_pp_file()
+    print('done writing qe pp input file ' + str(ppfilename))
+
+    filename = 'tests/xyzoutput.txt.bak'
+    print('started parsing qe output file ' + str(filename))
+    wrapper.read_espresso_output_file(filename)
+    print('finished parsing qe output file ' + str(filename))
