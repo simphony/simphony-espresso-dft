@@ -1,13 +1,30 @@
 import os
 
-from simespresso.io.espresso_data_file_parser import LammpsDataFileParser
-from simlammps.abc_data_manager import ABCDataManager
-from simlammps.common.atom_style_description import (ATOM_STYLE_DESCRIPTIONS,
-                                                     get_attributes)
-from simlammps.config.domain import get_box
-from simlammps.io.lammps_data_file_writer import LammpsDataFileWriter
-from simlammps.io.lammps_data_line_interpreter import LammpsDataLineInterpreter
-from simlammps.io.lammps_simple_data_handler import LammpsSimpleDataHandler
+
+import logging
+import math
+import os
+import os.path
+import sys
+
+import numpy as np
+from enum import Enum
+from simphony.core.cuba import CUBA
+from simphony.core.data_container import DataContainer
+from simphony.cuds.abc_modeling_engine import ABCModelingEngine
+from simphony.cuds.abc_particles import ABCParticles
+from simphony.cuds.lattice import Lattice
+from simphony.cuds.particles import Particle, Particles
+
+from qeCubaExtensions import qeCUBAExtension
+
+logging.basicConfig(level=logging.DEBUG)
+
+class QeFileIO(ABCModelingEngine):
+
+
+from simespresso.io_QE import qe_file_io
+
 from simphony.core.cuba import CUBA
 from simphony.core.cuds_item import CUDSItem
 from simphony.core.data_container import DataContainer
@@ -33,34 +50,22 @@ def _filter_unsupported_data(iterable, supported_cuba):
         yield supported_particle
 
 
-class LammpsFileIoDataManager(ABCDataManager):
-    """  Class managing Lammps data information using file-io
-    The class performs communicating the data to and from lammps using FILE-IO
-    communications (i.e. through input and output files). The class manages
+class QeFileIoDataManager():
+    """  Class managing data using file-io
+    The class manages
     data existing in Lammps (via lammps data file) and allows this data to be
     queried and to be changed.
-    Class maintains a cache of the particle information. This information
-    is read from file whenever the read() method is called and written to
-    the file whenever the flush() method is called.
-    Parameters
-    ----------
-    atom_style : str
     """
     def __init__(self, atom_style):
-        super(LammpsFileIoDataManager, self).__init__()
-
-        self._atom_style = atom_style
 
         # map from lammps-id to simphony-uid
-        self._lammpsid_to_uid = {}
+        self._qe_id_to_uid = {}
 
         # cache of particle containers
         self._pc_cache = {}
 
         # cache of data container extensions
         self._dc_extension_cache = {}
-
-        self._supported_cuba = get_attributes(self._atom_style)
 
     def get_data(self, uname):
         """Returns data container associated with particle container
@@ -216,7 +221,7 @@ class LammpsFileIoDataManager(ABCDataManager):
             self._write_data_file(input_data_filename)
         else:
             raise RuntimeError(
-                "No particles.  Lammps cannot run without a particle")
+                "No particles.  QE cannot run without a particle")
         # TODO handle properly when there are no particle containers
         # or when some of them do not contain any particles
         # (i.e. someone has deleted all the particles)
@@ -228,7 +233,7 @@ class LammpsFileIoDataManager(ABCDataManager):
         output_data_filename :
             name of data-file where info read from (i.e lammps's output).
         """
-        self._update_from_lammps(output_data_filename)
+        self._update_from_qe(output_data_filename)
 
 # Private methods #######################################################
     def _update_from_lammps(self, output_data_filename):
@@ -343,3 +348,1010 @@ class LammpsFileIoDataManager(ABCDataManager):
             else:
                 mass[material_type] = data[CUBA.MASS]
         return mass
+
+   '''
+    functions for reading and writing quantum espresso input and output files
+    '''
+    #multiple wrappers  - scf, forces, relax, md
+    def __init__(self):
+        self.SP = DataContainer()  # System Model Equations and Material
+        # relations (Governing Equations)
+        self.SD = DataContainer()  # System Material Description and
+        # State Data including Boundaries (not conditions)
+        self.BC = DataContainer()  # Boundary conditions
+        self.CM = DataContainer()  # Computational Methods
+        # (numerical and solver aspects only)
+        self.pc = Particles('quantum_espresso_particles')
+        self.CUBAExtension = {}
+        self.CM_extension = {}
+        self.SP_extension = {}
+        self.BC_extension = {}
+        self.datasets = {}
+        self.combined_dataset=DataContainer()
+
+        #data for running qe
+        #control
+        self.calculation_type = 'scf'
+        self.restart_mode = 'from_scratch'
+        self.pseudopotential_directory = './'
+        self.pseudopotential_prefix = 'simphony_pp'
+        self.tprnfor = '.true.'
+        self. max_seconds = 3600*24
+        self.output_directory = './'
+
+        #system
+        self.celldm = [1, 1, 1]  #This should  come from lattice vectors
+        #  if the user only specificies atom positions, what should this be
+        self.ibrav = 8  #this should also be defined in cuba
+        self.n_atom_types = 0 #comes from pc
+        self.ecutwfc = 60.0  #find reasonable default
+        self.ecutrho = 240 #find reasonable default
+        self.input_dft = 'vdw-df-c09' #maybe give a default
+
+        #electrons
+        self.mixing_mode = 'local-TF'
+        self.mixing_beta = 0.8 # good default?
+        self.convergence_threshold = 1.0*10**-7
+
+        #other info
+        self.position_units ="angstrom"
+        self.input_pwname="input.pw"
+        self.output_filename="qe_output"
+        self.path_to_espresso='pw.x'
+        self.mpi=False
+        self.mpi_Nprocessors=2
+        self.mapping=[]
+
+    def pcs_to_single_pc(self,pcs):
+        particle_list = []
+        mapping = []
+        i = 0
+        for dataset in pcs:
+              for particle in dataset.iter_particles():
+#                    particle_copy=copy.deepcopy(particle)
+                    particle_list.append(particle)
+                    mapentry = [dataset.name,particle,i]
+                    mapping.append(mapentry)
+                    i += 1
+        if len(particle_list):
+#            self.pc.add_particles(particle_list)
+            self.mapping = mapping
+
+    def single_pc_to_pcs(self,pcs):
+        pcs={} #dict of pcs
+        for entry in self.mapping:
+            pc_name = entry[0]
+            particle = entry[1]
+            if pc_name in pcs:
+                pcs[pc_name].add_particles([particle])
+                #check if list needed for single particle
+            else:
+                pcs[pc_name] = Particles(pc_name)
+                pcs[pc_name].add_particles([particle])
+                #check if list needed
+            pc_name = entry[0]
+            particle = entry[1]
+            if pc_name in pcs:
+                pcs[pc_name].add_particles([particle])
+                #check if list needed for single particle
+            else:
+                pcs[pc_name] = Particles(pc_name)
+                pcs[pc_name].add_particles([particle])
+                #check if list needed
+
+    def read_espresso_output_file(self, file_name):
+        '''
+        This function parses  Espresso output files which usually will have
+        a name like 'name.charge'.
+        This file has the structure shown at
+        http://phycomp.technion.ac.il/~sbgrosso/QE_charge_density/node18.html
+        The first line has 8 numbers, the three first numbers are the size of
+        the grid in the three spatial directions, the three following are the
+        same repeated.
+        The seventh number corresponds to the number of atoms and the last
+        one to the number of different type of atoms.
+        Second line - the first number is the type of Bravais lattice,
+        and the three following numbers are the celldimensions defined in the
+        input file of pw.x.
+        The charge density is defined for each point of the grid starting
+        after the atom definitions.
+        :param file_name: name of the espresso output file
+        :return:
+        '''
+        #should read total energy, iteration, deltaE, etc
+        if not (os.path.exists(file_name)):
+            logging.debug("file " + str(file_name) + " not found")
+            return (1)
+
+        with open(file_name, 'r') as f:
+            file_iter = iter(f)
+
+            try:
+                # read first four lines of the header - first line blank
+                line = file_iter.next()
+
+                # 2nd line : gridsize x,y,z twice , natoms natomtypes
+                line = file_iter.next()
+                logging.debug('read line2:' + str(line))
+                values = line.split()
+                ints = [int(val) for val in values]
+                for val in ints:
+                    if not isinstance(val, int):
+                        logging.debug('got noninteger value in output, line 2')
+                        return None
+                n_lattice_points = ints[0:3]
+                n_atoms = ints[6]
+                logging.debug(
+                    'n_points:' + str(n_lattice_points) +
+                    ' n_atoms:' + str(n_atoms))
+
+                # 3rd line : bravais lattice, celldm[0],[1],[2]
+                line = file_iter.next()
+                logging.debug('read line3:' + str(line))
+                values = line.split()
+                floats = [float(val) for val in values]
+                for val in floats:
+                    if not isinstance(val, float) and not \
+                            isinstance(val, int):
+                        logging.debug('got non-float/int in input line 3')
+                        return None
+                bravais = int(floats[0])
+                celldm = floats[1:4]
+                logging.debug(
+                    'bravais:' + str(bravais) +
+                    ' celldm:' + str(celldm))
+                # see http://www.quantum-espresso.org/
+                # wp-content/uploads/Doc/INPUT_PW.html#idp82064
+                if bravais == 0:
+                    Ltype = 'free'
+                if bravais == 1:
+                    Ltype = 'cubic P(sc)'
+                if bravais == 2:
+                    Ltype = 'cubic F(fcc)'
+                if bravais == 3:
+                    Ltype = 'cubic I(bcc)'
+                if bravais == 4:
+                    Ltype = 'orthorhombic'
+                if bravais == 5:
+                    Ltype = 'trigonal'
+                if bravais == 6:
+                    Ltype = 'tetragonal P(st)'
+                if bravais == 7:
+                    Ltype = 'tetragonal I(bct)'
+                if bravais == 8:
+                    Ltype = 'orthorhombic P'
+                if bravais == 9:
+                    Ltype = 'orthorhombic bco'
+                if bravais == 10:
+                    Ltype = 'orthorhombic fc'
+                if bravais == 11:
+                    Ltype = 'orthorhombic bc'
+                if bravais == 12:
+                    Ltype = 'monoclinic P unique axis c'
+                if bravais == 13:
+                    Ltype = 'monoclinic base centered'
+                if bravais == 14:
+                    Ltype = 'triclinic'
+
+                self.L = Lattice('quantum espresso lattice',
+                                 Ltype, celldm, n_lattice_points, [0, 0, 0])
+                self.BC.lattice = self.L
+                # 4th line - don't care
+                line = file_iter.next()
+                logging.debug('read line4:' + str(line))
+            except StopIteration:
+                print('eof reached')
+                logging.warning('eof reached')
+            except:
+                # print("problem with line", line)
+                if (line):
+                    print(str(line))
+                    logging.warning("problem with line", str(line))
+                else:
+                    logging.warning("no line obtained")
+                return
+            # TODO skip all the atom definition lines,
+            # eg look for alphabetic characters at beginning of line
+            logging.debug('skipping ' + str(n_atoms) + ' lines')
+            for i in range(0, n_atoms + 1):
+                line = file_iter.next()
+
+            logging.debug('read ' + str(n_lattice_points) +
+                          ' lattice point lines')
+            self.read_densities(n_lattice_points, file_iter,
+                                aviz_filename='avizout.xyz')
+
+    def running_index_to_node_index(self, index, n_latticepoints):
+        node_z = index / (n_latticepoints[0] * n_latticepoints[1])
+        node_y = (index / n_latticepoints[0]) % n_latticepoints[1]
+        node_x = index % n_latticepoints[0]
+        return [node_x, node_y, node_z]
+
+    def read_densities(self, n_latticepoints, file_iter, aviz_filename=False):
+        charge_density = self.read_xyz(n_latticepoints, file_iter)
+        charge_as_list = charge_density.flatten()
+        nodelist = []
+        for charge_index, charge in enumerate(charge_as_list):
+            node_index = self.running_index_to_node_index(charge_index,
+                                                          n_latticepoints)
+            # TODO convert charge_index to node index
+            node = self.L.get_node(node_index)
+            # TODO check if this is ok
+            node.data[CUBA.MASS] = charge
+            nodelist.append(node)
+        self.L.update_nodes(nodelist)
+        # we have to ask the lattice to update the changed node
+
+        if aviz_filename:
+            self.write_aviz_output(charge_density, aviz_filename)
+
+    def write_aviz_output(self, xyz_array, aviz_xyzfile):
+        base_vector = self.L.base_vect
+        n_elements = np.shape(xyz_array)
+        n_size = np.size(xyz_array)
+
+        with open(aviz_xyzfile, 'w') as f:
+            try:
+                line = str(n_size) + '\n'
+                f.write(line)
+                line = 'simphony to aviz xyz file\n'
+                f.write(line)
+                for i in range(0, n_elements[0]):
+                    x = i * base_vector[0]
+                    for j in range(0, n_elements[1]):
+                        y = j * base_vector[0]
+                        for k in range(0, n_elements[2]):
+                            z = k * base_vector[0]
+                            density = xyz_array[i, j, k]
+                            line = 'C ' + str(x) + ' ' + str(y) + ' ' + str(z) + \
+                                   ' ' + str(density) + '\n'
+                            f.write(line)
+            except:
+                print('error writing aviz file')
+        return
+
+    def read_xyz(self, n_latticepoints, file_iter):
+        line = file_iter.next()
+        x_points = n_latticepoints[0]
+        y_points = n_latticepoints[1]
+        z_points = n_latticepoints[2]
+        x_count = 0
+        y_count = 0
+        z_count = 0
+        charge_density = np.zeros([x_points, y_points, z_points])
+        line_number = 0
+        try:
+            while line is not None:
+                line_number = line_number + 1
+                print('x{0} y{1} z{2} line:{3}'
+                      .format(x_count, y_count, z_count, str(line)))
+                values = line.split()
+                charges = [float(val) for val in values]
+                #            print('charges:'+str(charges))
+
+                for charge in charges:
+                    charge_density[x_count, y_count, z_count] = charge
+                    x_count += 1
+                    if x_count == x_points:
+                        x_count = 0
+                        y_count += 1
+                        if y_count == y_points:
+                            y_count = 0
+                            z_count += 1
+                            if z_count == z_points:
+                                break
+
+                    line = file_iter.next()
+
+        except StopIteration:
+            print('EOF')
+        if x_count < x_points or y_count < y_points or z_count < z_points:
+            logging.debug('Got fewer points than expected:read {0} of {1} x, '
+                          '{2} of {3} y, {4} of {5} z'.
+                          format(x_count, x_points, y_count,
+                                 y_points, z_count, z_points))
+        return charge_density
+
+    def write_espresso_input_file(self, file_name,dataset_name = None):
+        """
+        :param file_name: name of the input file to write
+        :return:
+        """
+        SP = self.SP
+        if dataset_name is  None:
+            dataset_name = self.get_dataset_names()[0]
+        pc = self.get_dataset(dataset_name)
+
+#        SD = self.SD
+        # write parameters for a particular working input file
+
+        print('attempting to write ' + file_name)
+        try:
+            with open(file_name, 'w') as f:
+                # CONTROL section
+                # apparently a comma is not required at the end of every line
+                line = '&CONTROL\n'
+                f.write(line)
+                if hasattr(self, 'calculation_type'):
+                    line = '\t calculation=\'' + str(self.calculation_type) \
+                           + '\'\n'
+                    f.write(line)
+                if hasattr(self, 'restart_mode'):
+                    line = '\t restart_mode=\'' + str(self.restart_mode)\
+                           + '\'\n'
+                    f.write(line)
+                if hasattr(self, 'pseudopotential_directory'):
+                    line = '\t pseudo_dir=\'' + str(self.pseudopotential_directory) \
+                           + '\'\n'
+                    f.write(line)
+                if hasattr(self, 'pseudopotential_prefix'):
+                    line = '\t prefix=\'' + str(self.pseudopotential_prefix) \
+                           + '\'\n'
+                    f.write(line)
+                if hasattr(self, 'tprnfor'):
+                    line = '\t tprnfor=' + str(self.tprnfor) + '\n'
+                    f.write(line)
+                if hasattr(self, 'max_seconds'):
+                    line = '\t max_seconds=' + \
+                           str(int(self.max_seconds)) + '\n'
+                    f.write(line)
+                if hasattr(self, 'output_directory'):
+                    line = '\t outdir=\'' + str(self.output_directory) + '\'\n'
+                    f.write(line)
+                line = '/\n'
+                f.write(line)
+
+                # SYSTEM section
+                line = '&SYSTEM\n'
+                f.write(line)
+                if hasattr(self, 'ibrav'):
+                    line = '\t ibrav=' + str(self.ibrav) + '\n'
+                    # outdir
+                    f.write(line)
+                if hasattr(self, 'celldm'):
+                    line = '\t celldm(1)=' + \
+                           str(self.celldm[0]) + '\n'
+                    f.write(line)
+                    line = '\t celldm(2)=' + \
+                           str(self.celldm[1]) + '\n'
+                    f.write(line)
+                    line = '\t celldm(3)=' + \
+                           str(self.celldm[2]) + '\n'
+                    f.write(line)
+
+                # here goes nat and ntype
+                n_atoms = self.count_particles()
+                line = '\t nat=' + str(n_atoms) + '\n'
+                f.write(line)
+                n_atom_types = self.count_atom_types(pc)
+                logging.debug('n_atom_types:'+str(n_atom_types))
+                line = '\t ntyp=' + str(n_atom_types) + '\n'
+                f.write(line)
+                if hasattr(self, 'ecutwfc'):
+                    line = '\t ecutwfc=' + \
+                           str(self.ecutwfc) + '\n'
+                    f.write(line)
+                if hasattr(self, 'ecutrho'):
+                    line = '\t ecutrho=' + str(self.ecutrho) + '\n'
+                    f.write(line)
+                if hasattr(self, 'input_dft'):
+                    line = '\t input_dft=\'' + str(self.input_dft) \
+                           + '\'\n'
+                    f.write(line)
+                line = '/\n'
+                f.write(line)
+
+                # ELECTRONS section
+                line = '&ELECTRONS\n'
+                f.write(line)
+                if hasattr(self, 'mixing_mode'):
+                    line = '\t mixing_mode=\'' + \
+                           str(self.mixing_mode) + '\'\n'
+                    f.write(line)
+                if hasattr(self, 'mixing_beta'):
+                    line = '\t mixing_beta=' + \
+                           str(self.mixing_beta) + '\n'
+                    f.write(line)
+                if hasattr(self, 'convergence_threshold'):
+                    logging.debug('conv thresh:'+str(self.convergence_threshold))
+                    logdecimal = math.log10(self.convergence_threshold)
+                    base = 10 ** (logdecimal - int(logdecimal))
+                    logging.debug('exp:'+str(logdecimal))
+                    logging.debug('base:'+str(base))
+                    line = '\t conv_thr=' + str(base)+'d'+str(int(logdecimal))+ '\n'
+                    f.write(line)
+                line = '/\n'
+                f.write(line)
+
+                # IONS section
+                line = '&IONS\n'
+                f.write(line)
+                line = '/\n'
+                f.write(line)
+
+                # CELL section
+                line = '&CELL\n'
+                f.write(line)
+                line = '/\n'
+                f.write(line)
+
+                # ATOMIC SPECIES section
+                line = 'ATOMIC_SPECIES\n'
+                f.write(line)
+                # C 12.0107 06-C.GGA.fhi.UPF
+                for atomtype in self.what_atom_types():
+                    potential_file = self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL]
+                    #todo - take care of possible isotopes - same atom, different mass
+                    particle_mass_list = self.get_particle_masses()
+                    if atomtype in particle_mass_list:
+                        mass = particle_mass_list[atomtype]
+                        logging.debug('mass of {0} is {1}'.format(atomtype,mass))
+                    else:
+                        logging.warning('could not find mass of particle:'+str(atomtype))
+                        continue
+                    line =atomtype + ' ' + str(mass)+' ' + potential_file + '\n'
+                    logging.debug(line)
+                    f.write(line)
+                line = '\n'
+                f.write(line)
+
+                # K POINTS
+                sampling_mode = 'automatic'
+#                if hasattr(self,'CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD]'):
+                sampling_mode = self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD]
+                line = 'K_POINTS ' + str(sampling_mode) + '\n'
+                f.write(line)
+
+                #figure out how to write this into input.pw
+#                line = 'K_POINTS ' + \
+ #                      str(self.k_points_mode) + '\n'
+  #              f.write(line)
+
+#                if hasattr(self,'CM_extension[qeCUBAExtension.K_POINT_SAMPLING]'):
+                kpoints = self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING]
+                line = ''
+#                if hasattr(self, 'k_point_values'):
+                for point in kpoints:
+                    line = line + str(point) + ' '
+                line = line + '\n'
+                logging.debug(line)
+                f.write(line)
+                line = '\n'
+                f.write(line)
+
+
+                # ATOMIC POSITIONS
+                # this will apparently always be angstroms iiuc - jr
+                line = 'ATOMIC_POSITIONS ' + '(' + str(self.position_units) + ')'+'\n'
+                f.write(line)
+
+                multiplier = 10.0 ** 10
+                multiplier = 1.0
+                # QE wants coords. in Angstroms
+                for particle in pc.iter_particles():
+                    atom_type = particle.data
+                    #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
+                    atom = atom_type[CUBA.CHEMICAL_SPECIE][0]
+                    logging.debug('atom:' + str(atom) + ' data:' +
+                          str(atom_type) + ' ')
+                    line = str(atom) + ' ' + \
+                        str(multiplier * particle.coordinates[0]) + ' ' + \
+                        str(multiplier * particle.coordinates[1]) + ' ' + \
+                        str(multiplier * particle.coordinates[2]) + '\n'
+                    f.write(line)
+        except:
+            ('error in write block of write_espresso_input_file')
+            raise
+        print('finished writing file')
+        f.closed
+
+    def write_espresso_pp_file(self, ppfilename="testpp.in"):
+        '''
+        this writes an auxiliary required file determined the plot parameters
+        :return:
+        '''
+        outdir = './'
+        plotfile = 'output.charge'
+        outfile = 'density.dat'
+        lines = ['&inputpp',
+                 'prefix =\'qe_output\'',
+                 'filplot=\'' + plotfile + '\'',
+                 'plot_num=0',
+                 'outdir = ' + outdir,
+                 '/',
+                 '&plot',
+                 'nfile = 1',
+                 'filepp(1) = \'' + plotfile + '\'',
+                 'weight(1) = 1.0',
+                 'iflag = 3',
+                 'output_format = 6',
+                 'fileout = \'' + outfile + '\'']
+        with open(ppfilename, 'w') as pp:
+            for line in lines:
+                print'line:' + str(line)
+                pp.write(str(line) + '\n')
+        print('finished writing file')
+
+    def read_espresso_input_file(self, file_name):
+        """  This class parses  Espresso data files, either input or output
+        (produced by the espresso command  write_data) and calls a handler
+        which processes the parsed information.
+        A handler class is given the parsed information. This handler class can
+        then determine what to  do with it.  For, example it could just store
+        the data in memory (see LammpsSimpleDataHandler) or write it some other
+        data file (e.g. a CUDS-file).
+        cheatsheet for quantum espresso
+
+        0. create/obtain input file such as pp.in from cuds data
+        1. run  (using mpi for instance )
+        for file describing simulation
+        mpirun -np 48 /usr/local/espresso/bin/pw.x < input_pw.in > pw.out &
+        once simulation is done, run on file describing desired output
+        mpirun -np 48 /usr/local/espresso/bin/pp.x < input_pp.in > pp.out &
+        2. convert output (which is a charge density file) into simphony format
+        (see charge_density_xyz.cpp)
+
+        Parameters
+        ----------
+        handler :
+           handler will handle the parsed information provided by this class
+            calculation_type
+            restart_mode
+            pseudo_dir
+            prefix
+            tprnfor
+            max_seconds
+            outdir
+        file_name : name of qe input file
+            """
+        self.celldm = [None, None, None]
+        state = _ReadState.UNKNOWN
+        #       BC = DataContainer()   #boundary conditions
+        #       CM = DataContainer()   #computational method
+        #       SD = DataContainer()  #state data
+        pc = self.pc
+        #       dc = DataContainer()
+        with open(file_name, 'r') as f:
+            line_number = 0
+            file_iter = iter(f)
+            line = file_iter.next()
+            try:
+                while line is not None:
+                    line_number += 1
+                    logging.debug('read line:' + str(line))
+                    state = _ReadState.get_state(state, line)
+                    if state is _ReadState.CONTROL:
+                        print('reading control section')
+                        line = self.process_control(file_iter)
+                        continue
+                    elif state is _ReadState.SYSTEM:
+                        print('reading system')
+                        line = self.process_system(file_iter)
+                        continue
+                    elif state is _ReadState.ELECTRONS:
+                        print('reading electrons')
+                        line = self.process_electrons(file_iter)
+                        continue
+                    elif state is _ReadState.IONS:
+                        print('reading ions')
+                        line = self.process_ions(file_iter)
+                        continue
+                    elif state is _ReadState.CELL:
+                        print('reading ions')
+                        line = self.process_ions(file_iter)
+                        continue
+                    elif state is _ReadState.ATOMIC_SPECIES:
+                        print('reading atomic species')
+                        line = self.process_atomic_species(file_iter)
+                        continue
+                    elif state is _ReadState.K_POINTS:
+                        print('reading k points')
+                        values = line.split()
+                        line = self.process_k_points(file_iter,
+                                                     mode=values[1])
+                        continue
+                    elif state is _ReadState.ATOMIC_POSITIONS:
+                        print('reading atomic positions')
+                        values = line.split()
+                        self.process_atomic_positions(file_iter,
+                                                           units=values[1])
+                        #  take out pc and use self.PC
+                    break
+
+                #                    line = file_iter.next()
+            except StopIteration:
+                print('eof reached')
+            except Exception:
+                print("problem with line number=", line_number, line)
+                return
+        return
+
+    def process_control(self, f):
+        print('processing control section')
+        line = f.next()
+        while _ReadState.get_state(_ReadState.CONTROL, line) == \
+                _ReadState.CONTROL:
+            values = [x.strip() for x in line.split('=')]
+            logging.debug('line in control section:' + str(line))
+            if "calculation" in line:
+                values = line.split('=')
+                calculation_type = values[1]
+#               Not sure if this is ok or not...
+                self.calculation_type = calculation_type
+            elif "restart_mode" in line:
+                self.restart_mode = values[1]
+# TODO change restart mode to check if qe was interrupted previously
+# - should not be a cuba keyword
+# set restart mode='restart' if qe was interrupted as described here
+# http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html#idp27692160
+            elif "pseudo_dir" in line:
+                pseudo_dir = values[1]
+                self.pseudopotential_directory = pseudo_dir
+            elif "prefix" in line:
+                prefix = values[1]
+                self.pseudopotential_prefix = prefix
+            elif "tprnfor" in line:
+                tprnfor = values[1]
+                self.tprnfor = tprnfor
+            elif "max_seconds" in line:
+                max_seconds = float(values[1])
+                self.max_seconds = max_seconds
+            elif "outdir" in line:
+                outdir = values[1]
+                self.output_directory = outdir
+            line = f.next()
+        return line
+
+    def process_system(self, f):
+        self.celldm = [None, None, None]
+        print('processing system section')
+        line = f.next()
+        while _ReadState.get_state(_ReadState.SYSTEM, line) == \
+                _ReadState.SYSTEM:
+            values = [x.strip() for x in line.split('=')]
+            logging.debug('line in control section:' + str(line))
+            if "ibrav" in line:
+                ibrav = int(values[1])
+                self.ibrav = ibrav
+
+            elif "celldm(1)" in line:
+                self.celldm = [0, 0, 0]
+                self.celldm[0] = float(values[1])
+            elif "celldm(2)" in line:
+                self.celldm[1] = float(values[1])
+            elif "celldm(3)" in line:
+                self.celldm[2] = float(values[1])
+                self.SP[CUBA.LATTICE_VECTORS] = self.celldm
+
+            elif "nat" in line:
+                pass
+            elif "ntyp" in line:
+                n_atom_types = int(values[1])
+                self.n_atom_types = n_atom_types
+            elif "ecutwfc" in line:
+                ecutwfc = float(values[1])
+                self.ecutwfc = ecutwfc
+            elif "ecutrho" in line:
+                ecutrho = float(values[1])
+                # maybe int
+                self.ecutrho = ecutrho
+            elif "input_dft" in line:
+                input_dft = values[1]
+                self.input_dft = input_dft
+            line = f.next()
+        return line
+
+    def process_electrons(self, f):
+        print('processing eletrons section')
+        line = f.next()
+        while _ReadState.get_state(_ReadState.ELECTRONS, line) == \
+                _ReadState.ELECTRONS:
+            values = [x.strip() for x in line.split('=')]
+            logging.debug('line in electrons section:' + str(line))
+            if "mixing_mode" in line:
+                mixing_mode = values[1]
+                self.mixing_mode = mixing_mode
+            elif "mixing_beta" in line:
+                mixing_beta = float(values[1])
+                self.mixing_beta = mixing_beta
+            elif "conv_thr" in line:
+                convergence_threshold = values[1]
+                # numbers like 1.0d-7 might have to be converted to float
+                self.convergence_threshold = convergence_threshold
+            line = f.next()
+        return line
+
+    def process_ions(self, f):
+        print('processing ions section')
+        f.next()
+        line = f.next()
+        return line
+
+    def process_cell(self, f):
+        print('processing cell section')
+        f.next()
+        line = f.next()
+        return line
+
+    def process_atomic_species(self, f):
+        print('processing atomic species section')
+        line = f.next()
+        self.SP[CUBA.CHEMICAL_SPECIE] = []
+        self.SP[CUBA.MASS] = []
+        self.pseudopotential_files = []
+        while _ReadState.get_state(_ReadState.ATOMIC_SPECIES, line) == \
+                _ReadState.ATOMIC_SPECIES:
+            values = line.split()
+            logging.debug('line in atomic species section:' + str(line))
+#            print('atomtypes:'+str(self.atomtypes))
+
+            if len(values) > 0:
+                if values[0] in atomtypes:
+                    print("atom type:" + values[0])
+                    # self.dc(CHEMICAL_SPECIE = values[0])
+                    self.SP[CUBA.CHEMICAL_SPECIE].append(values[0])
+                    mass = float(values[1])
+                    self.SP[CUBA.MASS].append(mass)
+                    potential_file = values[2]
+            line = f.next()
+        return line
+
+    def process_k_points(self, f, mode='automatic'):
+        # skip line
+        print('processing k_points section')
+        line = f.next()
+        self.k_points_mode = mode
+
+        while _ReadState.get_state(_ReadState.K_POINTS, line) == \
+                _ReadState.K_POINTS:
+            #        print('line:'+str(line))
+            values = line.split()
+            if len(values):
+                K_points = (values)
+                print('k points:' + str(K_points))
+                self.k_point_values = K_points
+            line = f.next()
+
+        return line
+
+    def process_atomic_positions(self, f, units='(angstrom)'):
+        print('processing atomic_positions section')
+        try:
+            line = f.next()
+            self.position_units = units
+            particle_list = []
+            while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS, line) \
+                    == _ReadState.ATOMIC_POSITIONS:
+                logging.debug('line in atomic positions section:' + str(line))
+                values = line.split()
+                print('values:' + str(values))
+                atom_pos = [0, 0, 0]
+                if values[0] in atomtypes:
+                    atomtype = values[0]
+                    # store position in meters; original in Angstrom
+                    atom_pos[0] = float(values[1]) * 1e-10
+                    atom_pos[1] = float(values[2]) * 1e-10
+                    atom_pos[2] = float(values[3]) * 1e-10
+                    # s = str(i)
+                    # make uid using string of index
+                    # uidstring =
+                    # uid = uuid.UUID(uidstring)
+
+                    p = Particle([atom_pos[0], atom_pos[1], atom_pos[2]])
+                    # ,uuid.UUID(int=i)
+                    print('uid:' + str(p.uid))
+                    p.data[CUBA.CHEMICAL_SPECIE] = atomtype
+                    particle_list.append(p)
+                    try:
+                        line = f.next()
+                    except StopIteration:
+                        print('EOF')
+                        break
+            if len(particle_list):
+                self.pc.add_particles(particle_list)
+                #  part_container.add_particle(p)
+                n = self.count_particles()
+                print('n_particles=' + str(n))
+        except StopIteration:
+            return
+        return
+
+    def count_particles(self,pc=None):
+        '''
+        Take a particular pc to count, otherwise count all datasets
+        '''
+        n = 0
+        if pc is None:
+            names = self.get_dataset_names()
+            for name in names:
+                n += self.count_particles(self.get_dataset(name))
+            return n
+        else:
+            for particle in pc.iter_particles():
+                n += 1
+        return n
+
+    def get_particle_masses(self,pc=None):
+        '''
+        Take a particular pc to count, otherwise count all datasets
+        '''
+        #todo - take care of possible isotopes - same atom, different mass
+
+        particle_dict = {}
+        if pc is None:
+            names = self.get_dataset_names()
+            for name in names:
+                pc = self.get_dataset(name)
+                for particle in pc.iter_particles():
+                    atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                    atomtype = atomtype_list[0]
+                    mass =particle.data[CUBA.MASS]
+                    if not atomtype in particle_dict:
+                        particle_dict[atomtype]=mass
+                        logging.debug('masses:'+str(particle_dict))
+
+            logging.debug('1.atomtypes:'+str(atomtypes))
+            n_atom_types = len(atomtypes)
+        else:
+            #implement case where particular pc is sent
+            pass
+        return particle_dict
+
+    def count_atom_types(self,pc=None):
+        '''
+        Take a particular pc to count, otherwise count all datasets
+        '''
+        atomtypes = set([])
+        n_atom_types = 0
+        if pc is None:
+            names = self.get_dataset_names()
+            for name in names:
+                n_atom_types += self.count_atom_types(self.get_dataset(name))
+            return n_atom_types
+        else:
+            for particle in pc.iter_particles():
+                atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                atomtype = atomtype_list[0]
+                logging.debug('0.atomtype:'+str(atomtype))
+                atomtypes.add(atomtype)
+            logging.debug('1.atomtypes:'+str(atomtypes))
+            n_atom_types = len(atomtypes)
+        return n_atom_types
+
+    def what_atom_types(self,pc=None):
+        atomtype_set = self.what_atom_types_set(pc=pc)
+        logging.debug('2.atomtypes:'+str(atomtype_set))
+        return [atomtype for atomtype in atomtype_set]
+
+
+    def what_atom_types_set(self,pc=None):
+        '''
+        Take a particular pc to count, otherwise count all datasets
+        '''
+        atomtypes = set([])
+        if pc is None:
+            names = self.get_dataset_names()
+            for name in names:
+                more_atoms = self.what_atom_types_set(self.get_dataset(name))
+                logging.debug('2.5.more atoms:'+str(more_atoms))
+                for atomtype in more_atoms:
+                    atomtypes.add(atomtype)
+            return atomtypes
+        else:
+            for particle in pc.iter_particles():
+                atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                atomtype = atomtype_list[0]
+                logging.debug('3.atomtype:'+str(atomtype))
+                atomtypes.add(atomtype)
+            logging.debug('4.atomtypes:'+str(atomtypes))
+        return atomtypes
+
+    def add_dataset(self, container):
+        """Add a CUDS container
+        Parameters
+        ----------
+        container : {ABCParticles}
+            The CUDS container to add to the engine.
+        Raises
+        ------
+        TypeError:
+            If the container type is not supported (i.e. ABCLattice, ABCMesh).
+        ValueError:
+            If there is already a dataset with the given name.
+        """
+        if not isinstance(container, ABCParticles):
+            raise TypeError(
+                "The type of the dataset container is not supported")
+
+        if container.name in self.get_dataset_names():
+            raise ValueError(
+                'Particle container \'{}\' already exists'.format(
+                    container.name))
+        else:
+#            self._data_manager.new_particles(container)
+#            uname = uuid.uuid4()
+            self.datasets[container.name] = container
+#            particles = container
+#            self._unames[particles.name] = uname
+#            self._names[uname] = particles.name
+
+#            lammps_pc = LammpsParticles(self, uname)
+#            self._lpcs[uname] = lammps_pc
+
+#            self._handle_new_particles(uname, particles)
+#            return lammps_pc
+
+class _ReadState(Enum):
+    UNKNOWN, UNSUPPORTED, CONTROL, SYSTEM, ELECTRONS, IONS, CELL, \
+        ATOMIC_SPECIES, K_POINTS, ATOMIC_POSITIONS = range(10)
+
+    @staticmethod
+    def get_state(current_state, line):
+        new_state = current_state
+        if "&CONTROL" in line:
+            new_state = _ReadState.CONTROL
+        elif "&SYSTEM" in line:
+            new_state = _ReadState.SYSTEM
+        elif "&ELECTRONS" in line:
+            new_state = _ReadState.ELECTRONS
+        elif "&IONS" in line:
+            new_state = _ReadState.IONS
+        elif "&CELL" in line:
+            new_state = _ReadState.CELL
+        elif "ATOMIC_SPECIES" in line:
+            new_state = _ReadState.ATOMIC_SPECIES
+        elif "K_POINTS" in line:
+            new_state = _ReadState.K_POINTS
+        elif "ATOMIC_POSITIONS" in line:
+            new_state = _ReadState.ATOMIC_POSITIONS
+        #      print('current state:'+str(new_state))
+        return new_state
+
+
+
+atomtypes = ["C", "H", "He", "N", "O", "Na", "Mg"]
+
+def which(program):
+    import os
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+
+
+
+#simple tests
+if __name__ == "__main__":
+    wrapper = QeDataHandler()
+#    filename = 'xyzoutput.txt.bak'
+#    filename = '../../examples/input_pw.in'
+    filename = 'tests/pw.in'
+    print('started parsing qe input file ' + str(filename))
+    wrapper.read_espresso_input_file(filename)
+    print('done parsing qe input file ' + str(filename))
+
+    print('started writing qe input file ' + str(filename))
+    new_inputfilename = 'tests/new_input_pw.in'
+    wrapper.write_espresso_input_file(new_inputfilename)
+    print('done writing qe input file ' + str(new_inputfilename))
+
+    ppfilename = 'tests/testpp.in'
+    print('started writing qe pp input file ' + str(ppfilename))
+    wrapper.write_espresso_pp_file()
+    print('done writing qe pp input file ' + str(ppfilename))
+
+    filename = 'tests/xyzoutput.txt.bak'
+    print('started parsing qe output file ' + str(filename))
+    wrapper.read_espresso_output_file(filename)
+    print('finished parsing qe output file ' + str(filename))

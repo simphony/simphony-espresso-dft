@@ -12,6 +12,7 @@ from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from simphony.cuds.abc_particles import ABCParticles
 
 from simespresso.io_QE.qe_process import QeProcess
+from simespresso.io_QE.qe_file_io import QeFileIO
 
 
 @contextlib.contextmanager
@@ -35,7 +36,7 @@ class QeWrapper(ABCModelingEngine):
         """
 
         self._executable_name = "pw.x"
-        self._data_manager = simespresso.io.espresso_class()
+        self._data_manager = QeFileIO()
 
         self.BC = DataContainer()
         self.CM = DataContainer()

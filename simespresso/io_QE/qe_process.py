@@ -7,7 +7,7 @@ import sys
 import subprocess
 import logging
 
-from simespresso.io_QE.data_handler import  QeDataHandler
+from simespresso.io_QE.qe_file_io import  QeDataHandler
 
 
 class QeProcess(object):

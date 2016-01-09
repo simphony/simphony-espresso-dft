@@ -12,7 +12,7 @@ import logging
 #from simespresso.io_QE import espresso_class
 #import qeCubaExtensions
 #import espresso_class
-from data_handler import QeWrapper
+from qe_file_io import QeWrapper
 from qeCubaExtensions import qeCUBAExtension
 
 # Create the Cu unit cell, assuming a simple cubic system with 4 basis
