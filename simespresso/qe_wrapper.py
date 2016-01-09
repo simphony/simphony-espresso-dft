@@ -12,7 +12,7 @@ from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from simphony.cuds.abc_particles import ABCParticles
 
 from simespresso.io_QE.qe_process import QeProcess
-from simespresso.io_QE.qe_file_io import QeFileIO
+from simespresso.io_QE.espresso_fileio_data_manager import QeFileIoDataManager
 
 
 @contextlib.contextmanager

@@ -1,53 +1,20 @@
 import os
-
-
+import os.path
 import logging
 import math
-import os
-import os.path
-import sys
-
 import numpy as np
 from enum import Enum
-from simphony.core.cuba import CUBA
-from simphony.core.data_container import DataContainer
-from simphony.cuds.abc_modeling_engine import ABCModelingEngine
+
 from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.lattice import Lattice
-from simphony.cuds.particles import Particle, Particles
-
-from qeCubaExtensions import qeCUBAExtension
-
-logging.basicConfig(level=logging.DEBUG)
-
-class QeFileIO(ABCModelingEngine):
-
-
-from simespresso.io_QE import qe_file_io
-
 from simphony.core.cuba import CUBA
+from qeCubaExtensions import qeCUBAExtension
 from simphony.core.cuds_item import CUDSItem
 from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particles, Particle
 
+logging.basicConfig(level=logging.DEBUG)
 
-def _filter_unsupported_data(iterable, supported_cuba):
-    """Ensure iterators only provide particles with only supported data
-    Parameters
-    ----------
-    iterable : iterator of Particles
-        iterable of particles
-    supported_cuba: list of CUBA
-        what cuba is supported
-    """
-    for particle in iterable:
-        data = particle.data
-        supported_data = {cuba: data[cuba] for cuba in
-                          data if cuba in supported_cuba}
-        supported_particle = Particle(coordinates=particle.coordinates,
-                                      uid=particle.uid,
-                                      data=supported_data)
-        yield supported_particle
 
 
 class QeFileIoDataManager():
@@ -66,6 +33,54 @@ class QeFileIoDataManager():
 
         # cache of data container extensions
         self._dc_extension_cache = {}
+
+        self.SP = DataContainer()  # System Model Equations and Material
+        # relations (Governing Equations)
+        self.SD = DataContainer()  # System Material Description and
+        # State Data including Boundaries (not conditions)
+        self.BC = DataContainer()  # Boundary conditions
+        self.CM = DataContainer()  # Computational Methods
+        # (numerical and solver aspects only)
+        self.pc = Particles('quantum_espresso_particles')
+        self.CUBAExtension = {}
+        self.CM_extension = {}
+        self.SP_extension = {}
+        self.BC_extension = {}
+        self.datasets = {}
+        self.combined_dataset=DataContainer()
+
+        #data for running qe
+        #control
+        self.calculation_type = 'scf'
+        self.restart_mode = 'from_scratch'
+        self.pseudopotential_directory = './'
+        self.pseudopotential_prefix = 'simphony_pp'
+        self.tprnfor = '.true.'
+        self. max_seconds = 3600*24
+        self.output_directory = './'
+
+        #system
+        self.celldm = [1, 1, 1]  #This should  come from lattice vectors
+        #  if the user only specificies atom positions, what should this be
+        self.ibrav = 8  #this should also be defined in cuba
+        self.n_atom_types = 0 #comes from pc
+        self.ecutwfc = 60.0  #find reasonable default
+        self.ecutrho = 240 #find reasonable default
+        self.input_dft = 'vdw-df-c09' #maybe give a default
+
+        #electrons
+        self.mixing_mode = 'local-TF'
+        self.mixing_beta = 0.8 # good default?
+        self.convergence_threshold = 1.0*10**-7
+
+        #other info
+        self.position_units ="angstrom"
+        self.input_pwname="input.pw"
+        self.output_filename="qe_output"
+        self.path_to_espresso='pw.x'
+        self.mpi=False
+        self.mpi_Nprocessors=2
+        self.mapping=[]
 
     def get_data(self, uname):
         """Returns data container associated with particle container
@@ -236,14 +251,12 @@ class QeFileIoDataManager():
         self._update_from_qe(output_data_filename)
 
 # Private methods #######################################################
-    def _update_from_lammps(self, output_data_filename):
+    def _update_from_qe(self, output_data_filename):
         """read from file and update cache
         """
         assert os.path.isfile(output_data_filename)
 
-        handler = LammpsSimpleDataHandler()
-        parser = LammpsDataFileParser(handler)
-        parser.parse(output_data_filename)
+        self.
 
         interpreter = LammpsDataLineInterpreter(self._atom_style)
 
@@ -252,7 +265,6 @@ class QeFileIoDataManager():
         velocities = handler.get_velocities()
         masses = handler.get_masses()
 
-        assert(len(atoms) == len(velocities))
 
         type_data = {}
 
@@ -353,54 +365,7 @@ class QeFileIoDataManager():
     functions for reading and writing quantum espresso input and output files
     '''
     #multiple wrappers  - scf, forces, relax, md
-    def __init__(self):
-        self.SP = DataContainer()  # System Model Equations and Material
-        # relations (Governing Equations)
-        self.SD = DataContainer()  # System Material Description and
-        # State Data including Boundaries (not conditions)
-        self.BC = DataContainer()  # Boundary conditions
-        self.CM = DataContainer()  # Computational Methods
-        # (numerical and solver aspects only)
-        self.pc = Particles('quantum_espresso_particles')
-        self.CUBAExtension = {}
-        self.CM_extension = {}
-        self.SP_extension = {}
-        self.BC_extension = {}
-        self.datasets = {}
-        self.combined_dataset=DataContainer()
 
-        #data for running qe
-        #control
-        self.calculation_type = 'scf'
-        self.restart_mode = 'from_scratch'
-        self.pseudopotential_directory = './'
-        self.pseudopotential_prefix = 'simphony_pp'
-        self.tprnfor = '.true.'
-        self. max_seconds = 3600*24
-        self.output_directory = './'
-
-        #system
-        self.celldm = [1, 1, 1]  #This should  come from lattice vectors
-        #  if the user only specificies atom positions, what should this be
-        self.ibrav = 8  #this should also be defined in cuba
-        self.n_atom_types = 0 #comes from pc
-        self.ecutwfc = 60.0  #find reasonable default
-        self.ecutrho = 240 #find reasonable default
-        self.input_dft = 'vdw-df-c09' #maybe give a default
-
-        #electrons
-        self.mixing_mode = 'local-TF'
-        self.mixing_beta = 0.8 # good default?
-        self.convergence_threshold = 1.0*10**-7
-
-        #other info
-        self.position_units ="angstrom"
-        self.input_pwname="input.pw"
-        self.output_filename="qe_output"
-        self.path_to_espresso='pw.x'
-        self.mpi=False
-        self.mpi_Nprocessors=2
-        self.mapping=[]
 
     def pcs_to_single_pc(self,pcs):
         particle_list = []
@@ -1246,40 +1211,6 @@ class QeFileIoDataManager():
             logging.debug('4.atomtypes:'+str(atomtypes))
         return atomtypes
 
-    def add_dataset(self, container):
-        """Add a CUDS container
-        Parameters
-        ----------
-        container : {ABCParticles}
-            The CUDS container to add to the engine.
-        Raises
-        ------
-        TypeError:
-            If the container type is not supported (i.e. ABCLattice, ABCMesh).
-        ValueError:
-            If there is already a dataset with the given name.
-        """
-        if not isinstance(container, ABCParticles):
-            raise TypeError(
-                "The type of the dataset container is not supported")
-
-        if container.name in self.get_dataset_names():
-            raise ValueError(
-                'Particle container \'{}\' already exists'.format(
-                    container.name))
-        else:
-#            self._data_manager.new_particles(container)
-#            uname = uuid.uuid4()
-            self.datasets[container.name] = container
-#            particles = container
-#            self._unames[particles.name] = uname
-#            self._names[uname] = particles.name
-
-#            lammps_pc = LammpsParticles(self, uname)
-#            self._lpcs[uname] = lammps_pc
-
-#            self._handle_new_particles(uname, particles)
-#            return lammps_pc
 
 class _ReadState(Enum):
     UNKNOWN, UNSUPPORTED, CONTROL, SYSTEM, ELECTRONS, IONS, CELL, \
@@ -1329,11 +1260,28 @@ def which(program):
 
     return None
 
+def _filter_unsupported_data(iterable, supported_cuba):
+    """Ensure iterators only provide particles with only supported data
+    Parameters
+    ----------
+    iterable : iterator of Particles
+        iterable of particles
+    supported_cuba: list of CUBA
+        what cuba is supported
+    """
+    for particle in iterable:
+        data = particle.data
+        supported_data = {cuba: data[cuba] for cuba in
+                          data if cuba in supported_cuba}
+        supported_particle = Particle(coordinates=particle.coordinates,
+                                      uid=particle.uid,
+                                      data=supported_data)
+        yield supported_particle
 
 
 #simple tests
 if __name__ == "__main__":
-    wrapper = QeDataHandler()
+    wrapper = QeFileIoDataManager
 #    filename = 'xyzoutput.txt.bak'
 #    filename = '../../examples/input_pw.in'
     filename = 'tests/pw.in'
