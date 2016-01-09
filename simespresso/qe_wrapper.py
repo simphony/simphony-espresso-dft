@@ -33,7 +33,7 @@ class QeWrapper(ABCModelingEngine):
         """
 
         self._executable_name = "pw.x"
-        self._data_manager =  simespresso.io.espresso_class
+        self._data_manager = simespresso.io.espresso_class()
 
         self.BC = DataContainer()
         self.CM = DataContainer()
@@ -55,6 +55,7 @@ class QeWrapper(ABCModelingEngine):
         ValueError:
             If there is already a dataset with the given name.
         """
+        # todo-what container types do we need to support for QE
         if not isinstance(container, ABCParticles):
             raise TypeError(
                 "The type of the dataset container is not supported")
@@ -134,61 +135,29 @@ class QeWrapper(ABCModelingEngine):
                             name))
 
     def run(self):
-        """ Run lammps-engine based on configuration and data
+        """ Run qe based on configuration and data
         """
+        with _temp_directory() as temp_dir:
+            input_data_filename = os.path.join(
+                temp_dir, "data_in.qe")
+            output_data_filename = os.path.join(
+                temp_dir, "data_out.qe")
 
-        if self._use_internal_interface:
             # before running, we flush any changes to lammps
-            self._data_manager.flush()
+            self._data_manager.flush(input_data_filename)
 
-            # TODO this has to be rewritten as
-            # we only want to send configuration commands
-            # once (or after whenever they change) but we want
-            # to send the the 'run' command each time
-            commands = ""
-            commands += ScriptWriter.get_pair_style(
-                _combine(self.SP, self.SP_extension))
-            commands += ScriptWriter.get_fix(CM=_combine(self.CM,
-                                                         self.CM_extension))
-            commands += ScriptWriter.get_pair_coeff(
-                _combine(self.SP, self.SP_extension))
-            # changing existing boundary (which was already
-            # sent by LammpsInternalDataManager)
-            commands += ScriptWriter.get_boundary(
-                _combine(self.BC,
-                         self.BC_extension),
-                change_existing_boundary=True)
-            commands += ScriptWriter.get_run(CM=_combine(self.CM,
-                                                         self.CM_extension))
-
-            for command in commands.splitlines():
-                self._lammps.command(command)
+            commands = self._script_writer.get_configuration(
+                input_data_file=input_data_filename,
+                output_data_file=output_data_filename,
+                BC=_combine(self.BC, self.BC_extension),
+                CM=_combine(self.CM, self.CM_extension),
+                SP=_combine(self.SP, self.SP_extension))
+            process = LammpsProcess(lammps_name=self._executable_name,
+                                    log_directory=temp_dir)
+            process.run(commands)
 
             # after running, we read any changes from lammps
-            # TODO rework
-            self._data_manager.read()
-        else:
-            with _temp_directory() as temp_dir:
-                input_data_filename = os.path.join(
-                    temp_dir, "data_in.lammps")
-                output_data_filename = os.path.join(
-                    temp_dir, "data_out.lammps")
-
-                # before running, we flush any changes to lammps
-                self._data_manager.flush(input_data_filename)
-
-                commands = self._script_writer.get_configuration(
-                    input_data_file=input_data_filename,
-                    output_data_file=output_data_filename,
-                    BC=_combine(self.BC, self.BC_extension),
-                    CM=_combine(self.CM, self.CM_extension),
-                    SP=_combine(self.SP, self.SP_extension))
-                process = LammpsProcess(lammps_name=self._executable_name,
-                                        log_directory=temp_dir)
-                process.run(commands)
-
-                # after running, we read any changes from lammps
-                self._data_manager.read(output_data_filename)
+            self._data_manager.read(output_data_filename)
 
 
 def _combine(data_container, data_container_extension):
