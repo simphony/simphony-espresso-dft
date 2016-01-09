@@ -3,10 +3,12 @@ This module provides a way to run the lammps or liggghts process
 """
 
 import os
+import sys
 import subprocess
 import logging
 
-from simespresso.io_QE.data_handler import  qe_data_handler
+from simespresso.io_QE.data_handler import  QeDataHandler
+
 
 class QeProcess(object):
     """ Class runs the lammps/liggghts program
@@ -27,7 +29,7 @@ class QeProcess(object):
         self._returncode = 0
         self._stderr = ""
         self._stdout = ""
-        self._datahandler = qe_data_handler()
+        self._datahandler = QeDataHandler()
 
         if log_directory:
             self._log = os.path.join(log_directory, 'log.qe')
@@ -62,22 +64,23 @@ class QeProcess(object):
             if Lammps did not run correctly
         """
         logging.debug('starting qe engine')
-
-        self._datahandler.write_espresso_input_file(input_data_filename
         logging.debug('path to espresso:'+self._qe_executable)
+
         if not which(self._qe_executable):
             logging.debug('no path to espresso')
             raise ValueError(
                 'espresso command not found (looking for '
-                            + self.path_to_espresso+')')
+                            + self._qe_exectable+')')
+
+        self._datahandler.write_espresso_input_file(input_data_file)
 
         if self._datahandler.mpi:
             command = 'mpirun -np ' + str(self.mpi_Nprocessors) + ' ' + \
-                     path + ' < ' + pwname + ' > ' \
-                      + self.datahandler.output_filename
+                     self._qe_executable + ' < ' + input_data_file + ' > ' \
+                      + output_data_file
         else:
-            command = self.path_to_espresso + ' < ' + pwname + ' > ' \
-                      + self.datahandler.output_filename
+            command = self.path_to_espresso + ' < ' + input_data_file + ' > ' \
+                      + output_data_file
         logging.debug('attempting to run command: ' + command)
         try:
             subprocess.check_call(command, shell=True,
@@ -91,6 +94,7 @@ class QeProcess(object):
 
 
 '''
+    code from lammps - maybe use the stdout and stderr pipes
         proc = subprocess.Popen(
             [self._qe_executable, '-log', self._log], stdin=subprocess.PIPE,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
