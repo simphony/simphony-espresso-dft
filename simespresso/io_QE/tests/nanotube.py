@@ -3,7 +3,7 @@ __author__ = 'jeremy'
 import os
 import unittest
 
-from simespresso.io_QE import espresso_class
+from simespresso.io_QE import io_files
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particle, Particles
@@ -12,7 +12,7 @@ from simphony.cuds.particles import Particle, Particles
 class nanotubes(object):
 
     def __init__(self):
-        self.qe_wrapper = espresso_class.qe_functions()
+        self.qe_wrapper = io_files.qe_functions()
 
     def make_and_test_nanotube(self):
         length = 10**-9

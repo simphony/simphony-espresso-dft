@@ -17,12 +17,6 @@ from qeCubaExtensions import qeCUBAExtension
 
 logging.basicConfig(level=logging.DEBUG)
 
-@contextlib.contextmanager
-def _temp_directory():
-    temp_dir = tempfile.mkdtemp()
-    yield temp_dir
-    shutil.rmtree(temp_dir)
-
 class qe_data_handler(ABCModelingEngine):
     '''
     functions for reading and writing quantum espresso input and output files
@@ -986,21 +980,7 @@ class _ReadState(Enum):
         #      print('current state:'+str(new_state))
         return new_state
 
-def which(name):
-    found = 0
-    for path in os.getenv("PATH").split(os.path.pathsep):
-        full_path = path + os.sep + name
-        if os.path.exists(full_path):
-            """
-            if os.stat(full_path).st_mode & stat.S_IXUSR:
-                found = 1
-                print(full_path)
-            """
-            found = 1
-            print(full_path)
-    # Return a UNIX-style exit code so it can be checked by calling scripts.
-    # Programming shortcut to toggle the value of found: 1 => 0, 0 => 1.
-    sys.exit(1 - found)
+
 
 atomtypes = ["C", "H", "He", "N", "O", "Na", "Mg"]
 

@@ -3,7 +3,7 @@ __author__ = 'jeremy'
 import os
 import unittest
 
-from simespresso.io_QE import espresso_class
+from simespresso.io_QE import io_files
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particle, Particles
@@ -18,7 +18,7 @@ class OutcomesTest(unittest.TestCase):
 
     def test_espresso_data_file_read(self):
         print('TEST OF READING QE INPUT FILE')
-        wrapper = espresso_class.qe_functions()
+        wrapper = io_files.qe_functions()
         wrapper.read_espresso_input_file(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
@@ -57,7 +57,7 @@ class OutcomesTest(unittest.TestCase):
 
     def test_espresso_data_file_write(self):
         print('TEST OF WRITING QE INPUT FILE')
-        wrp = espresso_class.qe_functions()
+        wrp = io_files.qe_functions()
         espresso_input_filename = 'pw_generated.in'
         wrp.SP = DataContainer()
         wrp.pc = Particles('quantum_espresso_particles')
@@ -118,7 +118,7 @@ class OutcomesTest(unittest.TestCase):
     def test_espresso_ppfile_write(self, ppfilename="testpp.in"):
         print('TEST OF WRITING QE PP FILE')
 
-        wrp = espresso_class.qe_functions()
+        wrp = io_files.qe_functions()
         wrp.write_espresso_pp_file(ppfilename="testpp.in")
 
     def test_read_espresso_output_file(self):
@@ -130,14 +130,14 @@ class OutcomesTest(unittest.TestCase):
             print("file "+str(file_name)+" not found")
             return(1)
         print('testing reading of qe output file '+str(file_name))
-        qe_wrapper = espresso_class.qe_functions()
+        qe_wrapper = io_files.qe_functions()
         qe_wrapper.read_espresso_output_file(file_name)
 
     def test_running_index_to_node_inredex(self):
         print('testing espresso_data_file_read')
         n_latticepoints = [10, 7, 6]
         index = 5
-        espresso_wrapper = espresso_class.qe_functions()
+        espresso_wrapper = io_files.qe_functions()
         indices = espresso_wrapper.running_index_to_node_index(index,
                                                                n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
@@ -180,7 +180,7 @@ class OutcomesTest(unittest.TestCase):
         mpi = False
         mpi_Nprocessors = 2
         path_to_espresso = 'pw.x'  # /usr/bin/pw.x is not default apparently
-        wrapper = espresso_class.qe_functions()
+        wrapper = io_files.qe_functions()
 #        wrapper.start_qe2(name_in, name_out)
         wrapper.start_qe(name_in, name_out, path_to_espresso=path_to_espresso,
                          mpi=mpi, mpi_Nprocessors=mpi_Nprocessors)
