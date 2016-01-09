@@ -6,11 +6,12 @@ import os
 import shutil
 import tempfile
 
-import simespresso.io.espresso_class
 from simphony.core.data_container import DataContainer
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from simphony.cuds.abc_particles import ABCParticles
 
+import simespresso.io.espresso_class
+from simespresso.io_process import QeProcess
 
 @contextlib.contextmanager
 def _temp_directory():
@@ -143,7 +144,7 @@ class QeWrapper(ABCModelingEngine):
             output_data_filename = os.path.join(
                 temp_dir, "data_out.qe")
 
-            # before running, we flush any changes to lammps
+            # before running, we flush any changes
             self._data_manager.flush(input_data_filename)
 
             commands = self._script_writer.get_configuration(
@@ -152,7 +153,8 @@ class QeWrapper(ABCModelingEngine):
                 BC=_combine(self.BC, self.BC_extension),
                 CM=_combine(self.CM, self.CM_extension),
                 SP=_combine(self.SP, self.SP_extension))
-            process = LammpsProcess(lammps_name=self._executable_name,
+
+            process = QeProcess(qe_name=self._executable_name,
                                     log_directory=temp_dir)
             process.run(commands)
 
