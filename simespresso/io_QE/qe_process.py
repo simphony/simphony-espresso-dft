@@ -70,7 +70,8 @@ class QeProcess(object):
             raise ValueError(
                 'espresso command not found (looking for '
                             + self.path_to_espresso+')')
-        if self.datahandler.mpi:
+
+        if self._datahandler.mpi:
             command = 'mpirun -np ' + str(self.mpi_Nprocessors) + ' ' + \
                      path + ' < ' + pwname + ' > ' \
                       + self.datahandler.output_filename
