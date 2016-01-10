@@ -22,8 +22,8 @@ class QeFileIoDataManager():
     data existing in Lammps (via lammps data file) and allows this data to be
     queried and to be changed.
     """
-    def __init__(self, atom_style):
-
+    def __init__(self):
+            super(QeFileIoDataManager, self).__init__()
         # map from lammps-id to simphony-uid
         self._qe_id_to_uid = {}
 

@@ -1,7 +1,7 @@
 import uuid
 import abc
 
-
+from simespresso.qe_particles import QeParticles
 
 class ABCDataManager(object):
     """  Class managing qe data
@@ -83,7 +83,7 @@ class ABCDataManager(object):
             particle container to be added
         Returns
         -------
-        LammpsParticles
+        pc
         """
 
         # generate a unique name for this particle container
@@ -93,7 +93,7 @@ class ABCDataManager(object):
         self._unames[particles.name] = uname
         self._names[uname] = particles.name
 
-        lammps_pc = LammpsParticles(self, uname)
+        lammps_pc = QeParticles(self, uname)
         self._lpcs[uname] = lammps_pc
 
         self._handle_new_particles(uname, particles)
