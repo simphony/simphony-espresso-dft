@@ -16,7 +16,6 @@ from simphony.cuds.particles import Particles, Particle
 logging.basicConfig(level=logging.DEBUG)
 
 
-
 class QeFileIoDataManager():
     """  Class managing data using file-io
     The class manages

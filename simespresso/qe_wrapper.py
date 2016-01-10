@@ -14,7 +14,6 @@ from simphony.cuds.abc_particles import ABCParticles
 from simespresso.io_QE.qe_process import QeProcess
 from simespresso.io_QE.espresso_fileio_data_manager import QeFileIoDataManager
 
-
 @contextlib.contextmanager
 def _temp_directory():
     """ context manager that provides temp directory
@@ -36,8 +35,7 @@ class QeWrapper(ABCModelingEngine):
         """
 
         self._executable_name = "pw.x"
-        self._data_manager = QeFileIO()
-
+        self._data_manager = QeFileIoDataManager()
         self.BC = DataContainer()
         self.CM = DataContainer()
         self.SP = DataContainer()
