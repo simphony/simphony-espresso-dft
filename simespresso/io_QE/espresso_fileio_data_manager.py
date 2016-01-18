@@ -1044,16 +1044,15 @@ class QeFileIoDataManager():
 #            print('atomtypes:'+str(self.atomtypes))
 
             if len(values) > 0:
-                if values[0] in atomtypes:
-                    atomtype = values[0]
-                    print("atom type:" + atomtype)
-                    # self.dc(CHEMICAL_SPECIE = values[0])
-                    self.SP[CUBA.CHEMICAL_SPECIE].append(atomtype)
-                    mass = float(values[1])
-                    self.SP[CUBA.MASS].append(mass)
-                    self.potential_file_dictionary[atomtype] = values[2]
-                    self.masses_dictionary[atomtype]=mass
-                    logging.debug('atomtype {0} mass {1} pot.file.dict {2} massdict {3}'.format(atomtype,mass, self.potential_file_dictionary,self.masses_dictionary))
+                atomtype = values[0]
+                print("atom type:" + atomtype)
+                # self.dc(CHEMICAL_SPECIE = values[0])
+                self.SP[CUBA.CHEMICAL_SPECIE].append(atomtype)
+                mass = float(values[1])
+                self.SP[CUBA.MASS].append(mass)
+                self.potential_file_dictionary[atomtype] = values[2]
+                self.masses_dictionary[atomtype]=mass
+                logging.debug('atomtype {0} mass {1} pot.file.dict {2} massdict {3}'.format(atomtype,mass, self.potential_file_dictionary,self.masses_dictionary))
             line = f.next()
         return line
 
@@ -1087,30 +1086,29 @@ class QeFileIoDataManager():
                 values = line.split()
                 print('values:' + str(values))
                 atom_pos = [0, 0, 0]
-                if values[0] in atomtypes:
-                    atomtype = values[0]
-                    self.atomtypes.append(atomtype)
-                    mass = self.masses_dictionary[atomtype]
-                    self.masses.append(mass)
-                    # store position in meters; original in Angstrom
-                    atom_pos[0] = float(values[1]) * 1e-10
-                    atom_pos[1] = float(values[2]) * 1e-10
-                    atom_pos[2] = float(values[3]) * 1e-10
-                    # s = str(i)
-                    # make uid using string of index
-                    # uidstring =
-                    # uid = uuid.UUID(uidstring)
+                atomtype = values[0]
+                self.atomtypes.append(atomtype)
+                mass = self.masses_dictionary[atomtype]
+                self.masses.append(mass)
+                # store position in meters; original in Angstrom
+                atom_pos[0] = float(values[1]) * 1e-10
+                atom_pos[1] = float(values[2]) * 1e-10
+                atom_pos[2] = float(values[3]) * 1e-10
+                # s = str(i)
+                # make uid using string of index
+                # uidstring =
+                # uid = uuid.UUID(uidstring)
 
-                    p = Particle([atom_pos[0], atom_pos[1], atom_pos[2]])
-                    # ,uuid.UUID(int=i)
-                    print('uid:' + str(p.uid))
-                    p.data[CUBA.CHEMICAL_SPECIE] = atomtype
-                    particle_list.append(p)
-                    try:
-                        line = f.next()
-                    except StopIteration:
-                        print('EOF')
-                        break
+                p = Particle([atom_pos[0], atom_pos[1], atom_pos[2]])
+                # ,uuid.UUID(int=i)
+                print('uid:' + str(p.uid))
+                p.data[CUBA.CHEMICAL_SPECIE] = atomtype
+                particle_list.append(p)
+                try:
+                    line = f.next()
+                except StopIteration:
+                    print('EOF')
+                    break
             if len(particle_list):
                 self.pc.add_particles(particle_list)
                 #  part_container.add_particle(p)
@@ -1240,10 +1238,6 @@ class _ReadState(Enum):
             new_state = _ReadState.ATOMIC_POSITIONS
         #      print('current state:'+str(new_state))
         return new_state
-
-
-
-atomtypes = ["C", "H", "He", "N", "O", "Na", "Mg"]
 
 def which(program):
     import os
