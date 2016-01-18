@@ -361,9 +361,7 @@ class QeFileIoDataManager():
                 mass[material_type] = data[CUBA.MASS]
         return mass
 
-
-
-    def pcs_to_single_pc(self,pcs):
+    def _pcs_to_single_pc(self,pcs):
         particle_list = []
         mapping = []
         i = 0
@@ -378,7 +376,7 @@ class QeFileIoDataManager():
 #            self.pc.add_particles(particle_list)
             self.mapping = mapping
 
-    def single_pc_to_pcs(self,pcs):
+    def _single_pc_to_pcs(self,pcs):
         pcs={} #dict of pcs
         for entry in self.mapping:
             pc_name = entry[0]
@@ -400,7 +398,7 @@ class QeFileIoDataManager():
                 pcs[pc_name].add_particles([particle])
                 #check if list needed
 
-    def read_espresso_output_file(self, file_name):
+    def _read_espresso_output_file(self, file_name):
         '''
         This function parses  Espresso output files which usually will have
         a name like 'name.charge'.
@@ -522,13 +520,13 @@ class QeFileIoDataManager():
             self.read_densities(n_lattice_points, file_iter,
                                 aviz_filename='avizout.xyz')
 
-    def running_index_to_node_index(self, index, n_latticepoints):
+    def _running_index_to_node_index(self, index, n_latticepoints):
         node_z = index / (n_latticepoints[0] * n_latticepoints[1])
         node_y = (index / n_latticepoints[0]) % n_latticepoints[1]
         node_x = index % n_latticepoints[0]
         return [node_x, node_y, node_z]
 
-    def read_densities(self, n_latticepoints, file_iter, aviz_filename=False):
+    def _read_densities(self, n_latticepoints, file_iter, aviz_filename=False):
         charge_density = self.read_xyz(n_latticepoints, file_iter)
         charge_as_list = charge_density.flatten()
         nodelist = []
@@ -546,7 +544,7 @@ class QeFileIoDataManager():
         if aviz_filename:
             self.write_aviz_output(charge_density, aviz_filename)
 
-    def write_aviz_output(self, xyz_array, aviz_xyzfile):
+    def _write_aviz_output(self, xyz_array, aviz_xyzfile):
         base_vector = self.L.base_vect
         n_elements = np.shape(xyz_array)
         n_size = np.size(xyz_array)
@@ -571,7 +569,7 @@ class QeFileIoDataManager():
                 print('error writing aviz file')
         return
 
-    def read_xyz(self, n_latticepoints, file_iter):
+    def _read_xyz(self, n_latticepoints, file_iter):
         line = file_iter.next()
         x_points = n_latticepoints[0]
         y_points = n_latticepoints[1]
@@ -613,7 +611,7 @@ class QeFileIoDataManager():
                                  y_points, z_count, z_points))
         return charge_density
 
-    def write_espresso_input_file(self, file_name,dataset_name = None):
+    def _write_espresso_input_file(self, file_name,dataset_name = None):
         """
         :param file_name: name of the input file to write
         :return:
@@ -806,7 +804,7 @@ class QeFileIoDataManager():
         print('finished writing file')
         f.closed
 
-    def write_espresso_pp_file(self, ppfilename="testpp.in"):
+    def _write_espresso_pp_file(self, ppfilename="testpp.in"):
         '''
         this writes an auxiliary required file determined the plot parameters
         :return:
@@ -833,7 +831,7 @@ class QeFileIoDataManager():
                 pp.write(str(line) + '\n')
         print('finished writing file')
 
-    def read_espresso_input_file(self, file_name):
+    def _read_espresso_input_file(self, file_name):
         """  This class parses  Espresso data files, either input or output
         (produced by the espresso command  write_data) and calls a handler
         which processes the parsed information.
@@ -927,7 +925,7 @@ class QeFileIoDataManager():
                 return
         return
 
-    def process_control(self, f):
+    def _process_control(self, f):
         print('processing control section')
         line = f.next()
         while _ReadState.get_state(_ReadState.CONTROL, line) == \
@@ -963,7 +961,7 @@ class QeFileIoDataManager():
             line = f.next()
         return line
 
-    def process_system(self, f):
+    def _process_system(self, f):
         self.celldm = [None, None, None]
         print('processing system section')
         line = f.next()
@@ -1002,7 +1000,7 @@ class QeFileIoDataManager():
             line = f.next()
         return line
 
-    def process_electrons(self, f):
+    def _process_electrons(self, f):
         print('processing eletrons section')
         line = f.next()
         while _ReadState.get_state(_ReadState.ELECTRONS, line) == \
@@ -1022,19 +1020,19 @@ class QeFileIoDataManager():
             line = f.next()
         return line
 
-    def process_ions(self, f):
+    def _process_ions(self, f):
         print('processing ions section')
         f.next()
         line = f.next()
         return line
 
-    def process_cell(self, f):
+    def _process_cell(self, f):
         print('processing cell section')
         f.next()
         line = f.next()
         return line
 
-    def process_atomic_species(self, f):
+    def _process_atomic_species(self, f):
         print('processing atomic species section')
         line = f.next()
         self.SP[CUBA.CHEMICAL_SPECIE] = []
@@ -1057,7 +1055,7 @@ class QeFileIoDataManager():
             line = f.next()
         return line
 
-    def process_k_points(self, f, mode='automatic'):
+    def _process_k_points(self, f, mode='automatic'):
         # skip line
         print('processing k_points section')
         line = f.next()
@@ -1075,7 +1073,7 @@ class QeFileIoDataManager():
 
         return line
 
-    def process_atomic_positions(self, f, units='(angstrom)'):
+    def _process_atomic_positions(self, f, units='(angstrom)'):
         print('processing atomic_positions section')
         try:
             line = f.next()
@@ -1117,7 +1115,7 @@ class QeFileIoDataManager():
             return
         return
 
-    def count_particles(self,pc=None):
+    def _count_particles(self,pc=None):
         '''
         Take a particular pc to count, otherwise count all datasets
         '''
@@ -1132,7 +1130,7 @@ class QeFileIoDataManager():
                 n += 1
         return n
 
-    def get_particle_masses(self,pc=None):
+    def _get_particle_masses(self,pc=None):
         '''
         Take a particular pc to count, otherwise count all datasets
         '''
@@ -1158,7 +1156,7 @@ class QeFileIoDataManager():
             pass
         return particle_dict
 
-    def count_atom_types(self,pc=None):
+    def _count_atom_types(self,pc=None):
         '''
         Take a particular pc to count, otherwise count all datasets
         '''
@@ -1179,13 +1177,12 @@ class QeFileIoDataManager():
             n_atom_types = len(atomtypes)
         return n_atom_types
 
-    def what_atom_types(self,pc=None):
+    def _what_atom_types(self,pc=None):
         atomtype_set = self.what_atom_types_set(pc=pc)
         logging.debug('2.atomtypes:'+str(atomtype_set))
         return [atomtype for atomtype in atomtype_set]
 
-
-    def what_atom_types_set(self,pc=None):
+    def _what_atom_types_set(self,pc=None):
         '''
         Take a particular pc to count, otherwise count all datasets
         '''
