@@ -23,8 +23,8 @@ class QeFileIoDataManager():
     queried and to be changed.
     """
     def __init__(self):
-            super(QeFileIoDataManager, self).__init__()
-        # map from lammps-id to simphony-uid
+        super(QeFileIoDataManager, self).__init__()
+        # map from qe-id to simphony-uid
         self._qe_id_to_uid = {}
 
         # cache of particle containers
@@ -250,14 +250,15 @@ class QeFileIoDataManager():
         self._update_from_qe(output_data_filename)
 
 # Private methods #######################################################
-    def _update_from_qe(self, output_data_filename):
+    def _update_from_qe(self, data_filename):
         """read from file and update cache
         """
-        assert os.path.isfile(output_data_filename)
+        assert os.path.isfile(data_filename)
 
-        self.
 
-        interpreter = LammpsDataLineInterpreter(self._atom_style)
+        self.read_qe_input_file
+
+
 
         atoms = handler.get_atoms()
         number_atom_types = handler.get_number_atom_types()
@@ -306,7 +307,7 @@ class QeFileIoDataManager():
         """ Write data file containing current state of simulation
         """
         # recreate (and store) map from lammps-id to simphony-id
-        self._lammpsid_to_uid = {}
+        self._qeid_to_uid = {}
 
         # determine the number of particles
         # and collect the different material types
@@ -360,10 +361,6 @@ class QeFileIoDataManager():
                 mass[material_type] = data[CUBA.MASS]
         return mass
 
-   '''
-    functions for reading and writing quantum espresso input and output files
-    '''
-    #multiple wrappers  - scf, forces, relax, md
 
 
     def pcs_to_single_pc(self,pcs):
@@ -1210,6 +1207,11 @@ class QeFileIoDataManager():
             logging.debug('4.atomtypes:'+str(atomtypes))
         return atomtypes
 
+
+   '''
+    functions for reading and writing quantum espresso input and output files
+    '''
+    #multiple wrappers  - scf, forces, relax, md
 
 class _ReadState(Enum):
     UNKNOWN, UNSUPPORTED, CONTROL, SYSTEM, ELECTRONS, IONS, CELL, \
