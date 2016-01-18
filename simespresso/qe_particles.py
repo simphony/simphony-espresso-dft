@@ -8,6 +8,7 @@ class QeParticles(ABCParticles):
     ----------
     name : string
         name of particles
+        
     data : DataContainer
         holds data
     data_extension : dict
