@@ -41,6 +41,10 @@ class QeFileIoDataManager():
         self.CM = DataContainer()  # Computational Methods
         # (numerical and solver aspects only)
         self.pc = Particles('quantum_espresso_particles')
+        self.atomtypes = []
+        self.masses = []
+        self.potential_file_dictionary = {}
+        self.masses_dictionary = {}
         self.CUBAExtension = {}
         self.CM_extension = {}
         self.SP_extension = {}
@@ -256,14 +260,12 @@ class QeFileIoDataManager():
         assert os.path.isfile(data_filename)
 
 
-        self.read_qe_input_file
+        self._read_espresso_input_file(data_filename)
 
-
-
-        atoms = handler.get_atoms()
-        number_atom_types = handler.get_number_atom_types()
-        velocities = handler.get_velocities()
-        masses = handler.get_masses()
+        atoms = self.pc
+        number_atom_types = self.n_atom_types
+        #velocities = handler.get_velocities()
+        masses = self.masses
 
 
         type_data = {}
@@ -271,25 +273,22 @@ class QeFileIoDataManager():
         for atom_type in range(1, number_atom_types+1):
             type_data[atom_type] = DataContainer()
 
-        for atom_type, mass in masses.iteritems():
-            type_data[atom_type][CUBA.MASS] = mass
+#the mass is stored in the pc
+#        for atom_type, mass in masses.iteritems():
+#            type_data[atom_type][CUBA.MASS] = mass
 
         # update each particle container with these
         # material-specific attributes
-        # TODO updating the material_type from lammps should possibly be
-        # removed as lammps is not going to change it
         for _, pc in self._pc_cache.iteritems():
             data = type_data[pc.data[CUBA.MATERIAL_TYPE]]
             for key, value in data.iteritems():
                 pc.data[key] = value
 
-        for lammps_id, values in atoms.iteritems():
-            uname, uid = self._lammpsid_to_uid[lammps_id]
+        for qe_id, values in atoms.iteritems():
+            uname, uid = self._qeid_to_uid[qe_id]
             cache_pc = self._pc_cache[uname]
             p = cache_pc.get_particle(uid)
             p.coordinates, p.data = interpreter.convert_atom_values(values)
-            p.data.update(
-                interpreter.convert_velocity_values(velocities[lammps_id]))
 
             cache_pc.update_particles([p])
 
@@ -1046,12 +1045,15 @@ class QeFileIoDataManager():
 
             if len(values) > 0:
                 if values[0] in atomtypes:
-                    print("atom type:" + values[0])
+                    atomtype = values[0]
+                    print("atom type:" + atomtype)
                     # self.dc(CHEMICAL_SPECIE = values[0])
-                    self.SP[CUBA.CHEMICAL_SPECIE].append(values[0])
+                    self.SP[CUBA.CHEMICAL_SPECIE].append(atomtype)
                     mass = float(values[1])
                     self.SP[CUBA.MASS].append(mass)
-                    potential_file = values[2]
+                    self.potential_file_dictionary[atomtype] = values[2]
+                    self.masses_dictionary[atomtype]=mass
+                    logging.debug('atomtype {0} mass {1} pot.file.dict {2} massdict {3}'.format(atomtype,mass, self.potential_file_dictionary,self.masses_dictionary))
             line = f.next()
         return line
 
@@ -1087,6 +1089,9 @@ class QeFileIoDataManager():
                 atom_pos = [0, 0, 0]
                 if values[0] in atomtypes:
                     atomtype = values[0]
+                    self.atomtypes.append(atomtype)
+                    mass = self.masses_dictionary[atomtype]
+                    self.masses.append(mass)
                     # store position in meters; original in Angstrom
                     atom_pos[0] = float(values[1]) * 1e-10
                     atom_pos[1] = float(values[2]) * 1e-10
