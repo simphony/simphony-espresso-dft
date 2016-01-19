@@ -42,7 +42,7 @@ pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
 # later (D1.6) the BC should be part of the cuds: mycuds.BOX_VECTORS
 # define the wrapper to use.
 
-wrapper = Qe_Wrapper()
+wrapper = qe_wrapper.QeWrapper()
 # Define the BC component of the SimPhoNy application model:
 wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
                                                         "periodic",
