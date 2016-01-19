@@ -791,7 +791,7 @@ class QeFileIoDataManager():
                     #the qe_id is an ordered list of particles
                     self._qe_id.append(particle.uid)
                     atom_index = atom_index +1
-                    logging.debug('wrote particle {0} with uid {1}'.format(atom_index,particle.uid)
+                    logging.debug('wrote particle {0} with uid {1}'.format(atom_index,particle.uid))
                     f.write(line)
         except:
             ('error in write block of write_espresso_input_file')
@@ -1208,9 +1208,9 @@ class QeFileIoDataManager():
         return atomtypes
 
 
-   '''
+'''
     functions for reading and writing quantum espresso input and output files
-    '''
+'''
     #multiple wrappers  - scf, forces, relax, md
 
 class _ReadState(Enum):

@@ -1,16 +1,11 @@
-import numpy
-import math
 from simphony.core.cuba import CUBA
-from simphony.core.cuds_item import CUDSItem
 from simphony.cuds.particles import Particle, Particles
-from simphony.io.h5_cuds import H5CUDS
 import logging
 
 #    from simphony.engine import quantumESPRESSO
 # todo  figure out how to get wrapper into simphony.engine
 # instead of the following
 
-import simespresso
 from simespresso import qe_wrapper
 #import qeCubaExtensions
 #import espresso_class
