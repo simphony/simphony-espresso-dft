@@ -12,8 +12,10 @@ import logging
 #from simespresso.io_QE import espresso_class
 #import qeCubaExtensions
 #import espresso_class
-from qe_file_io import QeWrapper
+
+
 from qeCubaExtensions import qeCUBAExtension
+from simespresso import qe_wrapper
 
 # Create the Cu unit cell, assuming a simple cubic system with 4 basis
 # atoms (for an FCC latticle)
@@ -44,7 +46,7 @@ pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
 # later (D1.6) the BC should be part of the cuds: mycuds.BOX_VECTORS
 # define the wrapper to use.
 
-wrapper = QeWrapper()
+wrapper = qe_wrapper.Qe_Wrapper()
 # Define the BC component of the SimPhoNy application model:
 wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
                                                         "periodic",
@@ -57,11 +59,11 @@ wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
 # but not implemented yet)
 wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] = "Monkhorst-Pack"
 wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] = "automatic"
-#can we define CUBA.Monkhorst-Pack please
 wrapper.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [3, 3, 3, 0, 0, 0]
 wrapper.run()
 # the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc within the value of the total energy from the output (log file) of QE
 names = wrapper.get_dataset_names()
+print('dataset names:'+str(names))
 extracted_pc = wrapper.get_dataset("Copper")
 print('checking particles:')
 for particle in extracted_pc:

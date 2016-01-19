@@ -34,7 +34,9 @@ class QeFileIoDataManager():
         # map from qe-id to simphony-uid
         self._qe_id_to_uid = {}
 
-        # cache of particle containers
+        #map from inputfile line number to qe_id
+        self._qe_id=[]
+        # cache (dictionary) of particle containers
         self._pc_cache = {}
 
         # cache of data container extensions
@@ -90,7 +92,6 @@ class QeFileIoDataManager():
         self.path_to_espresso='pw.x'
         self.mpi=False
         self.mpi_Nprocessors=2
-        self.mapping=[]
 
     def get_data(self, uname):
         """Returns data container associated with particle container
@@ -148,15 +149,12 @@ class QeFileIoDataManager():
             particle container to be added
         """
         # create stand-alone particle container to use
-        # as a cache of for input/output to LAMMPS
+        # as a cache  for input/output
         pc = Particles(name="_")
         pc.data = DataContainer(particles.data)
 
         for p in particles.iter_particles():
             pc.add_particles([p])
-
-        for b in particles.iter_bonds():
-            pc.add_bonds([b])
 
         self._pc_cache[uname] = pc
 
@@ -776,6 +774,10 @@ class QeFileIoDataManager():
                 multiplier = 10.0 ** 10
                 multiplier = 1.0
                 # QE wants coords. in Angstroms
+                atom_index = 0
+                #make sure this is correct - new link bet file lines and particles
+                #with every file write
+                self._qe_id = []
                 for particle in pc.iter_particles():
                     atom_type = particle.data
                     #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
@@ -787,8 +789,9 @@ class QeFileIoDataManager():
                         str(multiplier * particle.coordinates[1]) + ' ' + \
                         str(multiplier * particle.coordinates[2]) + '\n'
                     #the qe_id is an ordered list of particles
-                    self.qe_id.append(particle.uid)
-
+                    self._qe_id.append(particle.uid)
+                    atom_index = atom_index +1
+                    logging.debug('wrote particle {0} with uid {1}'.format(atom_index,particle.uid)
                     f.write(line)
         except:
             ('error in write block of write_espresso_input_file')
@@ -1073,6 +1076,7 @@ class QeFileIoDataManager():
             line = f.next()
             self.position_units = units
             particle_list = []
+            atom_index = 0
             while _ReadState.get_state(_ReadState.ATOMIC_POSITIONS, line) \
                     == _ReadState.ATOMIC_POSITIONS:
                 logging.debug('line in atomic positions section:' + str(line))
@@ -1097,13 +1101,14 @@ class QeFileIoDataManager():
                 print('uid:' + str(p.uid))
                 p.data[CUBA.CHEMICAL_SPECIE] = atomtype
                 particle_list.append(p)
-                self.qe_id.append(p.uid)
-
+                self._qe_id.append(p.uid)
+                logging.debug('read atom {0} with uid {1}'.format(atom_index,p.uid))
                 try:
                     line = f.next()
                 except StopIteration:
                     print('EOF')
                     break
+                atom_index = atom_index + 1
             if len(particle_list):
                 self.pc.add_particles(particle_list)
                 #  part_container.add_particle(p)
