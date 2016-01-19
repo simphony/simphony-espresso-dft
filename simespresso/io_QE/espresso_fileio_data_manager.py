@@ -16,6 +16,8 @@ from simphony.cuds.particles import Particles, Particle
 '''
 requirements of wrapper
 implement run, add_dataset, get_data_names, iter_dataset
+keep list of which atom/entity is at which line number in datafile
+to allow wrapper to update entities after run of simulator
 
 '''
 logging.basicConfig(level=logging.DEBUG)
@@ -320,27 +322,8 @@ class QeFileIoDataManager():
     def _write_data_file(self, filename):
         """ Write data file containing current state of simulation
         """
-        # recreate (and store) map from lammps-id to simphony-id
-        self._qeid_to_uid = {}
-
-        # determine the number of particles
-        # and collect the different material types
-        # in oder to determine the number of types
-   #     num_particles = sum(
-#            pc.count_of(
- #               CUDSItem.PARTICLE) for pc in self._pc_cache.itervalues())
-  #      types = set(pc.data[CUBA.MATERIAL_TYPE]
-#                    for pc in self._pc_cache.itervalues())
-
-  #      box = get_box([de for _, de in self._dc_extension_cache.iteritems()])
-
-    #    mass = self._get_mass() \
-     #       if ATOM_STYLE_DESCRIPTIONS[self._atom_style].has_mass_per_type \
-      #      else None
-       # for uname, pc in self._pc_cache.iteritems():
-        #    material_type = pc.data[CUBA.MATERIAL_TYPE]
-
-        self._write_data_file(filename)
+        self._qe_id_to_uid = {}
+        self._write_espresso_input_file(filename)
 
     def _get_mass(self):
         """ Get a dictionary from 'material type' to 'mass'.
