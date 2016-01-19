@@ -9,13 +9,13 @@ import logging
 #    from simphony.engine import quantumESPRESSO
 # todo  figure out how to get wrapper into simphony.engine
 # instead of the following
-#from simespresso.io_QE import espresso_class
+import qe_wrapper
+
 #import qeCubaExtensions
 #import espresso_class
 
 
 from qeCubaExtensions import qeCUBAExtension
-from simespresso import qe_wrapper
 
 # Create the Cu unit cell, assuming a simple cubic system with 4 basis
 # atoms (for an FCC latticle)
@@ -46,7 +46,7 @@ pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
 # later (D1.6) the BC should be part of the cuds: mycuds.BOX_VECTORS
 # define the wrapper to use.
 
-wrapper = qe_wrapper.Qe_Wrapper()
+wrapper = Qe_Wrapper()
 # Define the BC component of the SimPhoNy application model:
 wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
                                                         "periodic",
