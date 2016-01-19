@@ -13,6 +13,11 @@ from simphony.core.cuds_item import CUDSItem
 from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particles, Particle
 
+'''
+requirements of wrapper
+implement run, add_dataset, get_data_names, iter_dataset
+
+'''
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -288,13 +293,23 @@ class QeFileIoDataManager():
             uname, uid = self._qeid_to_uid[qe_id]
             cache_pc = self._pc_cache[uname]
             p = cache_pc.get_particle(uid)
-            p.coordinates, p.data = interpreter.convert_atom_values(values)
+#            p.coordinates, p.data = interpreter.convert_atom_values(values)
+            #get coordinates
 
+        p.coordinates = []  ##TODO check what is expected here
+        p.data = []  ##TODO check what is expected here
+
+        for particle in self.pc.iter_particles():
+            atom_type = particle.data
+            #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
+            atom = atom_type[CUBA.CHEMICAL_SPECIE][0]
+            p.coordinates.append(particle.coordinates)
+            p.data.append(atom_type)
             cache_pc.update_particles([p])
 
             # TODO #9 (removing material type
-            atom_type = p.data[CUBA.MATERIAL_TYPE]
-            del p.data[CUBA.MATERIAL_TYPE]
+#            atom_type = p.data[CUBA.MATERIAL_TYPE]
+ #           del p.data[CUBA.MATERIAL_TYPE]
 
             # set the pc's material type
             # (current requirement/assumption is that each
@@ -311,29 +326,21 @@ class QeFileIoDataManager():
         # determine the number of particles
         # and collect the different material types
         # in oder to determine the number of types
-        num_particles = sum(
-            pc.count_of(
-                CUDSItem.PARTICLE) for pc in self._pc_cache.itervalues())
-        types = set(pc.data[CUBA.MATERIAL_TYPE]
-                    for pc in self._pc_cache.itervalues())
+   #     num_particles = sum(
+#            pc.count_of(
+ #               CUDSItem.PARTICLE) for pc in self._pc_cache.itervalues())
+  #      types = set(pc.data[CUBA.MATERIAL_TYPE]
+#                    for pc in self._pc_cache.itervalues())
 
-        box = get_box([de for _, de in self._dc_extension_cache.iteritems()])
+  #      box = get_box([de for _, de in self._dc_extension_cache.iteritems()])
 
-        mass = self._get_mass() \
-            if ATOM_STYLE_DESCRIPTIONS[self._atom_style].has_mass_per_type \
-            else None
-        writer = LammpsDataFileWriter(filename,
-                                      atom_style=self._atom_style,
-                                      number_atoms=num_particles,
-                                      number_atom_types=len(types),
-                                      simulation_box=box,
-                                      material_type_to_mass=mass)
-        for uname, pc in self._pc_cache.iteritems():
-            material_type = pc.data[CUBA.MATERIAL_TYPE]
-            for p in pc.iter_particles():
-                lammps_id = writer.write_atom(p, material_type)
-                self._lammpsid_to_uid[lammps_id] = (uname, p.uid)
-        writer.close()
+    #    mass = self._get_mass() \
+     #       if ATOM_STYLE_DESCRIPTIONS[self._atom_style].has_mass_per_type \
+      #      else None
+       # for uname, pc in self._pc_cache.iteritems():
+        #    material_type = pc.data[CUBA.MATERIAL_TYPE]
+
+        self._write_data_file(filename)
 
     def _get_mass(self):
         """ Get a dictionary from 'material type' to 'mass'.
@@ -796,6 +803,9 @@ class QeFileIoDataManager():
                         str(multiplier * particle.coordinates[0]) + ' ' + \
                         str(multiplier * particle.coordinates[1]) + ' ' + \
                         str(multiplier * particle.coordinates[2]) + '\n'
+                    #the qe_id is an ordered list of particles
+                    self.qe_id.append(particle.uid)
+
                     f.write(line)
         except:
             ('error in write block of write_espresso_input_file')
@@ -1104,6 +1114,8 @@ class QeFileIoDataManager():
                 print('uid:' + str(p.uid))
                 p.data[CUBA.CHEMICAL_SPECIE] = atomtype
                 particle_list.append(p)
+                self.qe_id.append(p.uid)
+
                 try:
                     line = f.next()
                 except StopIteration:
