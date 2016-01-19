@@ -9,8 +9,9 @@ import logging
 #    from simphony.engine import quantumESPRESSO
 # todo  figure out how to get wrapper into simphony.engine
 # instead of the following
-import qe_wrapper
 
+import simespresso
+from simespresso import qe_wrapper
 #import qeCubaExtensions
 #import espresso_class
 
