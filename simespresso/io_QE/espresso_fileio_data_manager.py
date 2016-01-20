@@ -50,6 +50,8 @@ class QeFileIoDataManager():
         self.BC = DataContainer()  # Boundary conditions
         self.CM = DataContainer()  # Computational Methods
         # (numerical and solver aspects only)
+
+        #remove , this is unecessary
         self.pc = Particles('quantum_espresso_particles')
         self.atomtypes = []
         self.masses = []
@@ -182,15 +184,21 @@ class QeFileIoDataManager():
         self._pc_cache[uname].update_particles(
             _filter_unsupported_data(iterable, self._supported_cuba))
 
-    def add_particles(self, iterable, uname):
+    def add_particles(self, pc):
+#    def add_particles(self, iterable, uname):
         """Add particles
         """
-        uids = self._pc_cache[uname].add_particles(iterable)
+    #unclear to me what this line from lammps was doing
+#        uids = self._pc_cache[uname].add_particles(iterable)
 
+        self._pc_cache[pc.name] = pc
         # filter the cached particles of unsupported CUBA
-        self._pc_cache[uname].update_particles(_filter_unsupported_data(
-            self._pc_cache[uname].iter_particles(uids), self._supported_cuba))
-
+# todo implement this filter
+      #  self._pc_cache[pc.uname].update_particles(_filter_unsupported_data(
+      #      self._pc_cache[uname].iter_particles(uids), self._supported_cuba))
+        uids = []
+        for particle in pc.iter_particles():
+            uids.append(particle.uid)
         return uids
 
     def remove_particle(self, uid, uname):
@@ -598,6 +606,14 @@ class QeFileIoDataManager():
                           format(x_count, x_points, y_count,
                                  y_points, z_count, z_points))
         return charge_density
+
+    def get_dataset_names(self):
+        names = []
+        for pc_name in self._pc_cache: #iterates over names
+            names.append(pc_name)
+        if len(names)<1:
+            raise RuntimeError('no particles found to write')
+        return names
 
     def _write_espresso_input_file(self, file_name,dataset_name = None):
         """

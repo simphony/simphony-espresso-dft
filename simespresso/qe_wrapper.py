@@ -62,12 +62,12 @@ class QeWrapper(ABCModelingEngine):
                 "The type of the dataset container is not supported")
 
         logging.debug('adding container '+str(container.name))
-        if container.name in self._data_manager:
+        if container.name in self._data_manager._pc_cache:
             raise ValueError(
                 'Particle container \'{}\' already exists'.format(
                     container.name))
         else:
-            self._data_manager.new_particles(container)
+            self._data_manager.add_particles(container)
 
     def get_dataset(self, name):
         """ Get the dataset
