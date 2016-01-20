@@ -12,6 +12,8 @@ from simphony.cuds.abc_particles import ABCParticles
 
 from simespresso.io_QE.espresso_fileio_data_manager import QeFileIoDataManager
 
+import logging
+
 @contextlib.contextmanager
 def _temp_directory():
     """ context manager that provides temp directory
@@ -59,6 +61,7 @@ class QeWrapper(ABCModelingEngine):
             raise TypeError(
                 "The type of the dataset container is not supported")
 
+        logging.debug('adding container '+str(container.name))
         if container.name in self._data_manager:
             raise ValueError(
                 'Particle container \'{}\' already exists'.format(

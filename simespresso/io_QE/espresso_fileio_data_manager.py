@@ -30,7 +30,8 @@ class QeFileIoDataManager():
     queried and to be changed.
     """
     def __init__(self):
-        super(QeFileIoDataManager, self).__init__()
+#   what was this doing in lammps?
+#        super(QeFileIoDataManager, self).__init__()
         # map from qe-id to simphony-uid
         self._qe_id_to_uid = {}
 
