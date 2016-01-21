@@ -57,9 +57,16 @@ class QeFileIoDataManager():
         self.masses = []
         self.potential_file_dictionary = {}
         self.masses_dictionary = {}
-        self.CUBAExtension = {}
-        self.CM_extension = {}
         self.SP_extension = {}
+
+        self.input_dft = 'vdw-df-c09' #maybe give a default
+        self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = self.input_dft
+ #       self.CUBAExtension = {}
+        self.CM_extension = {}
+#default values
+        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] =  "automatic"
+        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [5, 5, 5, 0, 0, 0]
+
         self.BC_extension = {}
         self.datasets = {}
         self.combined_dataset=DataContainer()
@@ -83,6 +90,8 @@ class QeFileIoDataManager():
         self.ecutrho = 240 #find reasonable default
         self.input_dft = 'vdw-df-c09' #maybe give a default
 
+
+
         #electrons
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
@@ -103,7 +112,9 @@ class QeFileIoDataManager():
         uname : string
             non-changing unique name of particles
         """
-        return DataContainer(self._pc_cache[uname].data)
+        return self._pc_cache[uname]
+        #is this necessarily a datacontainer or is a PC ok
+        #return DataContainer(self._pc_cache[uname].data)
 
     def set_data(self, data, uname):
         """Sets data container associated with particle container
@@ -112,11 +123,14 @@ class QeFileIoDataManager():
         uname : string
             non-changing unique name of particles
         """
-        self._pc_cache[uname].data = DataContainer(data)
+
+        self._pc_cache[uname].data = data
+        #is DC necessary or is PC ok here
+        #self._pc_cache[uname].data = DataContainer(data)
 
     def get_data_extension(self, uname):
         """Returns data container extension associated with particle container
-        Parameters
+        Parameters_
         ----------
         uname : string
             non-changing unique name of particles
@@ -623,7 +637,7 @@ class QeFileIoDataManager():
         SP = self.SP
         if dataset_name is  None:
             dataset_name = self.get_dataset_names()[0]
-        pc = self.get_dataset(dataset_name)
+        pc = self.get_data(dataset_name)
 
 #        SD = self.SD
         # write parameters for a particular working input file
@@ -683,10 +697,10 @@ class QeFileIoDataManager():
                     f.write(line)
 
                 # here goes nat and ntype
-                n_atoms = self.count_particles()
+                n_atoms = self._count_particles()
                 line = '\t nat=' + str(n_atoms) + '\n'
                 f.write(line)
-                n_atom_types = self.count_atom_types(pc)
+                n_atom_types = self._count_atom_types(pc)
                 logging.debug('n_atom_types:'+str(n_atom_types))
                 line = '\t ntyp=' + str(n_atom_types) + '\n'
                 f.write(line)
@@ -742,10 +756,10 @@ class QeFileIoDataManager():
                 line = 'ATOMIC_SPECIES\n'
                 f.write(line)
                 # C 12.0107 06-C.GGA.fhi.UPF
-                for atomtype in self.what_atom_types():
+                for atomtype in self._what_atom_types():
                     potential_file = self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL]
                     #todo - take care of possible isotopes - same atom, different mass
-                    particle_mass_list = self.get_particle_masses()
+                    particle_mass_list = self._get_particle_masses()
                     if atomtype in particle_mass_list:
                         mass = particle_mass_list[atomtype]
                         logging.debug('mass of {0} is {1}'.format(atomtype,mass))
@@ -1129,7 +1143,7 @@ class QeFileIoDataManager():
             if len(particle_list):
                 self.pc.add_particles(particle_list)
                 #  part_container.add_particle(p)
-                n = self.count_particles()
+                n = self._count_particles()
                 print('n_particles=' + str(n))
         except StopIteration:
             return
@@ -1143,7 +1157,8 @@ class QeFileIoDataManager():
         if pc is None:
             names = self.get_dataset_names()
             for name in names:
-                n += self.count_particles(self.get_dataset(name))
+
+                n += self._count_particles(self.get_data(name))
             return n
         else:
             for particle in pc.iter_particles():
@@ -1160,7 +1175,7 @@ class QeFileIoDataManager():
         if pc is None:
             names = self.get_dataset_names()
             for name in names:
-                pc = self.get_dataset(name)
+                pc = self.get_data(name)
                 for particle in pc.iter_particles():
                     atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
                     atomtype = atomtype_list[0]
@@ -1169,9 +1184,14 @@ class QeFileIoDataManager():
                         particle_dict[atomtype]=mass
                         logging.debug('masses:'+str(particle_dict))
 
-            logging.debug('1.atomtypes:'+str(atomtypes))
-            n_atom_types = len(atomtypes)
         else:
+            for particle in pc.iter_particles():
+                atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                atomtype = atomtype_list[0]
+                mass =particle.data[CUBA.MASS]
+                if not atomtype in particle_dict:
+                    particle_dict[atomtype]=mass
+                    logging.debug('masses:'+str(particle_dict))
             #implement case where particular pc is sent
             pass
         return particle_dict
@@ -1198,7 +1218,7 @@ class QeFileIoDataManager():
         return n_atom_types
 
     def _what_atom_types(self,pc=None):
-        atomtype_set = self.what_atom_types_set(pc=pc)
+        atomtype_set = self._what_atom_types_set(pc=pc)
         logging.debug('2.atomtypes:'+str(atomtype_set))
         return [atomtype for atomtype in atomtype_set]
 
@@ -1210,7 +1230,7 @@ class QeFileIoDataManager():
         if pc is None:
             names = self.get_dataset_names()
             for name in names:
-                more_atoms = self.what_atom_types_set(self.get_dataset(name))
+                more_atoms = self._what_atom_types_set(self.get_data(name))
                 logging.debug('2.5.more atoms:'+str(more_atoms))
                 for atomtype in more_atoms:
                     atomtypes.add(atomtype)

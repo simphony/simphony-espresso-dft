@@ -11,13 +11,13 @@ from simespresso.io_QE.qe_file_io import  QeDataHandler
 
 
 class QeProcess(object):
-    """ Class runs the lammps/liggghts program
+    """ Class to run quantum espresso
     Parameters
     ----------
-    lammps_name : str
-        name of LAMMPS executable
+    qe_name : str
+        name of qe executable
     log_directory : str, optional
-        name of directory of log file ('log.lammps') for lammps.
+        name of directory of log file ('log.qe')
         If not given, then pwd is where 'log.lammps' will be written.
     Raises
     ------
