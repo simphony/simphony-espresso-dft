@@ -7,7 +7,7 @@ import sys
 import subprocess
 import logging
 
-from simespresso.io_QE.qe_file_io import  QeDataHandler
+#from simespresso.io_QE.qe_file_io import  QeDataHandler
 
 
 class QeProcess(object):
@@ -24,12 +24,13 @@ class QeProcess(object):
     RuntimeError
         if Lammps did not run correctly
     """
-    def __init__(self, qe_executable="pw.x", log_directory=None):
+    def __init__(self, datahandler, qe_executable="pw.x", log_directory=None):
         self._qe_executable = qe_executable
         self._returncode = 0
         self._stderr = ""
         self._stdout = ""
-        self._datahandler = QeDataHandler()
+#        self._datahandler = QeDataHandler()
+        self._datahandler = datahandler
 
         if log_directory:
             self._log = os.path.join(log_directory, 'log.qe')
@@ -48,11 +49,7 @@ class QeProcess(object):
             raise RuntimeError(msg)
 
     def run(self,
-                input_data_file=input_data_filename,
-                output_data_file=output_data_filename,
-                BC=_combine(self.BC, self.BC_extension),
-                CM=_combine(self.CM, self.CM_extension),
-                SP=_combine(self.SP, self.SP_extension)):
+                input_data_file,output_data_file,BC,CM,SP):
         """Run engine with a set of commands
         Parameters
         ----------
