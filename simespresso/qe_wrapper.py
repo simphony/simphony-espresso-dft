@@ -12,6 +12,8 @@ from simphony.cuds.abc_particles import ABCParticles
 
 from simespresso.io_QE.espresso_fileio_data_manager import QeFileIoDataManager
 from simespresso.io_QE.qe_process import QeProcess
+from qeCubaExtensions import qeCUBAExtension
+
 import logging
 
 @contextlib.contextmanager
@@ -35,13 +37,18 @@ class QeWrapper(ABCModelingEngine):
         """
 
         self._executable_name = "pw.x"
-        self._data_manager = QeFileIoDataManager()
         self.BC = DataContainer()
         self.CM = DataContainer()
         self.SP = DataContainer()
-        self.CM_extension = {}
+        self.SD = DataContainer()
+        self.CM_extension = {}  #defaults below
+        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] =  "automatic"
+        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [5, 5, 5, 0, 0, 0]
+
         self.SP_extension = {}
         self.BC_extension = {}
+        self._data_manager = QeFileIoDataManager(self)
+
 
     def add_dataset(self, container):
         """Add a CUDS container

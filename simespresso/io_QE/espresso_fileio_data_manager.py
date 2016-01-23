@@ -29,10 +29,23 @@ class QeFileIoDataManager():
     data existing in Lammps (via lammps data file) and allows this data to be
     queried and to be changed.
     """
-    def __init__(self):
+    def __init__(self,wrapper):
 #   what was this doing in lammps?
 #        super(QeFileIoDataManager, self).__init__()
         # map from qe-id to simphony-uid
+        self.SP = wrapper.SP #DataContainer()  # System Model Equations and Material
+        # relations (Governing Equations)
+        self.SD = wrapper.SD #DataContainer()  # System Material Description and
+        # State Data including Boundaries (not conditions)
+        self.BC =wrapper.BC # DataContainer()  # Boundary conditions
+        self.CM = wrapper.CM #DataContainer()  # Computational Methods
+        self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09' #default
+#default values
+        self.CM_extension = wrapper.CM_extension
+
+        self.BC_extension = wrapper.BC_extension
+        logging.debug('kpoints:'+str(self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING]
+
         self._qe_id_to_uid = {}
 
         #map from inputfile line number to qe_id
@@ -43,13 +56,6 @@ class QeFileIoDataManager():
         # cache of data container extensions
         self._dc_extension_cache = {}
 
-        self.SP = DataContainer()  # System Model Equations and Material
-        # relations (Governing Equations)
-        self.SD = DataContainer()  # System Material Description and
-        # State Data including Boundaries (not conditions)
-        self.BC = DataContainer()  # Boundary conditions
-        self.CM = DataContainer()  # Computational Methods
-        # (numerical and solver aspects only)
 
         #remove , this is unecessary
         self.pc = Particles('quantum_espresso_particles')
@@ -59,15 +65,6 @@ class QeFileIoDataManager():
         self.masses_dictionary = {}
         self.SP_extension = {}
 
-        self.input_dft = 'vdw-df-c09' #maybe give a default
-        self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = self.input_dft
- #       self.CUBAExtension = {}
-        self.CM_extension = {}
-#default values
-        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] =  "automatic"
-        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [5, 5, 5, 0, 0, 0]
-
-        self.BC_extension = {}
         self.datasets = {}
         self.combined_dataset= None
             #was a DC
