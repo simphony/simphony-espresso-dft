@@ -44,11 +44,15 @@ pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
 
 wrapper = qe_wrapper.QeWrapper()
 # Define the BC component of the SimPhoNy application model:
-wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
+#wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
+ #                                                       "periodic",
+  #                                                      "periodic"]
+wrapper.BC_extension['BOX_FACES'] = ["periodic",
                                                         "periodic",
                                                         "periodic"]
 pc_w = wrapper.add_dataset(pc)
-wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
+#wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
+wrapper.SP_extension['PSEUDO_POTENTIAL''] = 'Cu.pz-d-hgh.UPF'
 
 # good for now, this is a standard pseudopotential,
 # later we shall have a better way (actually we have it now

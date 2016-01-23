@@ -794,8 +794,8 @@ class QeFileIoDataManager():
                 line = 'ATOMIC_SPECIES\n'
                 f.write(line)
                 # C 12.0107 06-C.GGA.fhi.UPF
+                potential_file = self.SP_extension['PSEUDO_POTENTIAL']
                 for atomtype in self._what_atom_types():
-                    potential_file = self.SP_extension['PSEUDO_POTENTIAL']
                     #todo - take care of possible isotopes - same atom, different mass
                     particle_mass_list = self._get_particle_masses()
                     if atomtype in particle_mass_list:
