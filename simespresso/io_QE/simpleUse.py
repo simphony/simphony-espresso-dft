@@ -1,5 +1,6 @@
 from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particle, Particles
+import os
 import logging
 
 #    from simphony.engine import quantumESPRESSO
@@ -52,12 +53,18 @@ wrapper.BC_extension['BOX_FACES'] = ["periodic",
                                                         "periodic"]
 pc_w = wrapper.add_dataset(pc)
 #wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
-wrapper.SP_extension['PSEUDO_POTENTIAL''] = 'Cu.pz-d-hgh.UPF'
+cwd = os.path.dirname(__file__)
+wrapper.SP_extension['PSEUDO_POTENTIAL'] = os.path.join(cwd,'Cu.pz-d-hgh.UPF')
+
+logging.debug('pp file:'+str(wrapper.SP_extension['PSEUDO_POTENTIAL']))
+#internal = wrapper._data_manager.SP_extension['PSEUDO_POTENTIAL']
+#logging.debug('pp file:'+str(internal))
 
 # good for now, this is a standard pseudopotential,
 # later we shall have a better way (actually we have it now
 # but not implemented yet)
 wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "Monkhorst-Pack"
+wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "test"
 #wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
 wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
 wrapper.run()

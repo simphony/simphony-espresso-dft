@@ -33,6 +33,10 @@ class QeFileIoDataManager():
 #   what was this doing in lammps?
 #        super(QeFileIoDataManager, self).__init__()
         # map from qe-id to simphony-uid
+        #this is necessary in order to pass info back up to the wrapper
+        #only values from there should be used, as the user will be
+        #manipulating those
+        self._wrapper = wrapper
         self.SP = wrapper.SP #DataContainer()  # System Model Equations and Material
         # relations (Governing Equations)
         self.SD = wrapper.SD #DataContainer()  # System Material Description and
@@ -794,7 +798,8 @@ class QeFileIoDataManager():
                 line = 'ATOMIC_SPECIES\n'
                 f.write(line)
                 # C 12.0107 06-C.GGA.fhi.UPF
-                potential_file = self.SP_extension['PSEUDO_POTENTIAL']
+                potential_file = self._wrapper.SP_extension['PSEUDO_POTENTIAL']
+#                potential_file = self.SP_extension['PSEUDO_POTENTIAL']
                 for atomtype in self._what_atom_types():
                     #todo - take care of possible isotopes - same atom, different mass
                     particle_mass_list = self._get_particle_masses()
@@ -813,7 +818,9 @@ class QeFileIoDataManager():
                 # K POINTS
                 sampling_mode = 'automatic'
 #                if hasattr(self,'CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD]'):
-                sampling_mode = self.CM_extension['K_POINT_SAMPLING_METHOD']
+
+                sampling_mode = self._wrapper.CM_extension['K_POINT_SAMPLING_METHOD']
+                sampling_mode = self._wrapper.CM_extension['K_POINT_SAMPLING_METHOD']
                 line = 'K_POINTS ' + str(sampling_mode) + '\n'
                 f.write(line)
 
