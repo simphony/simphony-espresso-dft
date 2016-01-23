@@ -42,10 +42,10 @@ class QeWrapper(ABCModelingEngine):
         self.SP = DataContainer()
         self.SD = DataContainer()
         self.CM_extension = {}  #defaults below
-        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] =  "automatic"
-        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [5, 5, 5, 0, 0, 0]
 
         self.SP_extension = {}
+        #self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09' #default
+
         self.BC_extension = {}
         self._data_manager = QeFileIoDataManager(self)
 

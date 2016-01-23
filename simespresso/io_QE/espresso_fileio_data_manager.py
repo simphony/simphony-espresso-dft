@@ -39,11 +39,23 @@ class QeFileIoDataManager():
         # State Data including Boundaries (not conditions)
         self.BC =wrapper.BC # DataContainer()  # Boundary conditions
         self.CM = wrapper.CM #DataContainer()  # Computational Methods
-        self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09' #default
+        self.SP_extension = wrapper.SP_extension
+#        self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09' #default
+        self.SP_extension['PSEUDO_POTENTIAL'] = 'vdw-df-c09' #default
 #default values
         self.CM_extension = wrapper.CM_extension
+        #the simphony method allows for two keys w. same name.,...
+#        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] =  "automatic"
+ #       self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [5, 5, 5, 0, 0, 0]
+
+        #simphony suba extensions allow same kw twice
+#        self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
+ #       self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
+        self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
+        self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
+        logging.debug('kpoints:'+str(self.CM_extension['K_POINT_SAMPLING']))
+
         self.BC_extension = wrapper.BC_extension
-        logging.debug('kpoints:'+str(self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING]
         self._qe_id_to_uid = {}
 
         #map from inputfile line number to qe_id
@@ -783,7 +795,7 @@ class QeFileIoDataManager():
                 f.write(line)
                 # C 12.0107 06-C.GGA.fhi.UPF
                 for atomtype in self._what_atom_types():
-                    potential_file = self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL]
+                    potential_file = self.SP_extension['PSEUDO_POTENTIAL']
                     #todo - take care of possible isotopes - same atom, different mass
                     particle_mass_list = self._get_particle_masses()
                     if atomtype in particle_mass_list:
@@ -801,7 +813,7 @@ class QeFileIoDataManager():
                 # K POINTS
                 sampling_mode = 'automatic'
 #                if hasattr(self,'CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD]'):
-                sampling_mode = self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD]
+                sampling_mode = self.CM_extension['K_POINT_SAMPLING_METHOD']
                 line = 'K_POINTS ' + str(sampling_mode) + '\n'
                 f.write(line)
 
@@ -811,7 +823,7 @@ class QeFileIoDataManager():
   #              f.write(line)
 
 #                if hasattr(self,'CM_extension[qeCUBAExtension.K_POINT_SAMPLING]'):
-                kpoints = self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING]
+                kpoints = self.CM_extension['K_POINT_SAMPLING']
                 line = ''
 #                if hasattr(self, 'k_point_values'):
                 for point in kpoints:
