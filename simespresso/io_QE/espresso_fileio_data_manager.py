@@ -69,7 +69,8 @@ class QeFileIoDataManager():
 
         self.BC_extension = {}
         self.datasets = {}
-        self.combined_dataset=DataContainer()
+        self.combined_dataset= None
+            #was a DC
 
         #data for running qe
         #control
@@ -635,8 +636,8 @@ class QeFileIoDataManager():
             for particle in pc.iter_particles():
                 for d in range(0,3): #3 dimensions, needs to be more general?
                     maxima[d] = max(maxima[d],particle.coordinates[d])
-                    logging.debug('p:{0},{1},{2} m:{3},{4},{5}'
-                                .format(particle.coordinates[0],particle.coordinates[1],particle.coordinates[2],maxima[0],maxima[1],maxima[2]))
+#                    logging.debug('p:{0},{1},{2} m:{3},{4},{5}'
+ #                               .format(particle.coordinates[0],particle.coordinates[1],particle.coordinates[2],maxima[0],maxima[1],maxima[2]))
         #check if celldm is too small
         for d in range(0,3): #3 dimensions, needs to be more general?
             if self.celldm[d] < maxima[d]:
@@ -645,6 +646,16 @@ class QeFileIoDataManager():
                                 .format(d,self.celldm[d],maxima[d],newbound ))
                 self.celldm[d] = newbound
 
+    def _combine_datasets(self):
+        self.combined_dataset = Particles('quantumEspresso combined particles')
+        #clear out combined dataset
+        for p in self.combined_dataset.iter_particles():
+            self.combined_dataset.remove_particles()
+
+       # now fill it with all particles in all pcs
+        for name, pc in self._pc_cache.iteritems():
+            particles = pc.iter_particles
+            self.combined_dataset.add_particles(particles)
 
     def _write_espresso_input_file(self, file_name,dataset_name = None):
         """
@@ -652,8 +663,11 @@ class QeFileIoDataManager():
         :return:
         """
         SP = self.SP
+        #todo  - combine datasets here
+        self.combined_dataset
         if dataset_name is  None:
             dataset_name = self.get_dataset_names()[0]
+        #todo  - combine datasets here
         pc = self.get_data(dataset_name)
         self._check_bounds()
 #        SD = self.SD
