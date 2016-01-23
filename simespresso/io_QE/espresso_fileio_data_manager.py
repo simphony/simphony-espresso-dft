@@ -42,10 +42,8 @@ class QeFileIoDataManager():
         self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09' #default
 #default values
         self.CM_extension = wrapper.CM_extension
-
         self.BC_extension = wrapper.BC_extension
         logging.debug('kpoints:'+str(self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING]
-
         self._qe_id_to_uid = {}
 
         #map from inputfile line number to qe_id
