@@ -37,16 +37,22 @@ class QeProcess(object):
         else:
             self._log = 'log.qe'
 
-        # see if lammps can be started
-        try:
-            self.run(" ")
-        except Exception:
-            msg = "quantum espresso could not be started."
-            if self._returncode == 127:
-                msg += " executable '{}' was not found.".format(qe_executable)
-            else:
-                msg += " stdout/err: " + self._stdout + " " + self._stderr
-            raise RuntimeError(msg)
+        # see if qe can be started
+        if not which(self._qe_executable):
+            logging.debug('no path to espresso')
+            raise ValueError(
+                'espresso command not found (looking for '
+                            + self._qe_exectable+')')
+
+
+#            self.run("pw.x")
+#        except Exception:
+ #           msg = "quantum espresso could not be started."
+  #          if self._returncode == 127:
+   #             msg += " executable '{}' was not found.".format(qe_executable)
+    #        else:
+     #           msg += " stdout/err: " + self._stdout + " " + self._stderr
+      #      raise RuntimeError(msg)
 
     def run(self,
                 input_data_file,output_data_file,BC,CM,SP):
@@ -69,7 +75,8 @@ class QeProcess(object):
                 'espresso command not found (looking for '
                             + self._qe_exectable+')')
 
-        self._datahandler.write_espresso_input_file(input_data_file)
+# taken care of in flush
+ #       self._datahandler.write_espresso_input_file(input_data_file)
 
         if self._datahandler.mpi:
             command = 'mpirun -np ' + str(self.mpi_Nprocessors) + ' ' + \
@@ -88,7 +95,6 @@ class QeProcess(object):
             e = sys.exc_info()[0]
             logging.debug('espresso command gave error %s' % e)
             raise ValueError('espresso command gave error %s' % e)
-
 
 '''
     code from lammps - maybe use the stdout and stderr pipes

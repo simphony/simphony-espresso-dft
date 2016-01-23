@@ -83,12 +83,12 @@ class QeFileIoDataManager():
 
         #system
         self.celldm = [1, 1, 1]  #This should  come from lattice vectors
+        self.celldm_margin = 5 #if no valid clldm given, go this far past edge
         #  if the user only specificies atom positions, what should this be
         self.ibrav = 8  #this should also be defined in cuba
         self.n_atom_types = 0 #comes from pc
         self.ecutwfc = 60.0  #find reasonable default
         self.ecutrho = 240 #find reasonable default
-        self.input_dft = 'vdw-df-c09' #maybe give a default
 
 
 
@@ -629,6 +629,23 @@ class QeFileIoDataManager():
             raise RuntimeError('no particles found to write')
         return names
 
+    def _check_bounds(self):
+        maxima = [0,0,0]
+        for name,pc in self._pc_cache.iteritems():
+            for particle in pc.iter_particles():
+                for d in range(0,3): #3 dimensions, needs to be more general?
+                    maxima[d] = max(maxima[d],particle.coordinates[d])
+                    logging.debug('p:{0},{1},{2} m:{3},{4},{5}'
+                                .format(particle.coordinates[0],particle.coordinates[1],particle.coordinates[2],maxima[0],maxima[1],maxima[2]))
+        #check if celldm is too small
+        for d in range(0,3): #3 dimensions, needs to be more general?
+            if self.celldm[d] < maxima[d]:
+                newbound = maxima[d]*self.celldm_margin
+                logging.warning('celldm[{0}={1} is smaller than max coord {2}, setting to {3}'
+                                .format(d,self.celldm[d],maxima[d],newbound ))
+                self.celldm[d] = newbound
+
+
     def _write_espresso_input_file(self, file_name,dataset_name = None):
         """
         :param file_name: name of the input file to write
@@ -638,7 +655,7 @@ class QeFileIoDataManager():
         if dataset_name is  None:
             dataset_name = self.get_dataset_names()[0]
         pc = self.get_data(dataset_name)
-
+        self._check_bounds()
 #        SD = self.SD
         # write parameters for a particular working input file
 
