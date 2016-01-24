@@ -36,6 +36,7 @@ class QeWrapper(ABCModelingEngine):
         ----------
         """
         self._executable_name = "/home/jr/sw/espresso-5.2.1/bin/pw.x"
+        self._executable_name = "pw.x"
         self.BC = DataContainer()
         self.CM = DataContainer()
         self.SP = DataContainer()
