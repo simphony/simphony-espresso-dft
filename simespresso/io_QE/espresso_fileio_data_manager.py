@@ -1002,6 +1002,43 @@ class QeFileIoDataManager():
                 return
         return
 
+    def _read_espresso_output_file(self, file_name):
+        """  Parses  Espresso output files, looking for total energy
+        Parameters
+        ----------
+        file_name : name of qe input file
+            """
+        with open(file_name, 'r') as f:
+            line_number = 0
+            file_iter = iter(f)
+            line = file_iter.next()
+            try:
+                while line is not None:
+                    line_number += 1
+#                    logging.debug('read line {0}:{1}'.format(line_number,line))
+                    if '!' in line and 'total energy' in line:
+                       #got final energy line
+                        parts = line.split()
+                        total_energy = parts[4]
+                        logging.debug('tparts:' + str(parts))
+                        logging.debug('tot energy:' + str(total_energy))
+                        line2 = file_iter.next()
+                        line3 = file_iter.next()
+                        parts = line3.split()
+                        estimated_scf_accuracy = parts[4]
+                        logging.debug('est accuracy:' + str(estimated_scf_accuracy))
+                        self.tot_energy_Ry = total_energy
+                        self._wrapper.tot_energy_Ry = total_energy
+                        self.estimated_accuracy_Ry = estimated_scf_accuracy
+                        self._wrapper.estimated_accuracy_Ry = estimated_scf_accuracy
+                    line = file_iter.next()
+            except StopIteration:
+                print('eof reached')
+            except Exception:
+                print("problem with line number=", line_number, line)
+                return
+        return
+
     def _process_control(self, f):
         print('processing control section')
         line = f.next()

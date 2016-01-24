@@ -92,6 +92,7 @@ class QeProcess(object):
             logging.debug('espresso command gave error %s' % e)
             raise ValueError('espresso command gave error %s' % e)
             exit
+        print('succesful exit from quantum espresso')
 '''
     code from lammps - maybe use the stdout and stderr pipes
         proc = subprocess.Popen(

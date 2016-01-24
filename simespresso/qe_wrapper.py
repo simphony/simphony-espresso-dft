@@ -36,7 +36,7 @@ class QeWrapper(ABCModelingEngine):
         ----------
         """
         self._executable_name = "/home/jr/sw/espresso-5.2.1/bin/pw.x"
-        self._executable_name = "pw.x"
+ #       self._executable_name = "pw.x"
         self.BC = DataContainer()
         self.CM = DataContainer()
         self.SP = DataContainer()
@@ -172,8 +172,7 @@ class QeWrapper(ABCModelingEngine):
             process.run(input_data_filename,output_data_filename,BC,CM,SP)
 
             # after running, we read any changes from lammps
-            self._data_manager.read(output_data_filename)
-
+            self._data_manager._read_espresso_output_file(output_data_filename)
 
 def _combine(data_container, data_container_extension):
     """ Combine a the approved CUBA with non-approved CUBA key-values
