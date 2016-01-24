@@ -653,7 +653,7 @@ class QeFileIoDataManager():
         for d in range(0,3): #3 dimensions, needs to be more general?
             if self.celldm[d] < maxima[d]:
                 newbound = maxima[d]*self.celldm_margin
-                logging.warning('celldm[{0}={1} is smaller than max coord {2}, setting to {3}'
+                logging.warning('celldm[{0}]={1} is smaller than max coord {2}, setting to {3}'
                                 .format(d,self.celldm[d],maxima[d],newbound ))
                 self.celldm[d] = newbound
 

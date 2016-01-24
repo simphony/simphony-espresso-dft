@@ -64,9 +64,9 @@ logging.debug('pp file:'+str(wrapper.SP_extension['PSEUDO_POTENTIAL']))
 # later we shall have a better way (actually we have it now
 # but not implemented yet)
 wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "Monkhorst-Pack"
-wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "test"
+#wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "test"
 #wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
-wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
+wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 4, 0, 0, 0]
 wrapper.run()
 # the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc within the value of the total energy from the output (log file) of QE
 names = wrapper.get_dataset_names()

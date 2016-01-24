@@ -24,6 +24,7 @@ class QeProcess(object):
     RuntimeError
         if Lammps did not run correctly
     """
+
     def __init__(self, datahandler, qe_executable="pw.x", log_directory=None):
         self._qe_executable = qe_executable
         self._returncode = 0
@@ -37,13 +38,13 @@ class QeProcess(object):
         else:
             self._log = 'log.qe'
 
-        # see if qe can be started
-        if not which(self._qe_executable):
-            logging.debug('no path to espresso')
-            raise ValueError(
-                'espresso command not found (looking for '
-                            + self._qe_exectable+')')
-
+        # see if qe can be started !
+#        logging.debug('exe {0} which exe {1}'.format(self._qe_executable,which(self._qe_executable)))
+ #       if not which(self._qe_executable):
+  #          logging.debug('no path to espresso')
+   #         raise ValueError(
+    #            'espresso command not found (looking for '
+     #                       + self._qe_executable+')')
 
 #            self.run("pw.x")
 #        except Exception:
@@ -64,16 +65,10 @@ class QeProcess(object):
         Raises
         ------
         RuntimeError
-            if Lammps did not run correctly
+            if qe did not run correctly
         """
         logging.debug('starting qe engine')
         logging.debug('path to espresso:'+self._qe_executable)
-
-        if not which(self._qe_executable):
-            logging.debug('no path to espresso')
-            raise ValueError(
-                'espresso command not found (looking for '
-                            + self._qe_exectable+')')
 
 # taken care of in flush
  #       self._datahandler.write_espresso_input_file(input_data_file)
@@ -83,7 +78,7 @@ class QeProcess(object):
                      self._qe_executable + ' < ' + input_data_file + ' > ' \
                       + output_data_file
         else:
-            command = self.path_to_espresso + ' < ' + input_data_file + ' > ' \
+            command = self._qe_executable + ' < ' + input_data_file + ' > ' \
                       + output_data_file
         logging.debug('attempting to run command: ' + command)
         try:
@@ -120,6 +115,7 @@ def which(name):
     found = 0
     for path in os.getenv("PATH").split(os.path.pathsep):
         full_path = path + os.sep + name
+        logging.debug('full path:'+str(full_path))
         if os.path.exists(full_path):
             """
             if os.stat(full_path).st_mode & stat.S_IXUSR:
@@ -130,4 +126,4 @@ def which(name):
             print(full_path)
     # Return a UNIX-style exit code so it can be checked by calling scripts.
     # Programming shortcut to toggle the value of found: 1 => 0, 0 => 1.
-    sys.exit(1 - found)
+    return(found)
