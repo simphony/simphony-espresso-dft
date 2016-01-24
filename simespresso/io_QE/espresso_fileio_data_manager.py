@@ -90,6 +90,7 @@ class QeFileIoDataManager():
         self.restart_mode = 'from_scratch'
 
         cwd = os.path.dirname(__file__)
+        logging.debug('cwd for pp file:'+str(cwd))
         self.pseudopotential_directory = cwd
         self.pseudopotential_prefix = 'simphony_pp'
         self.tprnfor = '.true.'
