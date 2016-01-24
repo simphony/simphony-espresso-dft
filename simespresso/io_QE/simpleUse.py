@@ -55,6 +55,7 @@ pc_w = wrapper.add_dataset(pc)
 #wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
 cwd = os.path.dirname(__file__)
 wrapper.SP_extension['PSEUDO_POTENTIAL'] = os.path.join(cwd,'Cu.pz-d-hgh.UPF')
+wrapper.SP_extension['PSEUDO_POTENTIAL'] = os.path.join(cwd,'Cu.pz-d-rrkjus.UPF')
 
 logging.debug('pp file:'+str(wrapper.SP_extension['PSEUDO_POTENTIAL']))
 #internal = wrapper._data_manager.SP_extension['PSEUDO_POTENTIAL']
@@ -63,10 +64,9 @@ logging.debug('pp file:'+str(wrapper.SP_extension['PSEUDO_POTENTIAL']))
 # good for now, this is a standard pseudopotential,
 # later we shall have a better way (actually we have it now
 # but not implemented yet)
-wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "Monkhorst-Pack"
-#wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "test"
-#wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
-wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 4, 0, 0, 0]
+#wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "Monkhorst-Pack"
+wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
+wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
 wrapper.run()
 # the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc within the value of the total energy from the output (log file) of QE
 names = wrapper.get_dataset_names()

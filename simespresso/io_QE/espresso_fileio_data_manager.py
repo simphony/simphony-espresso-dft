@@ -45,7 +45,8 @@ class QeFileIoDataManager():
         self.CM = wrapper.CM #DataContainer()  # Computational Methods
         self.SP_extension = wrapper.SP_extension
 #        self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09' #default
-        self.SP_extension['PSEUDO_POTENTIAL'] = 'vdw-df-c09' #default
+        self.SP_extension['PSEUDO_POTENTIAL'] = 'tests/06-C.GGA.fhi.UPF' #default
+        self.SP_extension['KERNEL_TABLE'] = 'tests/vdW_kernel_table' #default
 #default values
         self.CM_extension = wrapper.CM_extension
         #the simphony method allows for two keys w. same name.,...
