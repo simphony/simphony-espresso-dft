@@ -57,9 +57,9 @@ wrapper.BC_extension['BOX_FACES'] = ["periodic",
 pc_w = wrapper.add_dataset(pc)
 #wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
 cwd = os.path.dirname(__file__)
-wrapper.SP_extension['PSEUDO_POTENTIAL'] = os.path.join(cwd,'Cu.pz-d-hgh.UPF')
-wrapper.SP_extension['PSEUDO_POTENTIAL'] = os.path.join(cwd,'Cu.pz-d-rrkjus.UPF')
-wrapper.SP_extension['PSEUDO_POTENTIAL'] = 'Cu.pz-d-rrkjus.UPF'
+#wrapper.SP_extension['PSEUDO_POTENTIAL'] = os.path.join(cwd,'Cu.pz-d-rrkjus.UPF')
+#wrapper.SP_extension['PSEUDO_POTENTIAL'] = 'Cu.pz-d-rrkjus.UPF'
+wrapper.SP_extension['PSEUDO_POTENTIAL'] ='Cu.pz-d-hgh.UPF'
 
 logging.debug('pp file:'+str(wrapper.SP_extension['PSEUDO_POTENTIAL']))
 #internal = wrapper._data_manager.SP_extension['PSEUDO_POTENTIAL']
