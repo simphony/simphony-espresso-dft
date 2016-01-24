@@ -28,9 +28,9 @@ basis = [
     [0.5, 0.5, 0.0],
     [0.5, 0.0, 0.5],
     [0.0, 0.5, 0.5] ]
-basis = [
-    [0.0, 0.0, 0.0],
-    [0.0, 0.5, 0.5]]
+#basis = [
+ #   [0.0, 0.0, 0.0],
+  #  [0.0, 0.5, 0.5]]
 pc = Particles("Copper")
 for base_vector in basis:
     position = [component * a_latt for component in base_vector]
