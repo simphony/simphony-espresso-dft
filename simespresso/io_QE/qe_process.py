@@ -82,10 +82,11 @@ class QeProcess(object):
                       + output_data_file
         logging.debug('attempting to run command: ' + command)
         try:
-            subprocess.check_call(command, shell=True,
-                stdout=subprocess.PIPE).stdout.read()
-#            subprocess.Popen(command, shell=True,
-#                             stdout=subprocess.PIPE).stdout.read()
+#            subprocess.check_call(command, shell=True,
+ #               stdout=subprocess.PIPE).stdout.read()
+
+            subprocess.Popen(command, shell=True,
+                             stdout=subprocess.PIPE).stdout.read()
         except:
             e = sys.exc_info()[0]
             logging.debug('espresso command gave error %s' % e)
