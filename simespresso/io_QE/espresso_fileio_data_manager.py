@@ -88,7 +88,9 @@ class QeFileIoDataManager():
         #control
         self.calculation_type = 'scf'
         self.restart_mode = 'from_scratch'
-        self.pseudopotential_directory = './'
+
+        cwd = os.path.dirname(__file__)
+        self.pseudopotential_directory = cwd
         self.pseudopotential_prefix = 'simphony_pp'
         self.tprnfor = '.true.'
         self. max_seconds = 3600*24

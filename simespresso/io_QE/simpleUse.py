@@ -56,6 +56,7 @@ pc_w = wrapper.add_dataset(pc)
 cwd = os.path.dirname(__file__)
 wrapper.SP_extension['PSEUDO_POTENTIAL'] = os.path.join(cwd,'Cu.pz-d-hgh.UPF')
 wrapper.SP_extension['PSEUDO_POTENTIAL'] = os.path.join(cwd,'Cu.pz-d-rrkjus.UPF')
+wrapper.SP_extension['PSEUDO_POTENTIAL'] = 'Cu.pz-d-rrkjus.UPF'
 
 logging.debug('pp file:'+str(wrapper.SP_extension['PSEUDO_POTENTIAL']))
 #internal = wrapper._data_manager.SP_extension['PSEUDO_POTENTIAL']
