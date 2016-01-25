@@ -1016,7 +1016,7 @@ class QeFileIoDataManager():
                 while line is not None:
                     line_number += 1
 #                    logging.debug('read line {0}:{1}'.format(line_number,line))
-                    if  'total energy' in line:
+                    if  'total energy' and '=' and 'Ry' in line:
                        #got final energy line
                         got_energy = True
                         parts = line.split()
