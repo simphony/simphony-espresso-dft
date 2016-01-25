@@ -112,7 +112,7 @@ class QeFileIoDataManager():
         #electrons
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
-        self.convergence_threshold = 1.0*10**-7
+        self.convergence_threshold = 1.0*10**-3
 
         #other info
         self.position_units ="angstrom"
