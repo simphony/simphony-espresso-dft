@@ -727,13 +727,13 @@ class QeFileIoDataManager():
                     line = '\t outdir=\'' + str(self.output_directory) + '\'\n'
                     f.write(line)
                 if hasattr(self, 'etot_convergence_threshold'):
-                    line = '\t etot_conv_thr=\'' + str(self.etot_convergence_threshold) + '\'\n'
+                    line = '\t etot_conv_thr=' + str(self.etot_convergence_threshold) + '\n'
                     f.write(line)
                 if hasattr(self, 'force_convergence_threshold'):
-                    line = '\t forc_conv_thr=\'' + str(self.force_convergence_threshold) + '\'\n'
+                    line = '\t forc_conv_thr=' + str(self.force_convergence_threshold) + '\n'
                     f.write(line)
                 if hasattr(self, 'max_iterations'):
-                    line = '\t nstep=\'' + str(self.max_iterations) + '\'\n'
+                    line = '\t nstep=' + str(self.max_iterations) + '\n'
                     f.write(line)
 
                 line = '/\n'
