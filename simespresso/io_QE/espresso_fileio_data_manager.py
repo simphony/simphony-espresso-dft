@@ -112,7 +112,10 @@ class QeFileIoDataManager():
         #electrons
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
-        self.convergence_threshold = 1.0*10**-7
+        self.convergence_threshold = 1.0*10**-3
+        self.etot_convergence_threshold = 1.0*10**-3
+        self.force_convergence_threshold = 1.0*10**-3
+        self.max_iterations = 200
 
         #other info
         self.position_units ="angstrom"
@@ -722,6 +725,16 @@ class QeFileIoDataManager():
                 if hasattr(self, 'output_directory'):
                     line = '\t outdir=\'' + str(self.output_directory) + '\'\n'
                     f.write(line)
+                if hasattr(self, 'etot_convergence_threshold'):
+                    line = '\t etot_conv_thr=\'' + str(self.etot_convergence_threshold) + '\'\n'
+                    f.write(line)
+                if hasattr(self, 'force_convergence_threshold'):
+                    line = '\t forc_conv_thr=\'' + str(self.force_convergence_threshold) + '\'\n'
+                    f.write(line)
+                if hasattr(self, 'max_iterations'):
+                    line = '\t nstep=\'' + str(self.max_iterations) + '\'\n'
+                    f.write(line)
+
                 line = '/\n'
                 f.write(line)
 
