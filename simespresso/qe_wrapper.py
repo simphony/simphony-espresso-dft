@@ -24,7 +24,7 @@ def _temp_directory():
     """
     temp_dir = tempfile.mkdtemp()
     yield temp_dir
-    shutil.rmtree(temp_dir)
+    #shutil.rmtree(temp_dir)
 
 
 class QeWrapper(ABCModelingEngine):
