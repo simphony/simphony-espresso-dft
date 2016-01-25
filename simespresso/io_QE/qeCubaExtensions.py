@@ -55,6 +55,13 @@ class qeCUBAExtension(Enum):
     number:220
     shape: [3]
     type: double
+    - description: total energy
+    domain: [MD]
+    key: TOTAL_ENERGY
+    name: TOTAL_ENERGY
+    number:1234
+    shape: 1
+    type: double
     """
 
     BOX_VECTORS = "BOX_VECTORS"
@@ -64,4 +71,6 @@ class qeCUBAExtension(Enum):
     PSEUDO_POTENTIAL = "PSEUDO_POTENTIAL"
     K_POINT_SAMPLING_METHOD = "K_POINT_SAMPLING_METHOD"
     K_POINT_SAMPLING = "K_POINT_SAMPLING"
+    TOTAL_ENERGY = "TOTAL_ENERGY"
+
     #add 'extra results field with total energy, iter, delta E

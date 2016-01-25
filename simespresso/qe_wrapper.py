@@ -94,8 +94,8 @@ class QeWrapper(ABCModelingEngine):
         ValueError:
             If there is no dataset with the given name
         """
-        if name in self._data_manager:
-            return self._data_manager[name]
+        if name in self._data_manager._pc_cache:
+            return self._data_manager._pc_cache[name]
         else:
             raise ValueError(
                 'Particle container \'{}\` does not exist'.format(name))
@@ -104,7 +104,7 @@ class QeWrapper(ABCModelingEngine):
         """ Returns the names of all the datasets
         """
         # TODO  (simphony-common #218)
-        return [name for name in self._data_manager]
+        return [name for name in self._data_manager._pc_cache]
 
     def remove_dataset(self, name):
         """ Remove a dataset

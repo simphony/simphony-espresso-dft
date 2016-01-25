@@ -426,7 +426,7 @@ class QeFileIoDataManager():
                 pcs[pc_name].add_particles([particle])
                 #check if list needed
 
-    def _read_espresso_output_file(self, file_name):
+    def _read_espresso_output_file_old(self, file_name):
         '''
         This function parses  Espresso output files which usually will have
         a name like 'name.charge'.
@@ -1031,6 +1031,11 @@ class QeFileIoDataManager():
                         self._wrapper.tot_energy_Ry = total_energy
                         self.estimated_accuracy_Ry = estimated_scf_accuracy
                         self._wrapper.estimated_accuracy_Ry = estimated_scf_accuracy
+                        extracted_pc_names = self.get_dataset_names()
+                        first_dataset_name = extracted_pc_names[0]
+                        first_dataset = self.get_data(first_dataset_name)
+                        first_dataset.data_extension['TOTAL_ENERGY'] = total_energy
+                        first_dataset.data_extension[qeCUBAExtension.TOTAL_ENERGY] = total_energy
                     line = file_iter.next()
             except StopIteration:
                 print('eof reached')

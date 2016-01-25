@@ -2,7 +2,7 @@ from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particle, Particles
 import os
 import logging
-
+import qeCubaExtensions
 #    from simphony.engine import quantumESPRESSO
 # todo  figure out how to get wrapper into simphony.engine
 # instead of the following
@@ -77,6 +77,8 @@ names = wrapper.get_dataset_names()
 print('dataset names:'+str(names))
 extracted_pc = wrapper.get_dataset("Copper")
 print('checking particles:')
-for particle in extracted_pc:
+for particle in extracted_pc.iter_particles():
     print('particle:'+str(particle))
-extracted_pc.data_extension[qeCUBAExtension.TOTAL_ENERGY] # should print the tot eng
+#etot = extracted_pc.data_extension[qeCUBAExtension.TOTAL_ENERGY] # should print the tot eng
+etot = extracted_pc.data_extension['TOTAL_ENERGY'] # should print the tot eng
+print('tot energy:'+str(etot))

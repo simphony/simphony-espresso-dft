@@ -22,7 +22,7 @@ class QeProcess(object):
     Raises
     ------
     RuntimeError
-        if Lammps did not run correctly
+        if qe did not run correctly
     """
 
     def __init__(self, datahandler, qe_executable="pw.x", log_directory=None):
