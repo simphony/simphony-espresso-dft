@@ -26,7 +26,7 @@ unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 
 # later (D1.6) the BC should be part of the cuds: mycuds.BOX_VECTORS
 # define the wrapper to use.
-n_steps = 2
+n_steps = 20
 max_dist = 5
 distances = []
 total_energies = []
@@ -82,7 +82,7 @@ for i in range(1,n_steps+1):
     total_energies.append(etot)
 
 plt.plot(distances,total_energies,'ko-')
-plt.title('Total energy vs. distance for Cu-Cu ({0})'.format(wrapper.SP_extension['PSEUDO_POTENTIAL']))
+plt.title('Tot energy v. dist for Cu-Cu ({0})'.format(wrapper.SP_extension['PSEUDO_POTENTIAL']))
 plt.ylabel('Tot. energy (Rydberg)')
 plt.xlabel('Cu-Cu distance (Angstrom)')
 plt.savefig('Cu-Cu.jpg')
