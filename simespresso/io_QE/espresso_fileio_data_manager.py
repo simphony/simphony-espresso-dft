@@ -58,7 +58,6 @@ class QeFileIoDataManager():
  #       self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
         self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
         self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
-        logging.debug('kpoints:'+str(self.CM_extension['K_POINT_SAMPLING']))
 
         self.BC_extension = wrapper.BC_extension
         self._qe_id_to_uid = {}
