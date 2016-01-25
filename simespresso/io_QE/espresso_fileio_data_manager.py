@@ -100,7 +100,7 @@ class QeFileIoDataManager():
         self.output_directory = './'
 
         #system
-        self.celldm = [1, 1, 1]  #This should  come from lattice vectors
+        self.celldm = [10, 10, 10]  #This should  come from lattice vectors
         self.celldm_margin = 5 #if no valid clldm given, go this far past edge
         #  if the user only specificies atom positions, what should this be
         self.ibrav = 8  #this should also be defined in cuba
@@ -1012,12 +1012,14 @@ class QeFileIoDataManager():
             line_number = 0
             file_iter = iter(f)
             line = file_iter.next()
+            got_energy = False
             try:
                 while line is not None:
                     line_number += 1
 #                    logging.debug('read line {0}:{1}'.format(line_number,line))
                     if '!' in line and 'total energy' in line:
                        #got final energy line
+                        got_energy = True
                         parts = line.split()
                         total_energy = parts[4]
                         logging.debug('tparts:' + str(parts))
@@ -1042,6 +1044,8 @@ class QeFileIoDataManager():
             except Exception:
                 print("problem with line number=", line_number, line)
                 return
+            if not got_energy:
+                logging.warning('tot energy not found')
         return
 
     def _process_control(self, f):
