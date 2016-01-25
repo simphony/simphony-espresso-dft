@@ -4,6 +4,7 @@ import logging
 import math
 import numpy as np
 from enum import Enum
+import multiprocessing
 
 from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.lattice import Lattice
@@ -123,7 +124,7 @@ class QeFileIoDataManager():
         self.output_filename="qe_output"
         self.path_to_espresso='pw.x'
         self.mpi=True
-        self.mpi_Nprocessors=60
+        self.mpi_Nprocessors = max(1,multiprocessing.cpu_count() -1)
 
     def get_data(self, uname):
         """Returns data container associated with particle container
