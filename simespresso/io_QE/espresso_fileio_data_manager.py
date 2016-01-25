@@ -113,12 +113,9 @@ class QeFileIoDataManager():
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
         self.convergence_threshold = 1.0*10**-3
-<<<<<<< HEAD
-=======
         self.etot_convergence_threshold = 1.0*10**-3
         self.force_convergence_threshold = 1.0*10**-3
         self.max_iterations = 200
->>>>>>> 90f259da406b4f25c1ca9cf645d3c993bf15c4a1
 
         #other info
         self.position_units ="angstrom"
