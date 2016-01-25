@@ -74,7 +74,7 @@ class QeProcess(object):
  #       self._datahandler.write_espresso_input_file(input_data_file)
 
         if self._datahandler.mpi:
-            command = 'mpirun -np ' + str(self.mpi_Nprocessors) + ' ' + \
+            command = 'mpirun -np ' + str(self._datahandler.mpi_Nprocessors) + ' ' + \
                      self._qe_executable + ' < ' + input_data_file + ' > ' \
                       + output_data_file
         else:
