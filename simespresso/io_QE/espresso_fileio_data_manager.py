@@ -1022,7 +1022,7 @@ class QeFileIoDataManager():
                         parts = line.split()
                        # find index of '=' sign
                         ind = [i for i in range(len(parts)) if parts[i] == '=']
-                        total_energy = parts[ind[0]]
+                        total_energy = parts[ind[0]+1] # get element after = sign
                         logging.debug('tparts:' + str(parts)+' ind:'+str(ind))
                         logging.debug('tot energy:' + str(total_energy))
                         line2 = file_iter.next()
