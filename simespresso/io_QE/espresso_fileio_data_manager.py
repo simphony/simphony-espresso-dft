@@ -123,7 +123,7 @@ class QeFileIoDataManager():
         self.output_filename="qe_output"
         self.path_to_espresso='pw.x'
         self.mpi=True
-        self.mpi_Nprocessors=60
+        self.mpi_Nprocessors=7
 
     def get_data(self, uname):
         """Returns data container associated with particle container
