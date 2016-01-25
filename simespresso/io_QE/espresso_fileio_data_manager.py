@@ -1020,8 +1020,10 @@ class QeFileIoDataManager():
                        #got final energy line
                         got_energy = True
                         parts = line.split()
-                        total_energy = parts[4]
-                        logging.debug('tparts:' + str(parts))
+                       # find index of '=' sign
+                        ind = [i for i in range(len(parts)) if parts[i] == '=']
+                        total_energy = parts[ind[0]]
+                        logging.debug('tparts:' + str(parts)+' ind:'+str(ind))
                         logging.debug('tot energy:' + str(total_energy))
                         line2 = file_iter.next()
                         line3 = file_iter.next()
