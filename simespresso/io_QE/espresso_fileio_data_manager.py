@@ -100,8 +100,8 @@ class QeFileIoDataManager():
         self.output_directory = './'
 
         #system
-        self.celldm = [10, 10, 10]  #This should  come from lattice vectors
-        self.celldm_margin = 5 #if no valid clldm given, go this far past edge
+        self.celldm = [5, 5, 5]  #This should  come from lattice vectors
+        self.celldm_margin = 3 #if no valid clldm given, go this far past edge
         #  if the user only specificies atom positions, what should this be
         self.ibrav = 8  #this should also be defined in cuba
         self.n_atom_types = 0 #comes from pc
@@ -121,7 +121,7 @@ class QeFileIoDataManager():
         self.output_filename="qe_output"
         self.path_to_espresso='pw.x'
         self.mpi=True
-        self.mpi_Nprocessors=20
+        self.mpi_Nprocessors=60
 
     def get_data(self, uname):
         """Returns data container associated with particle container
