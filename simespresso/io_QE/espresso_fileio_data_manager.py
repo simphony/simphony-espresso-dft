@@ -1049,13 +1049,13 @@ class QeFileIoDataManager():
                        # find index of '=' sign
                         ind = [i for i in range(len(parts)) if parts[i] == '=']
                         total_energy = parts[ind[0]+1] # get element after = sign
-                        logging.debug('tparts:' + str(parts)+' ind:'+str(ind))
-                        logging.debug('tot energy:' + str(total_energy))
+ #                       logging.debug('tparts:' + str(parts)+' ind:'+str(ind))
+#                        logging.debug('tot energy:' + str(total_energy))
                         line2 = file_iter.next()
                         line3 = file_iter.next()
                         parts = line3.split()
                         estimated_scf_accuracy = parts[4]
-                        logging.debug('est accuracy:' + str(estimated_scf_accuracy))
+ #                       logging.debug('est accuracy:' + str(estimated_scf_accuracy))
                         self.tot_energy_Ry = total_energy
                         self._wrapper.tot_energy_Ry = total_energy
                         self.estimated_accuracy_Ry = estimated_scf_accuracy
