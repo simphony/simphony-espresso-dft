@@ -102,11 +102,11 @@ class QeProcess(object):
    #             pp_filename = input_data_filename + '.pp'
     #            self._write_espresso_pp_file(ppfilename=pp_filename)
 
-        if 'DESIRED_SIMULATIONS' in datahandler._wrapper.CM_extension:
-            if 'CHARGE_DENSITY' in self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
+        if 'DESIRED_SIMULATIONS' in self._datahandler._wrapper.CM_extension:
+            if 'CHARGE_DENSITY' in self._datahandler._wrapper.CM_extension['DESIRED_SIMULATIONS']:
                 #write a 'pp' file
                 logging.debug('doing postprocessing simulation')
-                pp_filename = input_data_filename + '.pp'
+                pp_filename = input_data_file + '.pp'
                 command = 'mpirun -np x /usr/local/espresso/bin/pp.x < '+ pp_filename + '  > pp.out '
 
                 self._write_espresso_pp_file(ppfilename=pp_filename)

@@ -114,9 +114,9 @@ class QeFileIoDataManager():
         #electrons
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
-        self.convergence_threshold = 1.0*10**-3
-        self.etot_convergence_threshold = 1.0*10**-3
-        self.force_convergence_threshold = 1.0*10**-3
+        self.convergence_threshold = 1.0*10**-2
+        self.etot_convergence_threshold = 1.0*10**-2
+        self.force_convergence_threshold = 1.0*10**-2
         self.max_iterations = 200
 
         #other info
