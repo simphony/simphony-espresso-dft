@@ -109,7 +109,21 @@ class QeProcess(object):
                 pp_filename = input_data_file + '.pp'
                 command = 'mpirun -np x /usr/local/espresso/bin/pp.x < '+ pp_filename + '  > pp.out '
 
-                self._write_espresso_pp_file(ppfilename=pp_filename)
+                logging.debug('attempting to run command: ' + command)
+                try:
+        #            subprocess.check_call(command, shell=True,
+         #               stdout=subprocess.PIPE).stdout.read()
+
+                    subprocess.Popen(command, shell=True,
+                                     stdout=subprocess.PIPE).stdout.read()
+                except:
+                    e = sys.exc_info()[0]
+                    logging.debug('espresso postprocess command gave error %s' % e)
+                    raise ValueError('espresso postprocess command gave error %s' % e)
+                    exit
+                print('succesful exit from quantum espresso')
+
+#                self._write_espresso_pp_file(ppfilename=pp_filename)
 
 
 
