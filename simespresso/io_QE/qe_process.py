@@ -107,7 +107,7 @@ class QeProcess(object):
                 #write a 'pp' file
                 logging.debug('doing postprocessing simulation')
                 pp_filename = input_data_file + '.pp'
-                command = 'mpirun -np x /usr/local/espresso/bin/pp.x < '+ pp_filename + '  > pp.out '
+                command = ' pp.x < '+ pp_filename + '  > pp.out '
 
                 logging.debug('attempting to run command: ' + command)
                 try:
