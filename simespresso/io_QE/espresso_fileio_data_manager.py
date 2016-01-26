@@ -59,6 +59,7 @@ class QeFileIoDataManager():
  #       self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
         self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
         self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
+        self.CM_extension['DESIRED_SIMULATIONS'] = ['TOTAL_ENERGY']
 
         self.BC_extension = wrapper.BC_extension
         self._qe_id_to_uid = {}
@@ -125,6 +126,8 @@ class QeFileIoDataManager():
         self.path_to_espresso='pw.x'
         self.mpi=True
         self.mpi_Nprocessors = max(1,multiprocessing.cpu_count() -1)
+
+
 
     def get_data(self, uname):
         """Returns data container associated with particle container
@@ -282,7 +285,7 @@ class QeFileIoDataManager():
         Parameters
         ----------
         input_data_filename :
-            name of data-file where inform is written to (i.e lammps's input).
+            name of data-file where inform is written to (i.e espresso's input).
         """
         if self._pc_cache:
             self._write_data_file(input_data_filename)
@@ -292,6 +295,15 @@ class QeFileIoDataManager():
         # TODO handle properly when there are no particle containers
         # or when some of them do not contain any particles
         # (i.e. someone has deleted all the particles)
+
+        if 'DESIRED_SIMULATIONS' in self._wrapper.CM_extension:
+            if 'CHARGE_DENSITY' in self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
+                #write a 'pp' file
+                pp_filename = input_data_filename + '.pp'
+                self._write_espresso_pp_file(ppfilename=pp_filename)
+
+        else:
+            logging.warning('Desired simulations not indicated, finding just total energy')
 
     def read(self, output_data_filename):
         """read from file

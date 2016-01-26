@@ -1,23 +1,21 @@
 from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particle, Particles
 import logging
-import  matplotlib.pyplot as plt
 from simespresso import qe_wrapper
 from qeCubaExtensions import qeCUBAExtension
 
-a_latt = 3.61  # this is in Angstroms, Please assume Angstroms, and atomic
+a_latt = 3.61  #  Angstroms
 unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
-basis = [
+particle_coordinates = [
     [0.0, 0.0, 0.0],
-    [0.0, 1.0, 0]]
+    [0.0, 1.0*a_latt, 0]]
 pc = Particles("Copper")
-for base_vector in basis:
-    position = [component * a_latt for component in base_vector]
-    p = Particle(coordinates=position)
+for particle in particle_coordinates:
+    p = Particle(coordinates=particle)
     p.data[CUBA.CHEMICAL_SPECIE] = ['Cu']
     p.data[CUBA.MASS] = 63.546
     pc.add_particles([p])
-    logging.debug('position:'+str(position))
+
 super_cell = [[x*a_latt for x in v] for v in unit_cell]
 pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
 wrapper = qe_wrapper.QeWrapper()
@@ -28,6 +26,7 @@ wrapper.add_dataset(pc)
 wrapper.SP_extension['PSEUDO_POTENTIAL'] ='Cu.pz-d-hgh.UPF'
 wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
 wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
+wrapper.CM_extension['DESIRED_SIMULATIONS'] = ['TOTAL_ENERGY','CHARGE_DENSITY']
 wrapper.run()
 extracted_pc = wrapper.get_dataset("Copper")
 print('checking particles:')

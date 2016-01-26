@@ -72,6 +72,7 @@ class QeProcess(object):
 
 # taken care of in flush
  #       self._datahandler.write_espresso_input_file(input_data_file)
+ #       if self._datahandler.wrapper
 
         if self._datahandler.mpi:
             command = 'mpirun -np ' + str(self._datahandler.mpi_Nprocessors) + ' ' + \
@@ -93,6 +94,26 @@ class QeProcess(object):
             raise ValueError('espresso command gave error %s' % e)
             exit
         print('succesful exit from quantum espresso')
+
+
+#                if 'DESIRED_SIMULATIONS' in self._wrapper.CM_extension:
+ #           if 'CHARGE_DENSITY' in self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
+  #              #write a 'pp' file
+   #             pp_filename = input_data_filename + '.pp'
+    #            self._write_espresso_pp_file(ppfilename=pp_filename)
+
+        if 'DESIRED_SIMULATIONS' in datahandler._wrapper.CM_extension:
+            if 'CHARGE_DENSITY' in self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
+                #write a 'pp' file
+                logging.debug('doing postprocessing simulation')
+                pp_filename = input_data_filename + '.pp'
+                command = 'mpirun -np x /usr/local/espresso/bin/pp.x < '+ pp_filename + '  > pp.out '
+
+                self._write_espresso_pp_file(ppfilename=pp_filename)
+
+
+
+
 '''
     code from lammps - maybe use the stdout and stderr pipes
         proc = subprocess.Popen(
