@@ -915,7 +915,7 @@ class QeFileIoDataManager():
         plotfile = 'output.charge'
         outfile = 'density.dat'
         lines = ['&inputpp',
-                 'prefix =\'qe_output\'',
+                 'prefix =\'simphony_pp\'',
                  'filplot=\'' + plotfile + '\'',
                  'plot_num=0',
                  'outdir = ' + outdir,
