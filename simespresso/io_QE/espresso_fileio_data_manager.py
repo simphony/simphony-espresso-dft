@@ -911,9 +911,10 @@ class QeFileIoDataManager():
         this writes an auxiliary required file determined the plot parameters
         :return:
         '''
-        outdir = './'
         plotfile = 'output.charge'
         outfile = 'density.dat'
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        outdir = cwd
         lines = ['&inputpp',
                  'prefix =\'simphony_pp\'',
                  'filplot=\'' + plotfile + '\'',
