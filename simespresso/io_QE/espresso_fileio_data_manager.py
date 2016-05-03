@@ -906,7 +906,7 @@ class QeFileIoDataManager():
         print('finished writing file')
         f.closed
 
-    def _write_espresso_pp_file(self, ppfilename="testpp.in"):
+    def _write_espresso_pp_file(self, ppfilename="testpp.in",outdir=None):
         '''
         this writes an auxiliary required file determined the plot parameters
         :return:

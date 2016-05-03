@@ -173,6 +173,9 @@ class QeWrapper(ABCModelingEngine):
 
             # after running, we read any changes from lammps
             self._data_manager._read_espresso_output_file(output_data_filename)
+    #        self._data_manager._read_densities(n_latticepoints, file_iter, aviz_filename=False):
+
+
 
 def _combine(data_container, data_container_extension):
     """ Combine a the approved CUBA with non-approved CUBA key-values
