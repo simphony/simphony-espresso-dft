@@ -117,8 +117,8 @@ class QeWrapper(ABCModelingEngine):
         ValueError:
             If there is no dataset with the given name
         """
-        if name in self._data_manager:
-            del self._data_manager[name]
+        if name in self._data_manager._pc_cache:
+            del self._data_manager._pc_cache[name]
         else:
             raise ValueError(
                 'Particles \'{}\' does not exist'.format(name))

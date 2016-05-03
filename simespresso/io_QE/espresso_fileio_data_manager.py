@@ -4,6 +4,7 @@ import logging
 import math
 import numpy as np
 from enum import Enum
+import multiprocessing
 
 from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.lattice import Lattice
@@ -124,6 +125,7 @@ class QeFileIoDataManager():
         self.path_to_espresso='pw.x'
         self.mpi=True
         self.mpi_Nprocessors=7
+#        self.mpi_Nprocessors = max(1,multiprocessing.cpu_count() -1)
 
     def get_data(self, uname):
         """Returns data container associated with particle container
@@ -726,13 +728,13 @@ class QeFileIoDataManager():
                     line = '\t outdir=\'' + str(self.output_directory) + '\'\n'
                     f.write(line)
                 if hasattr(self, 'etot_convergence_threshold'):
-                    line = '\t etot_conv_thr=\'' + str(self.etot_convergence_threshold) + '\'\n'
+                    line = '\t etot_conv_thr=' + str(self.etot_convergence_threshold) + '\n'
                     f.write(line)
                 if hasattr(self, 'force_convergence_threshold'):
-                    line = '\t forc_conv_thr=\'' + str(self.force_convergence_threshold) + '\'\n'
+                    line = '\t forc_conv_thr=' + str(self.force_convergence_threshold) + '\n'
                     f.write(line)
                 if hasattr(self, 'max_iterations'):
-                    line = '\t nstep=\'' + str(self.max_iterations) + '\'\n'
+                    line = '\t nstep=' + str(self.max_iterations) + '\n'
                     f.write(line)
 
                 line = '/\n'
@@ -902,7 +904,7 @@ class QeFileIoDataManager():
         plotfile = 'output.charge'
         outfile = 'density.dat'
         lines = ['&inputpp',
-                 'prefix =\'qe_output\'',
+                 'prefix =\'simphony_pp\'',
                  'filplot=\'' + plotfile + '\'',
                  'plot_num=0',
                  'outdir = ' + outdir,
