@@ -1,5 +1,5 @@
-""" LAMMPS Process
-This module provides a way to run the lammps or liggghts process
+""" qe Process
+This module provides a way to run the qe process
 """
 
 import os
@@ -14,11 +14,6 @@ class QeProcess(object):
     """ Class to run quantum espresso
     Parameters
     ----------
-    qe_name : str
-        name of qe executable
-    log_directory : str, optional
-        name of directory of log file ('log.qe')
-        If not given, then pwd is where 'log.lammps' will be written.
     Raises
     ------
     RuntimeError

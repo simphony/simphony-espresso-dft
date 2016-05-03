@@ -19,9 +19,7 @@ for particle in particle_coordinates:
 super_cell = [[x*a_latt for x in v] for v in unit_cell]
 pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
 wrapper = qe_wrapper.QeWrapper()
-wrapper.BC_extension['BOX_FACES'] = ["periodic",
-                                                        "periodic",
-                                                        "periodic"]
+wrapper.BC_extension['BOX_FACES'] = ["periodic","periodic","periodic"]
 wrapper.add_dataset(pc)
 wrapper.SP_extension['PSEUDO_POTENTIAL'] ='Cu.pz-d-hgh.UPF'
 wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
