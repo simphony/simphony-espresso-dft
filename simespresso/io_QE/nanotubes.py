@@ -3,13 +3,13 @@ from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particle, Particles
 import logging
 from simespresso import qe_wrapper
-from simespresso import generate_nanotube
+import generate_nanotube
 from qeCubaExtensions import qeCUBAExtension
 
 unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 a_latt = 3.61  #  Angstroms
 super_cell = [[x*a_latt for x in v] for v in unit_cell]
-super_cell =
+#super_cell =
 
 particle_coordinates = generate_nanotube.generate_nanotube_xyz('armchair')
 pc = Particles("Carbon")
