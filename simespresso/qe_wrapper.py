@@ -12,7 +12,7 @@ from simphony.cuds.abc_particles import ABCParticles
 
 from simespresso.io_QE.espresso_fileio_data_manager import QeFileIoDataManager
 from simespresso.io_QE.qe_process import QeProcess
-from qeCubaExtensions import qeCUBAExtension
+#from qeCubaExtensions import qeCUBAExtension
 
 import logging
 

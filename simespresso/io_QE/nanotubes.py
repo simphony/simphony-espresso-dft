@@ -4,7 +4,7 @@ from simphony.cuds.particles import Particle, Particles
 import logging
 from simespresso import qe_wrapper
 import generate_nanotube
-from qeCubaExtensions import qeCUBAExtension
+#from qeCubaExtensions import qeCUBAExtension
 
 unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 a_latt = 3.61  #  Angstroms
@@ -19,7 +19,7 @@ for particle in particle_coordinates:
     p.data[CUBA.MASS] = 12.0
     pc.add_particles([p])
 
-pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
+pc.data_extension = {'BOX_VECTORS': super_cell}
 wrapper = qe_wrapper.QeWrapper()
 wrapper.BC_extension['BOX_FACES'] = ["periodic","periodic","periodic"]
 wrapper.add_dataset(pc)
