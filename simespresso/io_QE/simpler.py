@@ -31,7 +31,7 @@ print('checking particles:')
 for particle in extracted_pc.iter_particles():
     print('particle:'+str(particle))
 if 'TOTAL_ENERGY' in extracted_pc.data_extension:
-    etot = extracted_pc.data_extension['TOTAL_ENERGY']  # should print the tot eng
+    etot = extracted_pc.data_extension['TOTAL_ENERGY']  # should print tot eng
     print('tot energy:'+str(etot))
 else:
     print('tot energy not found')
