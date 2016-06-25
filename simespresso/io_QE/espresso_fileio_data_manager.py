@@ -29,38 +29,38 @@ class QeFileIoDataManager():
     data existing in Lammps (via lammps data file) and allows this data to be
     queried and to be changed.
     """
-    def __init__(self,wrapper):
+    def __init__(self, wrapper):
         self._wrapper = wrapper
-        self.SP = wrapper.SP # (Governing Equations)
-        self.SD = wrapper.SD #DataContainer()  # System Material Description
+        self.SP = wrapper.SP  # (Governing Equations)
+        self.SD = wrapper.SD  #DataContainer()  System Material Description
         # and  State Data including Boundaries (not conditions)
-        self.BC =wrapper.BC # DataContainer()  # Boundary conditions
-        self.CM = wrapper.CM #DataContainer()  # Computational Methods
+        self.BC = wrapper.BC  # DataContainer()  # Boundary conditions
+        self.CM = wrapper.CM  #DataContainer()  # Computational Methods
         self.SP_extension = wrapper.SP_extension
         self.SP_extension['PSEUDO_POTENTIAL'] = 'tests/06-C.GGA.fhi.UPF'
         self.SP_extension['KERNEL_TABLE'] = 'tests/vdW_kernel_table'
         self.CM_extension = wrapper.CM_extension
 
-        #simphony suba extensions allow same kw twice
-#        self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
- #       self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
-        self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
+#        #simphony suba extensions allow same kw twice
+#        #self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
+#        #self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
+        self.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
         self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
         self.CM_extension['DESIRED_SIMULATIONS'] = ['TOTAL_ENERGY']
 
         self.BC_extension = wrapper.BC_extension
         self._qe_id_to_uid = {}
 
-        #map from inputfile line number to qe_id
+#map from inputfile line number to qe_id
         self._qe_id=[]
-        # cache (dictionary) of particle containers
+# cache (dictionary) of particle containers
         self._pc_cache = {}
 
-        # cache of data container extensions
+# cache of data container extensions
         self._dc_extension_cache = {}
 
 
-        #remove , this is unecessary
+#remove , this is unecessary
         self.pc = Particles('quantum_espresso_particles')
         self.atomtypes = []
         self.masses = []
@@ -89,8 +89,8 @@ class QeFileIoDataManager():
 
         #system
         self.celldm = [5, 5, 5]  #This should  come from lattice vectors
-        self.celldm_margin = 3 #if no valid clldm given, go this far past edge
-        #  if the user only specificies atom positions, what should this be
+        self.celldm_margin = 3  #if no valid clldm given, go this far past edge
+#  if the user only specificies atom positions, what should this be
         self.ibrav = 8  #this should also be defined in cuba
         self.n_atom_types = 0 #comes from pc
         self.ecutwfc = 60.0  #find reasonable default
@@ -98,7 +98,7 @@ class QeFileIoDataManager():
 
 
 
-        #electrons
+#electrons
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
         self.convergence_threshold = 1.0*10**-2
@@ -106,7 +106,7 @@ class QeFileIoDataManager():
         self.force_convergence_threshold = 1.0*10**-2
         self.max_iterations = 200
 
-        #other info
+#other info
         self.position_units ="angstrom"
         self.input_pwname="input.pw"
         self.output_filename="qe_output"
@@ -651,27 +651,29 @@ class QeFileIoDataManager():
 
     def _check_bounds(self):
         maxima = [0,0,0]
-        for name,pc in self._pc_cache.iteritems():
+        for name, pc in self._pc_cache.iteritems():
             for particle in pc.iter_particles():
-                for d in range(0,3): #3 dimensions, needs to be more general?
+                for d in range(0, 3): #3 dimensions, needs to be more general?
                     maxima[d] = max(maxima[d],particle.coordinates[d])
 #                    logging.debug('p:{0},{1},{2} m:{3},{4},{5}'
- #                               .format(particle.coordinates[0],particle.coordinates[1],particle.coordinates[2],maxima[0],maxima[1],maxima[2]))
-        #check if celldm is too small
+#                    .format(particle.coordinates[0],particle.coordinates[1],
+#                       particle.coordinates[2],maxima[0],maxima[1],maxima[2]))
+#check if celldm is too small
         for d in range(0,3): #3 dimensions, needs to be more general?
             if self.celldm[d] < maxima[d]:
                 newbound = maxima[d]*self.celldm_margin
-                logging.warning('celldm[{0}]={1} is smaller than max coord {2}, setting to {3}'
+                logging.warning(
+                    'celldm[{0}]={1} smaller than max {2}, setting to {3}'
                                 .format(d,self.celldm[d],maxima[d],newbound ))
                 self.celldm[d] = newbound
 
     def _combine_datasets(self):
         self.combined_dataset = Particles('quantumEspresso combined particles')
-        #clear out combined dataset
+#clear out combined dataset
         for p in self.combined_dataset.iter_particles():
             self.combined_dataset.remove_particles()
 
-       # now fill it with all particles in all pcs
+# now fill it with all particles in all pcs
         for name, pc in self._pc_cache.iteritems():
             particles = pc.iter_particles
             self.combined_dataset.add_particles(particles)

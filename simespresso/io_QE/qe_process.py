@@ -8,8 +8,6 @@ import subprocess
 import logging
 
 
-
-
 class QeProcess(object):
     """ Class to run quantum espresso
     Parameters
@@ -33,22 +31,23 @@ class QeProcess(object):
         else:
             self._log = 'log.qe'
 
-        # see if qe can be started !
-        #logging.debug('exe {0} which exe {1}'.format(self._qe_executable,which(self._qe_executable)))
-        #if not which(self._qe_executable):
-        #    logging.debug('no path to espresso')
-        #    raise ValueError(
-        #    'espresso command not found (looking for '
-        #    + self._qe_executable+')')
+#        # see if qe can be started !
+#        #logging.debug('exe {0} which exe {1}'
+#        # .format(self._qe_executable,which(self._qe_executable)))
+#        #if not which(self._qe_executable):
+#        #    logging.debug('no path to espresso')
+#        #    raise ValueError(
+#        #    'espresso command not found (looking for '
+#       #    + self._qe_executable+')')
 
-        #self.run("pw.x")
-        #except Exception:
-        #msg = "quantum espresso could not be started."
-        #if self._returncode == 127:
-        #    msg += " executable '{}' was not found.".format(qe_executable)
-        #else:
-        #    msg += " stdout/err: " + self._stdout + " " + self._stderr
-        #raise RuntimeError(msg)
+#        #self.run("pw.x")
+#        #except Exception:
+#        #msg = "quantum espresso could not be started."
+#        #if self._returncode == 127:
+#        #    msg += " executable '{}' was not found.".format(qe_executable)
+#        #else:
+#       #    msg += " stdout/err: " + self._stdout + " " + self._stderr
+#       #raise RuntimeError(msg)
 
     def run(self,input_data_file,output_data_file,BC,CM,SP):
         """Run engine with a set of commands
@@ -114,9 +113,6 @@ class QeProcess(object):
                 print('succesful exit from quantum espresso')
 
 #                self._write_espresso_pp_file(ppfilename=pp_filename)
-
-
-
 
 '''
     code from lammps - maybe use the stdout and stderr pipes

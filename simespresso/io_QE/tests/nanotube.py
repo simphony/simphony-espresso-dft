@@ -1,11 +1,6 @@
 __author__ = 'jeremy'
-
-import os
-import unittest
-
 from simespresso.io_QE import qe_file_io
 from simphony.core.cuba import CUBA
-from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particle, Particles
 
 
@@ -24,7 +19,7 @@ class nanotubes(object):
     def place_atoms(self,length,diameter,helicity):
         particles = []
         for i in range(0,10):
-            #vjust testing this is obviously not a nanotube
+#vjust testing this is obviously not a nanotube
             p = Particle([1.0 * 1e-10, 2.0 * 1e-10, 3.0 * 1e-10 * i])
             p.data[CUBA.CHEMICAL_SPECIE] = 'C'
             particles.append(p)

@@ -38,9 +38,8 @@ class QeWrapper(ABCModelingEngine):
         self.CM = DataContainer()
         self.SP = DataContainer()
         self.SD = DataContainer()
-        self.CM_extension = {}  #defaults below
+        self.CM_extension = {}
         self.SP_extension = {}
-        #self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09'
         self.BC_extension = {}
         self._data_manager = QeFileIoDataManager(self)
 
@@ -149,12 +148,12 @@ class QeWrapper(ABCModelingEngine):
             # before running, we flush any changes
             self._data_manager.flush(input_data_filename)
 
-            BC=_combine(self.BC, self.BC_extension)
-            CM=_combine(self.CM, self.CM_extension)
-            SP=_combine(self.SP, self.SP_extension)
+            BC = _combine(self.BC, self.BC_extension)
+            CM = _combine(self.CM, self.CM_extension)
+            SP = _combine(self.SP, self.SP_extension)
 
-            process = QeProcess(self._data_manager, qe_executable=self._executable_name,
-                                    log_directory=temp_dir)
+            process = QeProcess(self._data_manager, qe_executable=
+            self._executable_name, log_directory=temp_dir)
             process.run(input_data_filename,output_data_filename,BC,CM,SP)
 
             # after running, we read any changes from lammps
@@ -178,4 +177,3 @@ def _combine(data_container, data_container_extension):
     result = dict(data_container_extension)
     result.update(data_container) #combines result,data_container to 1 dict
     return result
-
