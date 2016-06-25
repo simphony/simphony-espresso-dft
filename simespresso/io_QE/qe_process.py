@@ -49,7 +49,7 @@ class QeProcess(object):
 #       #    msg += " stdout/err: " + self._stdout + " " + self._stderr
 #       #raise RuntimeError(msg)
 
-    def run(self,input_data_file,output_data_file,BC,CM,SP):
+    def run(self, input_data_file, output_data_file, BC, CM, SP):
         """Run engine with a set of commands
         Parameters
         ----------

@@ -33,7 +33,7 @@ class QeFileIoDataManager():
         self._wrapper = wrapper
         self.SP = wrapper.SP  # (Governing Equations)
         self.SD = wrapper.SD  #DataContainer()  System Material Description
-        # and  State Data including Boundaries (not conditions)
+# and  State Data including Boundaries (not conditions)
         self.BC = wrapper.BC  # DataContainer()  # Boundary conditions
         self.CM = wrapper.CM  #DataContainer()  # Computational Methods
         self.SP_extension = wrapper.SP_extension
@@ -41,9 +41,9 @@ class QeFileIoDataManager():
         self.SP_extension['KERNEL_TABLE'] = 'tests/vdW_kernel_table'
         self.CM_extension = wrapper.CM_extension
 
-#        #simphony suba extensions allow same kw twice
-#        #self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
-#        #self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
+# simphony suba extensions allow same kw twice
+# self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"
+# self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
         self.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
         self.CM_extension['K_POINT_SAMPLING'] = [5, 5, 5, 0, 0, 0]
         self.CM_extension['DESIRED_SIMULATIONS'] = ['TOTAL_ENERGY']
@@ -51,8 +51,8 @@ class QeFileIoDataManager():
         self.BC_extension = wrapper.BC_extension
         self._qe_id_to_uid = {}
 
-#map from inputfile line number to qe_id
-        self._qe_id=[]
+# map from inputfile line number to qe_id
+        self._qe_id = []
 # cache (dictionary) of particle containers
         self._pc_cache = {}
 
@@ -60,7 +60,7 @@ class QeFileIoDataManager():
         self._dc_extension_cache = {}
 
 
-#remove , this is unecessary
+# remove , this is unecessary
         self.pc = Particles('quantum_espresso_particles')
         self.atomtypes = []
         self.masses = []
@@ -87,10 +87,10 @@ class QeFileIoDataManager():
         self. max_seconds = 3600*24
         self.output_directory = './'
 
-        #system
+# system
         self.celldm = [5, 5, 5]  #This should  come from lattice vectors
         self.celldm_margin = 3  #if no valid clldm given, go this far past edge
-#  if the user only specificies atom positions, what should this be
+# if the user only specificies atom positions, what should this be
         self.ibrav = 8  #this should also be defined in cuba
         self.n_atom_types = 0 #comes from pc
         self.ecutwfc = 60.0  #find reasonable default
@@ -98,7 +98,7 @@ class QeFileIoDataManager():
 
 
 
-#electrons
+# electrons
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
         self.convergence_threshold = 1.0*10**-2
@@ -106,7 +106,7 @@ class QeFileIoDataManager():
         self.force_convergence_threshold = 1.0*10**-2
         self.max_iterations = 200
 
-#other info
+# other info
         self.position_units ="angstrom"
         self.input_pwname="input.pw"
         self.output_filename="qe_output"
