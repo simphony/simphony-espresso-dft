@@ -66,13 +66,13 @@ for i in range(1, n_steps+1):
 # etot = extracted_pc.data_extension[qeCUBAExtension.TOTAL_ENERGY]
     etot = 0
     if 'TOTAL_ENERGY' in extracted_pc.data_extension:
-        etot = extracted_pc.data_extension['TOTAL_ENERGY'] #  tot eng
+        etot = extracted_pc.data_extension['TOTAL_ENERGY']  # tot eng
         total_energies.append(etot)
         print('tot energy:'+str(etot))
     else:
         print('tot energy not found')
 
-plt.plot(distances,total_energies, 'ko-')
+plt.plot(distances, total_energies, 'ko-')
 plt.title('Tot energy v. dist for Cu-Cu ({0})'.format(
     wrapper.SP_extension['PSEUDO_POTENTIAL']))
 plt.ylabel('Tot. energy (Rydberg)')
