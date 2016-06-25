@@ -1,6 +1,6 @@
 import os
 import unittest
-from simespresso.io_QE import qe_file_io
+from simespresso import qe_wrapper
 from simphony.core.cuba import CUBA
 from simphony.core.data_container import DataContainer
 from simphony.cuds.particles import Particle, Particles
@@ -15,7 +15,8 @@ class OutcomesTest(unittest.TestCase):
 
     def test_espresso_data_file_read(self):
         print('TEST OF READING QE INPUT FILE')
-        wrapper = qe_file_io.qe_functions()
+#        wrapper = qe_wrapper.qe_functions()
+        wrapper = qe_wrapper
         wrapper.read_espresso_input_file(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
@@ -54,7 +55,8 @@ class OutcomesTest(unittest.TestCase):
 
     def test_espresso_data_file_write(self):
         print('TEST OF WRITING QE INPUT FILE')
-        wrp = qe_file_io.qe_functions()
+#        wrp = qe_wrapper.qe_functions()
+        wrp = qe_wrapper
         espresso_input_filename = 'pw_generated.in'
         wrp.SP = DataContainer()
         wrp.pc = Particles('quantum_espresso_particles')
