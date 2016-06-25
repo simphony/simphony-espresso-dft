@@ -284,7 +284,7 @@ class QeFileIoDataManager():
                 pp_filename = input_data_filename + '.pp'
                 self._write_espresso_pp_file(ppfilename=pp_filename)
         else:
-            logging.warning('Desired simulations not given, finding total energy')
+            logging.warning('Desired params not given, doing total energy')
 
     def read(self, output_data_filename):
         """read from file
@@ -641,7 +641,7 @@ class QeFileIoDataManager():
         for name, pc in self._pc_cache.iteritems():
             for particle in pc.iter_particles():
                 for d in range(0, 3):  # 3 dimensions, needs to be general?
-                    maxima[d] = max(maxima[d],particle.coordinates[d])
+                    maxima[d] = max(maxima[d], particle.coordinates[d])
 #                    logging.debug('p:{0},{1},{2} m:{3},{4},{5}'
 #                    .format(particle.coordinates[0],particle.coordinates[1],
 #                       particle.coordinates[2],maxima[0],maxima[1],maxima[2]))
@@ -650,8 +650,8 @@ class QeFileIoDataManager():
             if self.celldm[d] < maxima[d]:
                 newbound = maxima[d]*self.celldm_margin
                 logging.warning(
-                    'celldm[{0}]={1} smaller than max {2}, setting to {3}'
-                                .format(d, self.celldm[d], maxima[d], newbound))
+                    'celldm[{0}]={1} smaller than max {2}, setting to {3}'.format(
+                        d, self.celldm[d], maxima[d], newbound))
                 self.celldm[d] = newbound
 
     def _combine_datasets(self):
@@ -665,7 +665,7 @@ class QeFileIoDataManager():
             particles = pc.iter_particles
             self.combined_dataset.add_particles(particles)
 
-    def _write_espresso_input_file(self, file_name, dataset_name = None):
+    def _write_espresso_input_file(self, file_name, dataset_name=None):
         """
         :param file_name: name of the input file to write
         :return:
@@ -719,8 +719,8 @@ class QeFileIoDataManager():
                            str(self.etot_convergence_threshold) + '\n'
                     f.write(line)
                 if hasattr(self, 'force_convergence_threshold'):
-                    line = '\t forc_conv_thr=' + str(self.force_convergence_threshold) \
-                           + '\n'
+                    line = '\t forc_conv_thr=' + \
+                           str(self.force_convergence_threshold) + '\n'
                     f.write(line)
                 if hasattr(self, 'max_iterations'):
                     line = '\t nstep=' + str(self.max_iterations) + '\n'
@@ -781,7 +781,8 @@ class QeFileIoDataManager():
                            str(self.mixing_beta) + '\n'
                     f.write(line)
                 if hasattr(self, 'convergence_threshold'):
-                    logging.debug('conv thresh:'+str(self.convergence_threshold))
+                    logging.debug('conv thresh:' + \
+                                  str(self.convergence_threshold))
                     logdecimal = math.log10(self.convergence_threshold)
                     base = 10 ** (logdecimal - int(logdecimal))
                     logging.debug('exp:'+str(logdecimal))
@@ -810,15 +811,16 @@ class QeFileIoDataManager():
                 potential_file = self._wrapper.SP_extension['PSEUDO_POTENTIAL']
 #                potential_file = self.SP_extension['PSEUDO_POTENTIAL']
                 for atomtype in self._what_atom_types():
-                    #todo - take care of possible isotopes - same atom, different mass
+                    # todo - take care of possible isotopes - same atom, different mass
                     particle_mass_list = self._get_particle_masses()
                     if atomtype in particle_mass_list:
                         mass = particle_mass_list[atomtype]
-                        logging.debug('mass of {0} is {1}'.format(atomtype,mass))
+                        logging.debug('mass of {0} is {1}'.format(atomtype, mass))
                     else:
-                        logging.warning('could not find mass of particle:'+str(atomtype))
+                        logging.warning('could not find mass of particle:' + \
+                                        str(atomtype))
                         continue
-                    line =atomtype + ' ' + str(mass)+' ' + potential_file + '\n'
+                    line = atomtype + ' ' + str(mass)+' ' + potential_file + '\n'
                     logging.debug(line)
                     f.write(line)
                 line = '\n'
@@ -826,8 +828,6 @@ class QeFileIoDataManager():
 
                 # K POINTS
                 sampling_mode = 'automatic'
-#                if hasattr(self,'CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD]'):
-
                 sampling_mode = self._wrapper.CM_extension['K_POINT_SAMPLING_METHOD']
                 sampling_mode = self._wrapper.CM_extension['K_POINT_SAMPLING_METHOD']
                 line = 'K_POINTS ' + str(sampling_mode) + '\n'
