@@ -109,7 +109,7 @@ class QeFileIoDataManager():
         self.output_filename = "qe_output"
         self.path_to_espresso = 'pw.x'
         self.mpi = True
-        self.mpi_Nprocessors = max(1, multiprocessing.cpu_count() -1)
+        self.mpi_Nprocessors = max(1, multiprocessing.cpu_count() - 1)
 
     def get_data(self, uname):
         """Returns data container associated with particle container
@@ -280,11 +280,11 @@ class QeFileIoDataManager():
         if 'DESIRED_SIMULATIONS' in self._wrapper.CM_extension:
             if 'CHARGE_DENSITY' in \
                     self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
-                #write a 'pp' file
+                # write a 'pp' file
                 pp_filename = input_data_filename + '.pp'
                 self._write_espresso_pp_file(ppfilename=pp_filename)
         else:
-            logging.warning('Desired simulations not indicated, finding total energy')
+            logging.warning('Desired simulations not given, finding total energy')
 
     def read(self, output_data_filename):
         """read from file
@@ -385,16 +385,16 @@ class QeFileIoDataManager():
         mapping = []
         i = 0
         for dataset in pcs:
-              for particle in dataset.iter_particles():
-                    particle_list.append(particle)
-                    mapentry = [dataset.name, particle, i]
-                    mapping.append(mapentry)
-                    i += 1
+            for particle in dataset.iter_particles():
+                particle_list.append(particle)
+                mapentry = [dataset.name, particle, i]
+                mapping.append(mapentry)
+                i += 1
         if len(particle_list):
             self.mapping = mapping
 
-    def _single_pc_to_pcs(self,pcs):
-        pcs={} # dict of pcs
+    def _single_pc_to_pcs(self, pcs):
+        pcs = {}  # dict of pcs
         for entry in self.mapping:
             pc_name = entry[0]
             particle = entry[1]
@@ -413,7 +413,7 @@ class QeFileIoDataManager():
             else:
                 pcs[pc_name] = Particles(pc_name)
                 pcs[pc_name].add_particles([particle])
-                #check if list needed
+                # check if list needed
 
     def _read_espresso_output_file_old(self, file_name):
         '''
@@ -637,10 +637,10 @@ class QeFileIoDataManager():
         return names
 
     def _check_bounds(self):
-        maxima = [0,0,0]
+        maxima = [0, 0, 0]
         for name, pc in self._pc_cache.iteritems():
             for particle in pc.iter_particles():
-                for d in range(0, 3):  # 3 dimensions, needs to be more general?
+                for d in range(0, 3):  # 3 dimensions, needs to be general?
                     maxima[d] = max(maxima[d],particle.coordinates[d])
 #                    logging.debug('p:{0},{1},{2} m:{3},{4},{5}'
 #                    .format(particle.coordinates[0],particle.coordinates[1],
@@ -651,12 +651,12 @@ class QeFileIoDataManager():
                 newbound = maxima[d]*self.celldm_margin
                 logging.warning(
                     'celldm[{0}]={1} smaller than max {2}, setting to {3}'
-                                .format(d,self.celldm[d],maxima[d],newbound ))
+                                .format(d, self.celldm[d], maxima[d], newbound))
                 self.celldm[d] = newbound
 
     def _combine_datasets(self):
         self.combined_dataset = Particles('quantumEspresso combined particles')
-#clear out combined dataset
+# clear out combined dataset
         for p in self.combined_dataset.iter_particles():
             self.combined_dataset.remove_particles()
 
@@ -665,17 +665,17 @@ class QeFileIoDataManager():
             particles = pc.iter_particles
             self.combined_dataset.add_particles(particles)
 
-    def _write_espresso_input_file(self, file_name,dataset_name = None):
+    def _write_espresso_input_file(self, file_name, dataset_name = None):
         """
         :param file_name: name of the input file to write
         :return:
         """
-        SP = self.SP
-        #todo  - combine datasets here
+#        SP = self.SP
+        # todo  - combine datasets here
         self.combined_dataset
-        if dataset_name is  None:
+        if dataset_name is None:
             dataset_name = self.get_dataset_names()[0]
-        #todo  - combine datasets here
+        # todo  - combine datasets here
         pc = self.get_data(dataset_name)
         self._check_bounds()
 #        SD = self.SD
@@ -715,8 +715,8 @@ class QeFileIoDataManager():
                     line = '\t outdir=\'' + str(self.output_directory) + '\'\n'
                     f.write(line)
                 if hasattr(self, 'etot_convergence_threshold'):
-                    line = '\t etot_conv_thr=' + str(self.etot_convergence_threshold) \
-                           + '\n'
+                    line = '\t etot_conv_thr=' + \
+                           str(self.etot_convergence_threshold) + '\n'
                     f.write(line)
                 if hasattr(self, 'force_convergence_threshold'):
                     line = '\t forc_conv_thr=' + str(self.force_convergence_threshold) \
