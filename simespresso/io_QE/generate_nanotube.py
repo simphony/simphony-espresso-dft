@@ -1,4 +1,26 @@
 __author__ = 'jeremy'
+import scipy.optimize
+import numpy as np
+
+def generate_polyhedral_nanotube(m,n):
+    initial_value = 0
+#    scipy.optimize.minimize(fun, x0, args=(), method=None, jac=None, hess=None, hessp=None, bounds=None, constraints=(), tol=None, callback=None, options=None)
+    x = scipy.optimize.newton(test_eqn,initial_value,args=(m,n))
+    print('x {} f(x) {}'.format(x,test_eqn(x,m,n)))
+    x = scipy.optimize.newton(phi_transcedental,initial_value,args=(m,n))
+    print('x {} f(x) {}'.format(x,phi_transcedental(x,m,n)))
+
+def test_eqn(x,m,n):
+    print('x {} m {} n {}'.format(x,m,n))
+    y = m*x**2+n*x+1
+    return y
+
+def phi_transcedental(phi,m,n):
+    print('phi {} m {} n {}'.format(phi,m,n))
+    ksi = (n*phi - np.pi)/m
+    x = (n**2 - m**2)*(np.sin(ksi+phi)**2)-n*(n+2*m)*(np.sin(ksi))**2+m*(2*n+m)*(np.sin(phi))**2
+    return x
+
 def generate_nanotube_xyz(type = 'armchair'):
     #coords from http://turin.nss.udel.edu/research/tubegenonline.html
     if type == 'armchair':
