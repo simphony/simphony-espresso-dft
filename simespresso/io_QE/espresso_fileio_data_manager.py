@@ -650,7 +650,7 @@ class QeFileIoDataManager():
             if self.celldm[d] < maxima[d]:
                 newbound = maxima[d]*self.celldm_margin
                 logging.warning(
-                    'celldm[{0}]={1} smaller than max {2}, setting to {3}'.format(
+                    'celldm[{0}]={1} < max {2}, setting to {3}'.format(
                         d, self.celldm[d], maxima[d], newbound))
                 self.celldm[d] = newbound
 
@@ -781,13 +781,14 @@ class QeFileIoDataManager():
                            str(self.mixing_beta) + '\n'
                     f.write(line)
                 if hasattr(self, 'convergence_threshold'):
-                    logging.debug('conv thresh:' + \
+                    logging.debug('conv thresh:' +
                                   str(self.convergence_threshold))
                     logdecimal = math.log10(self.convergence_threshold)
                     base = 10 ** (logdecimal - int(logdecimal))
                     logging.debug('exp:'+str(logdecimal))
                     logging.debug('base:'+str(base))
-                    line = '\t conv_thr=' + str(base)+'d'+str(int(logdecimal))+ '\n'
+                    line = '\t conv_thr=' + str(base)+'d' + \
+                           str(int(logdecimal)) + '\n'
                     f.write(line)
                 line = '/\n'
                 f.write(line)
@@ -808,7 +809,8 @@ class QeFileIoDataManager():
                 line = 'ATOMIC_SPECIES\n'
                 f.write(line)
                 # C 12.0107 06-C.GGA.fhi.UPF
-                potential_file = self._wrapper.SP_extension['PSEUDO_POTENTIAL']
+                potential_file = \
+                    self._wrapper.SP_extension['PSEUDO_POTENTIAL']
 #                potential_file = self.SP_extension['PSEUDO_POTENTIAL']
                 for atomtype in self._what_atom_types():
                     # todo - take care of possible isotopes - same atom, different mass
@@ -833,10 +835,10 @@ class QeFileIoDataManager():
                 line = 'K_POINTS ' + str(sampling_mode) + '\n'
                 f.write(line)
 
-                #figure out how to write this into input.pw
+# figure out how to write this into input.pw
 #                line = 'K_POINTS ' + \
- #                      str(self.k_points_mode) + '\n'
-  #              f.write(line)
+#                      str(self.k_points_mode) + '\n'
+#              f.write(line)
 
 #                if hasattr(self,'CM_extension[qeCUBAExtension.K_POINT_SAMPLING]'):
                 kpoints = self.CM_extension['K_POINT_SAMPLING']
@@ -849,19 +851,18 @@ class QeFileIoDataManager():
                 f.write(line)
                 line = '\n'
                 f.write(line)
-
-
                 # ATOMIC POSITIONS
                 # this will apparently always be angstroms iiuc - jr
-                line = 'ATOMIC_POSITIONS ' + '(' + str(self.position_units) + ')'+'\n'
+                line = 'ATOMIC_POSITIONS ' + '(' + str(self.position_units) \
+                       + ')'+'\n'
                 f.write(line)
 
                 multiplier = 10.0 ** 10
                 multiplier = 1.0
                 # QE wants coords. in Angstroms
                 atom_index = 0
-                #make sure this is correct - new link bet file lines and particles
-                #with every file write
+                # make sure this is correct - new link bet file lines and particles
+                # with every file write
                 self._qe_id = []
                 for particle in pc.iter_particles():
                     atom_type = particle.data
@@ -873,10 +874,11 @@ class QeFileIoDataManager():
                         str(multiplier * particle.coordinates[0]) + ' ' + \
                         str(multiplier * particle.coordinates[1]) + ' ' + \
                         str(multiplier * particle.coordinates[2]) + '\n'
-                    #the qe_id is an ordered list of particles
+                    # the qe_id is an ordered list of particles
                     self._qe_id.append(particle.uid)
                     atom_index = atom_index +1
-                    logging.debug('wrote particle {0} with uid {1}'.format(atom_index,particle.uid))
+                    logging.debug('wrote particle {0} with uid {1}'.format(
+                        atom_index,particle.uid))
                     f.write(line)
         except:
             ('error in write block of write_espresso_input_file')
@@ -994,7 +996,7 @@ class QeFileIoDataManager():
                         print('reading atomic positions')
                         values = line.split()
                         self.process_atomic_positions(file_iter,
-                                                           units=values[1])
+                                                      units=values[1])
                         #  take out pc and use self.PC
                     break
 
@@ -1021,14 +1023,15 @@ class QeFileIoDataManager():
                 while line is not None:
                     line_number += 1
 #                    logging.debug('read line {0}:{1}'.format(line_number,line))
-                    if  'total energy' in line and '=' in line and 'Ry' in line:
+                    if  'total energy' in line and '=' in line \
+                            and 'Ry' in line:
                        #got final energy line
                         got_energy = True
                         parts = line.split()
                        # find index of '=' sign
                         ind = [i for i in range(len(parts)) if parts[i] == '=']
                         total_energy = parts[ind[0]+1] # get element after = sign
- #                       logging.debug('tparts:' + str(parts)+' ind:'+str(ind))
+#                       logging.debug('tparts:' + str(parts)+' ind:'+str(ind))
 #                        logging.debug('tot energy:' + str(total_energy))
                         line2 = file_iter.next()
                         line3 = file_iter.next()
