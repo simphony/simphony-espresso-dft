@@ -32,10 +32,10 @@ class QeFileIoDataManager():
     def __init__(self, wrapper):
         self._wrapper = wrapper
         self.SP = wrapper.SP  # (Governing Equations)
-        self.SD = wrapper.SD  #DataContainer()  System Material Description
+        self.SD = wrapper.SD  # DataContainer()  System Material Description
 # and  State Data including Boundaries (not conditions)
         self.BC = wrapper.BC  # DataContainer()  # Boundary conditions
-        self.CM = wrapper.CM  #DataContainer()  # Computational Methods
+        self.CM = wrapper.CM  # DataContainer()  # Computational Methods
         self.SP_extension = wrapper.SP_extension
         self.SP_extension['PSEUDO_POTENTIAL'] = 'tests/06-C.GGA.fhi.UPF'
         self.SP_extension['KERNEL_TABLE'] = 'tests/vdW_kernel_table'
@@ -69,11 +69,11 @@ class QeFileIoDataManager():
         self.SP_extension = {}
 
         self.datasets = {}
-        self.combined_dataset= None
-            #was a DC
+        self.combined_dataset = None
+# was a DC
 
-        #data for running qe
-        #control
+# data for running qe
+# control
         self.calculation_type = 'scf'
         self.restart_mode = 'from_scratch'
 
@@ -88,16 +88,13 @@ class QeFileIoDataManager():
         self.output_directory = './'
 
 # system
-        self.celldm = [5, 5, 5]  #This should  come from lattice vectors
-        self.celldm_margin = 3  #if no valid clldm given, go this far past edge
+        self.celldm = [5, 5, 5]  # This should  come from lattice vectors
+        self.celldm_margin = 3  # if no valid clldm given, go this far past edge
 # if the user only specificies atom positions, what should this be
-        self.ibrav = 8  #this should also be defined in cuba
-        self.n_atom_types = 0 #comes from pc
-        self.ecutwfc = 60.0  #find reasonable default
-        self.ecutrho = 240 #find reasonable default
-
-
-
+        self.ibrav = 8  # this should also be defined in cuba
+        self.n_atom_types = 0 # comes from pc
+        self.ecutwfc = 60.0  # find reasonable default
+        self.ecutrho = 240 # find reasonable default
 # electrons
         self.mixing_mode = 'local-TF'
         self.mixing_beta = 0.8 # good default?
@@ -107,14 +104,12 @@ class QeFileIoDataManager():
         self.max_iterations = 200
 
 # other info
-        self.position_units ="angstrom"
-        self.input_pwname="input.pw"
-        self.output_filename="qe_output"
-        self.path_to_espresso='pw.x'
-        self.mpi=True
+        self.position_units = "angstrom"
+        self.input_pwname = "input.pw"
+        self.output_filename = "qe_output"
+        self.path_to_espresso = 'pw.x'
+        self.mpi = True
         self.mpi_Nprocessors = max(1,multiprocessing.cpu_count() -1)
-
-
 
     def get_data(self, uname):
         """Returns data container associated with particle container
@@ -124,8 +119,8 @@ class QeFileIoDataManager():
             non-changing unique name of particles
         """
         return self._pc_cache[uname]
-        #is this necessarily a datacontainer or is a PC ok
-        #return DataContainer(self._pc_cache[uname].data)
+        # is this necessarily a datacontainer or is a PC ok
+        # return DataContainer(self._pc_cache[uname].data)
 
     def set_data(self, data, uname):
         """Sets data container associated with particle container
@@ -210,14 +205,14 @@ class QeFileIoDataManager():
             _filter_unsupported_data(iterable, self._supported_cuba))
 
     def add_particles(self, pc):
-#    def add_particles(self, iterable, uname):
+# def add_particles(self, iterable, uname):
         """Add particles
         """
-    #unclear to me what this line from lammps was doing
-#        uids = self._pc_cache[uname].add_particles(iterable)
+# unclear to me what this line from lammps was doing
+# uids = self._pc_cache[uname].add_particles(iterable)
 
         self._pc_cache[pc.name] = pc
-        # filter the cached particles of unsupported CUBA
+# filter the cached particles of unsupported CUBA
 # todo implement this filter
       #  self._pc_cache[pc.uname].update_particles(_filter_unsupported_data(
       #      self._pc_cache[uname].iter_particles(uids), self._supported_cuba))
@@ -272,7 +267,7 @@ class QeFileIoDataManager():
         Parameters
         ----------
         input_data_filename :
-            name of data-file where inform is written to (i.e espresso's input).
+            name of data-file where inform is written to (espresso's input).
         """
         if self._pc_cache:
             self._write_data_file(input_data_filename)
@@ -284,11 +279,11 @@ class QeFileIoDataManager():
         # (i.e. someone has deleted all the particles)
 
         if 'DESIRED_SIMULATIONS' in self._wrapper.CM_extension:
-            if 'CHARGE_DENSITY' in self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
+            if 'CHARGE_DENSITY' in \
+                    self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
                 #write a 'pp' file
                 pp_filename = input_data_filename + '.pp'
                 self._write_espresso_pp_file(ppfilename=pp_filename)
-
         else:
             logging.warning('Desired simulations not indicated, finding just total energy')
 
@@ -306,22 +301,17 @@ class QeFileIoDataManager():
         """read from file and update cache
         """
         assert os.path.isfile(data_filename)
-
-
         self._read_espresso_input_file(data_filename)
-
         atoms = self.pc
         number_atom_types = self.n_atom_types
         #velocities = handler.get_velocities()
         masses = self.masses
 
-
         type_data = {}
-
         for atom_type in range(1, number_atom_types+1):
             type_data[atom_type] = DataContainer()
 
-#the mass is stored in the pc
+# the mass is stored in the pc
 #        for atom_type, mass in masses.iteritems():
 #            type_data[atom_type][CUBA.MASS] = mass
 
@@ -337,10 +327,10 @@ class QeFileIoDataManager():
             cache_pc = self._pc_cache[uname]
             p = cache_pc.get_particle(uid)
 #            p.coordinates, p.data = interpreter.convert_atom_values(values)
-            #get coordinates
+            # get coordinates
 
-        p.coordinates = []  ##TODO check what is expected here
-        p.data = []  ##TODO check what is expected here
+        p.coordinates = []  # TODO check what is expected here
+        p.data = []  # TODO check what is expected here
 
         for particle in self.pc.iter_particles():
             atom_type = particle.data
@@ -352,7 +342,7 @@ class QeFileIoDataManager():
 
             # TODO #9 (removing material type
 #            atom_type = p.data[CUBA.MATERIAL_TYPE]
- #           del p.data[CUBA.MATERIAL_TYPE]
+#           del p.data[CUBA.MATERIAL_TYPE]
 
             # set the pc's material type
             # (current requirement/assumption is that each
@@ -399,7 +389,7 @@ class QeFileIoDataManager():
               for particle in dataset.iter_particles():
 #                    particle_copy=copy.deepcopy(particle)
                     particle_list.append(particle)
-                    mapentry = [dataset.name,particle,i]
+                    mapentry = [dataset.name, particle, i]
                     mapping.append(mapentry)
                     i += 1
         if len(particle_list):

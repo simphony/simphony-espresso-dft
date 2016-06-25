@@ -158,7 +158,7 @@ class QeWrapper(ABCModelingEngine):
                 log_directory=temp_dir)
             process.run(input_data_filename, output_data_filename, BC, CM, SP)
 
-            # after running, we read any changes from lammps
+# after running, we read any changes from lammps
             self._data_manager._read_espresso_output_file(output_data_filename)
 
 
@@ -177,5 +177,5 @@ def _combine(data_container, data_container_extension):
         CUBA key-values
     """
     result = dict(data_container_extension)
-    result.update(data_container)  #combines result,data_container to 1 dict
+    result.update(data_container)  # combines result,data_container to 1 dict
     return result
