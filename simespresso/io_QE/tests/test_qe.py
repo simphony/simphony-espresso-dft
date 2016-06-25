@@ -1,4 +1,3 @@
-__author__ = 'jeremy'
 import os
 import unittest
 from simespresso.io_QE import qe_file_io

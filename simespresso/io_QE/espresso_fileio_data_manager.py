@@ -822,8 +822,8 @@ class QeFileIoDataManager():
                         logging.warning('could not find mass of particle:' +
                                         str(atomtype))
                         continue
-                    line = atomtype + ' ' + \
-                           str(mass)+' ' + potential_file + '\n'
+                    line = atomtype + ' ' + str(mass)\
+                    line = line + ' ' + potential_file + '\n'
                     logging.debug(line)
                     f.write(line)
                 line = '\n'
@@ -868,10 +868,13 @@ class QeFileIoDataManager():
                     atom = atom_type[CUBA.CHEMICAL_SPECIE][0]
                     logging.debug('atom:' + str(atom) +
                                   ' data:' + str(atom_type) + ' ')
-                    line = str(atom) + ' ' + \
-                           str(multiplier * particle.coordinates[0]) + ' ' + \
-                           str(multiplier * particle.coordinates[1]) + ' ' + \
-                           str(multiplier * particle.coordinates[2]) + '\n'
+                    line = str(atom) + ' '
+                    line = line + str(multiplier * particle.coordinates[0])
+                    line = line + ' '
+                    line = line + str(multiplier * particle.coordinates[1])
+                    line = line + ' '
+                    line = line + str(multiplier * particle.coordinates[2])
+                    line = line + '\n'
                     # the qe_id is an ordered list of particles
                     self._qe_id.append(particle.uid)
                     atom_index = atom_index + 1
@@ -1184,7 +1187,7 @@ class QeFileIoDataManager():
                 self.SP[CUBA.MASS].append(mass)
                 self.potential_file_dictionary[atomtype] = values[2]
                 self.masses_dictionary[atomtype] = mass
-##                logging.debug('atomtype {0} mass {1} pot.file.dict {2} massdict {3}'.format(
+#               logging.debug('atomtype {0} mass {1} pot.file.dict {2} massdict {3}'.format(
 #                    atomtype, mass, self.potential_file_dictionary,
 #                    self.masses_dictionary))
             line = f.next()

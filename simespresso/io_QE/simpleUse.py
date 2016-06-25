@@ -46,8 +46,8 @@ for i in range(1, n_steps+1):
     wrapper.BC_extension['BOX_FACES'] = \
         ["periodic", "periodic", "periodic"]
     wrapper.add_dataset(pc)
-#wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
-    wrapper.SP_extension['PSEUDO_POTENTIAL'] ='Cu.pz-d-hgh.UPF'
+# wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
+    wrapper.SP_extension['PSEUDO_POTENTIAL'] = 'Cu.pz-d-hgh.UPF'
 # good for now, this is a standard pseudopotential,
 # later we shall have a better way (actually we have it now
 # but not implemented yet)
@@ -63,17 +63,18 @@ for i in range(1, n_steps+1):
     print('checking particles:')
     for particle in extracted_pc.iter_particles():
         print('particle:'+str(particle))
-# etot = extracted_pc.data_extension[qeCUBAExtension.TOTAL_ENERGY] # should print the tot eng
+# etot = extracted_pc.data_extension[qeCUBAExtension.TOTAL_ENERGY]
     etot = 0
     if 'TOTAL_ENERGY' in extracted_pc.data_extension:
-        etot = extracted_pc.data_extension['TOTAL_ENERGY'] # should print the tot eng
+        etot = extracted_pc.data_extension['TOTAL_ENERGY'] # tot eng
         print('tot energy:'+str(etot))
     else:
-	print('tot energy not found')
+    print('tot energy not found')
     total_energies.append(etot)
 
-plt.plot(distances,total_energies,'ko-')
-plt.title('Tot energy v. dist for Cu-Cu ({0})'.format(wrapper.SP_extension['PSEUDO_POTENTIAL']))
+plt.plot(distances,total_energies, 'ko-')
+plt.title('Tot energy v. dist for Cu-Cu ({0})'.format(
+    wrapper.SP_extension['PSEUDO_POTENTIAL']))
 plt.ylabel('Tot. energy (Rydberg)')
 plt.xlabel('Cu-Cu distance (Angstrom)')
 plt.savefig('Cu-Cu.jpg')

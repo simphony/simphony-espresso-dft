@@ -94,7 +94,8 @@ class QeProcess(object):
 #            self._write_espresso_pp_file(ppfilename=pp_filename)
 
         if 'DESIRED_SIMULATIONS' in self._datahandler._wrapper.CM_extension:
-            if 'CHARGE_DENSITY' in self._datahandler._wrapper.CM_extension['DESIRED_SIMULATIONS']:
+            x = self._datahandler._wrapper
+            if 'CHARGE_DENSITY' in x.CM_extension['DESIRED_SIMULATIONS']:
                 logging.debug('doing postprocessing simulation')
                 pp_filename = input_data_file + '.pp'
                 command = ' pp.x < ' + pp_filename + '  > pp.out '
