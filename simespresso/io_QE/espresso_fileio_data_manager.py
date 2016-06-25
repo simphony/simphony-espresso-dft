@@ -822,7 +822,7 @@ class QeFileIoDataManager():
                         logging.warning('could not find mass of particle:' +
                                         str(atomtype))
                         continue
-                    line = atomtype + ' ' + str(mass)\
+                    line = atomtype + ' ' + str(mass)
                     line = line + ' ' + potential_file + '\n'
                     logging.debug(line)
                     f.write(line)
@@ -1187,7 +1187,8 @@ class QeFileIoDataManager():
                 self.SP[CUBA.MASS].append(mass)
                 self.potential_file_dictionary[atomtype] = values[2]
                 self.masses_dictionary[atomtype] = mass
-#               logging.debug('atomtype {0} mass {1} pot.file.dict {2} massdict {3}'.format(
+#               logging.debug('atomtype {0} mass {1} pot.file.dict
+# {2} massdict {3}'.format(
 #                    atomtype, mass, self.potential_file_dictionary,
 #                    self.masses_dictionary))
             line = f.next()
