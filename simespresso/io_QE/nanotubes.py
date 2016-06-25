@@ -26,7 +26,7 @@ wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
 wrapper.CM_extension['DESIRED_SIMULATIONS'] = \
     ['TOTAL_ENERGY', 'CHARGE_DENSITY']
 wrapper.run()
-extracted_pc = wrapper.get_dataset("Copper")
+extracted_pc = wrapper.get_dataset("Carbon")
 print('checking particles:')
 for particle in extracted_pc.iter_particles():
     print('particle:'+str(particle))
