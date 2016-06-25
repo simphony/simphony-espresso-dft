@@ -6,7 +6,6 @@ import numpy as np
 from enum import Enum
 import multiprocessing
 
-from simphony.cuds.abc_particles import ABCParticles
 from simphony.cuds.lattice import Lattice
 from simphony.core.cuba import CUBA
 from qeCubaExtensions import qeCUBAExtension
@@ -31,28 +30,16 @@ class QeFileIoDataManager():
     queried and to be changed.
     """
     def __init__(self,wrapper):
-#   what was this doing in lammps?
-#        super(QeFileIoDataManager, self).__init__()
-        # map from qe-id to simphony-uid
-        #this is necessary in order to pass info back up to the wrapper
-        #only values from there should be used, as the user will be
-        #manipulating those
         self._wrapper = wrapper
-        self.SP = wrapper.SP #DataContainer()  # System Model Equations and Material
-        # relations (Governing Equations)
-        self.SD = wrapper.SD #DataContainer()  # System Material Description and
-        # State Data including Boundaries (not conditions)
+        self.SP = wrapper.SP # (Governing Equations)
+        self.SD = wrapper.SD #DataContainer()  # System Material Description
+        # and  State Data including Boundaries (not conditions)
         self.BC =wrapper.BC # DataContainer()  # Boundary conditions
         self.CM = wrapper.CM #DataContainer()  # Computational Methods
         self.SP_extension = wrapper.SP_extension
-#        self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09' #default
-        self.SP_extension['PSEUDO_POTENTIAL'] = 'tests/06-C.GGA.fhi.UPF' #default
-        self.SP_extension['KERNEL_TABLE'] = 'tests/vdW_kernel_table' #default
-#default values
+        self.SP_extension['PSEUDO_POTENTIAL'] = 'tests/06-C.GGA.fhi.UPF'
+        self.SP_extension['KERNEL_TABLE'] = 'tests/vdW_kernel_table'
         self.CM_extension = wrapper.CM_extension
-        #the simphony method allows for two keys w. same name.,...
-#        self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING_METHOD] =  "automatic"
- #       self.CM_extension[qeCUBAExtension.K_POINT_SAMPLING] = [5, 5, 5, 0, 0, 0]
 
         #simphony suba extensions allow same kw twice
 #        self.CM_extension['K_POINT_SAMPLING_METHOD'] =  "automatic"

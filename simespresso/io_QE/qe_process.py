@@ -7,7 +7,7 @@ import sys
 import subprocess
 import logging
 
-#from simespresso.io_QE.qe_file_io import  QeDataHandler
+
 
 
 class QeProcess(object):
@@ -34,24 +34,23 @@ class QeProcess(object):
             self._log = 'log.qe'
 
         # see if qe can be started !
-#        logging.debug('exe {0} which exe {1}'.format(self._qe_executable,which(self._qe_executable)))
- #       if not which(self._qe_executable):
-  #          logging.debug('no path to espresso')
-   #         raise ValueError(
-    #            'espresso command not found (looking for '
-     #                       + self._qe_executable+')')
+        #logging.debug('exe {0} which exe {1}'.format(self._qe_executable,which(self._qe_executable)))
+        #if not which(self._qe_executable):
+        #    logging.debug('no path to espresso')
+        #    raise ValueError(
+        #    'espresso command not found (looking for '
+        #    + self._qe_executable+')')
 
-#            self.run("pw.x")
-#        except Exception:
- #           msg = "quantum espresso could not be started."
-  #          if self._returncode == 127:
-   #             msg += " executable '{}' was not found.".format(qe_executable)
-    #        else:
-     #           msg += " stdout/err: " + self._stdout + " " + self._stderr
-      #      raise RuntimeError(msg)
+        #self.run("pw.x")
+        #except Exception:
+        #msg = "quantum espresso could not be started."
+        #if self._returncode == 127:
+        #    msg += " executable '{}' was not found.".format(qe_executable)
+        #else:
+        #    msg += " stdout/err: " + self._stdout + " " + self._stderr
+        #raise RuntimeError(msg)
 
-    def run(self,
-                input_data_file,output_data_file,BC,CM,SP):
+    def run(self,input_data_file,output_data_file,BC,CM,SP):
         """Run engine with a set of commands
         Parameters
         ----------
@@ -64,10 +63,6 @@ class QeProcess(object):
         """
         logging.debug('starting qe engine')
         logging.debug('path to espresso:'+self._qe_executable)
-
-# taken care of in flush
- #       self._datahandler.write_espresso_input_file(input_data_file)
- #       if self._datahandler.wrapper
 
         if self._datahandler.mpi:
             command = 'mpirun -np ' + str(self._datahandler.mpi_Nprocessors) + ' ' + \

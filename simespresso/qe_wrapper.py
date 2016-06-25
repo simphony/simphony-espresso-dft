@@ -3,16 +3,13 @@ This module provides a wrapper for  quantum-espresso
 """
 import contextlib
 import os
-import shutil
 import tempfile
 
 from simphony.core.data_container import DataContainer
 from simphony.cuds.abc_modeling_engine import ABCModelingEngine
 from simphony.cuds.abc_particles import ABCParticles
-
 from simespresso.io_QE.espresso_fileio_data_manager import QeFileIoDataManager
 from simespresso.io_QE.qe_process import QeProcess
-#from qeCubaExtensions import qeCUBAExtension
 
 import logging
 
@@ -42,13 +39,10 @@ class QeWrapper(ABCModelingEngine):
         self.SP = DataContainer()
         self.SD = DataContainer()
         self.CM_extension = {}  #defaults below
-
         self.SP_extension = {}
-        #self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09' #default
-
+        #self.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'vdw-df-c09'
         self.BC_extension = {}
         self._data_manager = QeFileIoDataManager(self)
-
 
     def add_dataset(self, container):
         """Add a CUDS container
@@ -155,17 +149,9 @@ class QeWrapper(ABCModelingEngine):
             # before running, we flush any changes
             self._data_manager.flush(input_data_filename)
 
-#            commands = self._script_writer.get_configuration(
- #               input_data_file=input_data_filename,
-  #              output_data_file=output_data_filename,
-   #             BC=_combine(self.BC, self.BC_extension),
-    #            CM=_combine(self.CM, self.CM_extension),
-     #           SP=_combine(self.SP, self.SP_extension))
-
             BC=_combine(self.BC, self.BC_extension)
             CM=_combine(self.CM, self.CM_extension)
             SP=_combine(self.SP, self.SP_extension)
-
 
             process = QeProcess(self._data_manager, qe_executable=self._executable_name,
                                     log_directory=temp_dir)
@@ -173,8 +159,6 @@ class QeWrapper(ABCModelingEngine):
 
             # after running, we read any changes from lammps
             self._data_manager._read_espresso_output_file(output_data_filename)
-    #        self._data_manager._read_densities(n_latticepoints, file_iter, aviz_filename=False):
-
 
 
 def _combine(data_container, data_container_extension):
