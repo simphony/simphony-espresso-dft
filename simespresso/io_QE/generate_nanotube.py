@@ -3,17 +3,22 @@ import scipy.optimize
 import numpy as np
 
 def generate_polyhedral_nanotube(m,n):
-    initial_value = 0
+    initial_value = np.pi*(2*n+m)/(2*(n**2+n*m+m**2))
 #    scipy.optimize.minimize(fun, x0, args=(), method=None, jac=None, hess=None, hessp=None, bounds=None, constraints=(), tol=None, callback=None, options=None)
     x = scipy.optimize.newton(test_eqn,initial_value,args=(m,n))
     print('x {} f(x) {}'.format(x,test_eqn(x,m,n)))
     x = scipy.optimize.newton(phi_transcedental,initial_value,args=(m,n))
-    print('x {} f(x) {}'.format(x,phi_transcedental(x,m,n)))
+    print('x {} f(x) {} ok? {}'.format(x,phi_transcedental(x,m,n),check_bounds(m,n,x)))
+    print('soln x {} f(x) {} ok? {}'.format(x,phi_transcedental(x,m,n)))
 
 def test_eqn(x,m,n):
     print('x {} m {} n {}'.format(x,m,n))
     y = m*x**2+n*x+1
     return y
+
+def check_bounds(m,n,phi):
+    ok = np.pi/(n+m)<phi and phi < np.pi/n
+    return ok
 
 def phi_transcedental(phi,m,n):
     print('phi {} m {} n {}'.format(phi,m,n))
