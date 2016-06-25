@@ -3,6 +3,7 @@ import abc
 
 from simespresso.qe_particles import QeParticles
 
+
 class ABCDataManager(object):
     """  Class managing qe data
     The class performs communicating the data to and from qe. The
