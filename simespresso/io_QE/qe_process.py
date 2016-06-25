@@ -64,8 +64,9 @@ class QeProcess(object):
         logging.debug('path to espresso:'+self._qe_executable)
 
         if self._datahandler.mpi:
-            command = 'mpirun -np ' + str(self._datahandler.mpi_Nprocessors) + ' ' + \
-                     self._qe_executable + ' < ' + input_data_file + ' > ' \
+            command = 'mpirun -np ' + str(
+                self._datahandler.mpi_Nprocessors) + ' ' + \
+                      self._qe_executable + ' < ' + input_data_file + ' > ' \
                       + output_data_file
         else:
             command = self._qe_executable + ' < ' + input_data_file + ' > ' \
@@ -73,7 +74,7 @@ class QeProcess(object):
         logging.debug('attempting to run command: ' + command)
         try:
 #            subprocess.check_call(command, shell=True,
- #               stdout=subprocess.PIPE).stdout.read()
+#               stdout=subprocess.PIPE).stdout.read()
 
             subprocess.Popen(command, shell=True,
                              stdout=subprocess.PIPE).stdout.read()
@@ -86,10 +87,10 @@ class QeProcess(object):
 
 
 #                if 'DESIRED_SIMULATIONS' in self._wrapper.CM_extension:
- #           if 'CHARGE_DENSITY' in self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
-  #              #write a 'pp' file
-   #             pp_filename = input_data_filename + '.pp'
-    #            self._write_espresso_pp_file(ppfilename=pp_filename)
+#           if 'CHARGE_DENSITY' in self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
+#              #write a 'pp' file
+#             pp_filename = input_data_filename + '.pp'
+#            self._write_espresso_pp_file(ppfilename=pp_filename)
 
         if 'DESIRED_SIMULATIONS' in self._datahandler._wrapper.CM_extension:
             if 'CHARGE_DENSITY' in self._datahandler._wrapper.CM_extension['DESIRED_SIMULATIONS']:
@@ -100,8 +101,8 @@ class QeProcess(object):
 
                 logging.debug('attempting to run command: ' + command)
                 try:
-        #            subprocess.check_call(command, shell=True,
-         #               stdout=subprocess.PIPE).stdout.read()
+#            subprocess.check_call(command, shell=True,
+#               stdout=subprocess.PIPE).stdout.read()
 
                     subprocess.Popen(command, shell=True,
                                      stdout=subprocess.PIPE).stdout.read()
