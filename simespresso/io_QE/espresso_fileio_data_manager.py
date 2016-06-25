@@ -110,6 +110,7 @@ class QeFileIoDataManager():
         self.path_to_espresso = 'pw.x'
         self.mpi = True
         self.mpi_Nprocessors = max(1, multiprocessing.cpu_count() - 1)
+        self.mpi_Nprocessors = 10
 
     def get_data(self, uname):
         """Returns data container associated with particle container
