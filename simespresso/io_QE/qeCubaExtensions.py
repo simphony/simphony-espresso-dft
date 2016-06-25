@@ -73,4 +73,4 @@ class qeCUBAExtension(Enum):
     K_POINT_SAMPLING = "K_POINT_SAMPLING"
     TOTAL_ENERGY = "TOTAL_ENERGY"
 
-    #add 'extra results field with total energy, iter, delta E
+    # add 'extra results field with total energy, iter, delta E

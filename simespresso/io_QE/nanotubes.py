@@ -23,7 +23,8 @@ wrapper.add_dataset(pc)
 wrapper.SP_extension['PSEUDO_POTENTIAL'] = 'Cu.pz-d-hgh.UPF'
 wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
 wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
-wrapper.CM_extension['DESIRED_SIMULATIONS'] = ['TOTAL_ENERGY', 'CHARGE_DENSITY']
+wrapper.CM_extension['DESIRED_SIMULATIONS'] = \
+    ['TOTAL_ENERGY', 'CHARGE_DENSITY']
 wrapper.run()
 extracted_pc = wrapper.get_dataset("Copper")
 print('checking particles:')

@@ -822,8 +822,8 @@ class QeFileIoDataManager():
                         logging.warning('could not find mass of particle:' +
                                         str(atomtype))
                         continue
-                    line = atomtype + ' ' + str(mass)+' ' + \
-                           potential_file + '\n'
+                    line = atomtype + ' ' + \
+                           str(mass)+' ' + potential_file + '\n'
                     logging.debug(line)
                     f.write(line)
                 line = '\n'
@@ -866,15 +866,15 @@ class QeFileIoDataManager():
                     atom_type = particle.data
                     #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
                     atom = atom_type[CUBA.CHEMICAL_SPECIE][0]
-                    logging.debug('atom:' + str(atom) + ' data:' +
-                          str(atom_type) + ' ')
+                    logging.debug('atom:' + str(atom) +
+                                  ' data:' + str(atom_type) + ' ')
                     line = str(atom) + ' ' + \
                            str(multiplier * particle.coordinates[0]) + ' ' + \
                            str(multiplier * particle.coordinates[1]) + ' ' + \
                            str(multiplier * particle.coordinates[2]) + '\n'
                     # the qe_id is an ordered list of particles
                     self._qe_id.append(particle.uid)
-                    atom_index = atom_index +1
+                    atom_index = atom_index + 1
                     logging.debug('wrote particle {0} with uid {1}'.format(
                         atom_index, particle.uid))
                     f.write(line)
@@ -1026,7 +1026,7 @@ class QeFileIoDataManager():
                         parts = line.split()
                         # find index of '=' sign
                         ind = [i for i in range(len(parts)) if parts[i] == '=']
-                        total_energy = parts[ind[0]+1]  # get element after = sign
+                        total_energy = parts[ind[0]+1]  # get element after =
 #                       logging.debug('tparts:' + str(parts)+' ind:'+str(ind))
 #                       logging.debug('tot energy:' + str(total_energy))
                         line3 = file_iter.next()
@@ -1184,10 +1184,9 @@ class QeFileIoDataManager():
                 self.SP[CUBA.MASS].append(mass)
                 self.potential_file_dictionary[atomtype] = values[2]
                 self.masses_dictionary[atomtype] = mass
-                logging.debug('atomtype {0} mass {1} '
-                              'pot.file.dict {2} massdict {3}'.format(
-                    atomtype, mass, self.potential_file_dictionary,
-                    self.masses_dictionary))
+##                logging.debug('atomtype {0} mass {1} pot.file.dict {2} massdict {3}'.format(
+#                    atomtype, mass, self.potential_file_dictionary,
+#                    self.masses_dictionary))
             line = f.next()
         return line
 
@@ -1240,7 +1239,8 @@ class QeFileIoDataManager():
                 p.data[CUBA.CHEMICAL_SPECIE] = atomtype
                 particle_list.append(p)
                 self._qe_id.append(p.uid)
-                logging.debug('read atom {0} with uid {1}'.format(atom_index, p.uid))
+                logging.debug('read atom {0} with uid {1}'.format(
+                    atom_index, p.uid))
                 try:
                     line = f.next()
                 except StopIteration:
@@ -1387,6 +1387,7 @@ class _ReadState(Enum):
 
 def which(program):
     import os
+
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
@@ -1402,6 +1403,7 @@ def which(program):
                 return exe_file
 
     return None
+
 
 def _filter_unsupported_data(iterable, supported_cuba):
     """Ensure iterators only provide particles with only supported data

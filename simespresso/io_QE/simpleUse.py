@@ -1,7 +1,7 @@
 from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particle, Particles
 import logging
-import  matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from simespresso import qe_wrapper
 from qeCubaExtensions import qeCUBAExtension
 
@@ -31,7 +31,7 @@ for i in range(1, n_steps+1):
     for base_vector in basis:
         position = [component * a_latt for component in base_vector]
         p = Particle(coordinates=position)
-        p.data[CUBA.CHEMICAL_SPECIE] = ['Cu']  # this should be later an enum...
+        p.data[CUBA.CHEMICAL_SPECIE] = ['Cu']  # this should be an enum...
 # like, CUBA.CHEMICAL.ELEMENTS.Cu
         p.data[CUBA.MASS] = 63.546             # this is the atomic mass
         pc.add_particles([p])
@@ -40,30 +40,30 @@ for i in range(1, n_steps+1):
     pc.data_extension = {qeCUBAExtension.BOX_VECTORS: super_cell}
     wrapper = qe_wrapper.QeWrapper()
 # Define the BC component of the SimPhoNy application model:
-#wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
+# wrapper.BC_extension[qeCUBAExtension.BOX_FACES] = ["periodic",
 #                                                       "periodic",
 #                                                      "periodic"]
-    wrapper.BC_extension['BOX_FACES'] = ["periodic",
-                                                            "periodic",
-                                                            "periodic"]
+    wrapper.BC_extension['BOX_FACES'] = \
+        ["periodic", "periodic", "periodic"]
     wrapper.add_dataset(pc)
 #wrapper.SP_extension[qeCUBAExtension.PSEUDO_POTENTIAL] = 'Cu.pz-d-hgh.UPF'
     wrapper.SP_extension['PSEUDO_POTENTIAL'] ='Cu.pz-d-hgh.UPF'
 # good for now, this is a standard pseudopotential,
 # later we shall have a better way (actually we have it now
 # but not implemented yet)
-#wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "Monkhorst-Pack"
+# wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "Monkhorst-Pack"
     wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
     wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
     wrapper.run()
-# the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc within the value of the total energy from the output (log file) of QE
+# the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc
+# within the value of the total energy from the output (log file) of QE
     names = wrapper.get_dataset_names()
     print('dataset names:'+str(names))
     extracted_pc = wrapper.get_dataset("Copper")
     print('checking particles:')
     for particle in extracted_pc.iter_particles():
         print('particle:'+str(particle))
-#etot = extracted_pc.data_extension[qeCUBAExtension.TOTAL_ENERGY] # should print the tot eng
+# etot = extracted_pc.data_extension[qeCUBAExtension.TOTAL_ENERGY] # should print the tot eng
     etot = 0
     if 'TOTAL_ENERGY' in extracted_pc.data_extension:
         etot = extracted_pc.data_extension['TOTAL_ENERGY'] # should print the tot eng

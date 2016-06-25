@@ -73,11 +73,11 @@ class QeProcess(object):
                       + output_data_file
         logging.debug('attempting to run command: ' + command)
         try:
+            subprocess.Popen(command, shell=True,
+                             stdout=subprocess.PIPE).stdout.read()
 #            subprocess.check_call(command, shell=True,
 #               stdout=subprocess.PIPE).stdout.read()
 
-            subprocess.Popen(command, shell=True,
-                             stdout=subprocess.PIPE).stdout.read()
         except:
             e = sys.exc_info()[0]
             logging.debug('espresso command gave error %s' % e)
@@ -87,29 +87,28 @@ class QeProcess(object):
 
 
 #                if 'DESIRED_SIMULATIONS' in self._wrapper.CM_extension:
-#           if 'CHARGE_DENSITY' in self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
+#           if 'CHARGE_DENSITY' in
+# self._wrapper.CM_extension['DESIRED_SIMULATIONS']:
 #              #write a 'pp' file
 #             pp_filename = input_data_filename + '.pp'
 #            self._write_espresso_pp_file(ppfilename=pp_filename)
 
         if 'DESIRED_SIMULATIONS' in self._datahandler._wrapper.CM_extension:
             if 'CHARGE_DENSITY' in self._datahandler._wrapper.CM_extension['DESIRED_SIMULATIONS']:
-                #write a 'pp' file
                 logging.debug('doing postprocessing simulation')
                 pp_filename = input_data_file + '.pp'
-                command = ' pp.x < '+ pp_filename + '  > pp.out '
-
+                command = ' pp.x < ' + pp_filename + '  > pp.out '
                 logging.debug('attempting to run command: ' + command)
                 try:
+                    subprocess.Popen(command, shell=True,
+                                     stdout=subprocess.PIPE).stdout.read()
 #            subprocess.check_call(command, shell=True,
 #               stdout=subprocess.PIPE).stdout.read()
 
-                    subprocess.Popen(command, shell=True,
-                                     stdout=subprocess.PIPE).stdout.read()
                 except:
                     e = sys.exc_info()[0]
-                    logging.debug('espresso postprocess command gave error %s' % e)
-                    raise ValueError('espresso postprocess command gave error %s' % e)
+                    logging.debug('postprocess command gave error %s' % e)
+                    raise ValueError('postproc command gave error %s' % e)
                     exit
                 print('succesful exit from quantum espresso')
 
