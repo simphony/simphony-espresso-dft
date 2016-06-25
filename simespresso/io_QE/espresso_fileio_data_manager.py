@@ -813,24 +813,23 @@ class QeFileIoDataManager():
                     self._wrapper.SP_extension['PSEUDO_POTENTIAL']
 #                potential_file = self.SP_extension['PSEUDO_POTENTIAL']
                 for atomtype in self._what_atom_types():
-                    # todo - take care of possible isotopes - same atom, different mass
                     particle_mass_list = self._get_particle_masses()
                     if atomtype in particle_mass_list:
                         mass = particle_mass_list[atomtype]
-                        logging.debug('mass of {0} is {1}'.format(atomtype, mass))
+                        logging.debug('mass of {0} is {1}'.format(
+                            atomtype, mass))
                     else:
                         logging.warning('could not find mass of particle:' + \
                                         str(atomtype))
                         continue
-                    line = atomtype + ' ' + str(mass)+' ' + potential_file + '\n'
+                    line = atomtype + ' ' + str(mass)+' ' + \
+                           potential_file + '\n'
                     logging.debug(line)
                     f.write(line)
                 line = '\n'
                 f.write(line)
 
                 # K POINTS
-                sampling_mode = 'automatic'
-                sampling_mode = self._wrapper.CM_extension['K_POINT_SAMPLING_METHOD']
                 sampling_mode = self._wrapper.CM_extension['K_POINT_SAMPLING_METHOD']
                 line = 'K_POINTS ' + str(sampling_mode) + '\n'
                 f.write(line)
@@ -861,7 +860,7 @@ class QeFileIoDataManager():
                 multiplier = 1.0
                 # QE wants coords. in Angstroms
                 atom_index = 0
-                # make sure this is correct - new link bet file lines and particles
+                # make sure this is correct - new link bet lines and particles
                 # with every file write
                 self._qe_id = []
                 for particle in pc.iter_particles():
@@ -878,7 +877,7 @@ class QeFileIoDataManager():
                     self._qe_id.append(particle.uid)
                     atom_index = atom_index +1
                     logging.debug('wrote particle {0} with uid {1}'.format(
-                        atom_index,particle.uid))
+                        atom_index, particle.uid))
                     f.write(line)
         except:
             ('error in write block of write_espresso_input_file')
@@ -951,7 +950,6 @@ class QeFileIoDataManager():
         #       BC = DataContainer()   #boundary conditions
         #       CM = DataContainer()   #computational method
         #       SD = DataContainer()  #state data
-        pc = self.pc
         #       dc = DataContainer()
         with open(file_name, 'r') as f:
             line_number = 0
@@ -1022,7 +1020,6 @@ class QeFileIoDataManager():
             try:
                 while line is not None:
                     line_number += 1
-#                    logging.debug('read line {0}:{1}'.format(line_number,line))
                     if  'total energy' in line and '=' in line \
                             and 'Ry' in line:
                        #got final energy line
@@ -1030,14 +1027,14 @@ class QeFileIoDataManager():
                         parts = line.split()
                        # find index of '=' sign
                         ind = [i for i in range(len(parts)) if parts[i] == '=']
-                        total_energy = parts[ind[0]+1] # get element after = sign
+                        total_energy = parts[ind[0]+1]  # get element after = sign
 #                       logging.debug('tparts:' + str(parts)+' ind:'+str(ind))
 #                        logging.debug('tot energy:' + str(total_energy))
-                        line2 = file_iter.next()
                         line3 = file_iter.next()
                         parts = line3.split()
                         estimated_scf_accuracy = parts[4]
- #                       logging.debug('est accuracy:' + str(estimated_scf_accuracy))
+ #                       logging.debug('est accuracy:' +
+ # str(estimated_scf_accuracy))
                         self.tot_energy_Ry = total_energy
                         self._wrapper.tot_energy_Ry = total_energy
                         self.estimated_accuracy_Ry = estimated_scf_accuracy
@@ -1046,7 +1043,8 @@ class QeFileIoDataManager():
                         first_dataset_name = extracted_pc_names[0]
                         first_dataset = self.get_data(first_dataset_name)
                         first_dataset.data_extension['TOTAL_ENERGY'] = total_energy
-                        first_dataset.data_extension[qeCUBAExtension.TOTAL_ENERGY] = total_energy
+                        x = qeCUBAExtension.TOTAL_ENERGY
+                        first_dataset.data_extension[x] = total_energy
                     line = file_iter.next()
             except StopIteration:
                 print('eof reached')
@@ -1185,7 +1183,10 @@ class QeFileIoDataManager():
                 self.SP[CUBA.MASS].append(mass)
                 self.potential_file_dictionary[atomtype] = values[2]
                 self.masses_dictionary[atomtype]=mass
-                logging.debug('atomtype {0} mass {1} pot.file.dict {2} massdict {3}'.format(atomtype,mass, self.potential_file_dictionary,self.masses_dictionary))
+                logging.debug('atomtype {0} mass {1} '
+                              'pot.file.dict {2} massdict {3}'.format(
+                    atomtype, mass, self.potential_file_dictionary,
+                    self.masses_dictionary))
             line = f.next()
         return line
 
@@ -1239,7 +1240,7 @@ class QeFileIoDataManager():
                 p.data[CUBA.CHEMICAL_SPECIE] = atomtype
                 particle_list.append(p)
                 self._qe_id.append(p.uid)
-                logging.debug('read atom {0} with uid {1}'.format(atom_index,p.uid))
+                logging.debug('read atom {0} with uid {1}'.format(atom_index, p.uid))
                 try:
                     line = f.next()
                 except StopIteration:
@@ -1285,24 +1286,24 @@ class QeFileIoDataManager():
                 for particle in pc.iter_particles():
                     atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
                     atomtype = atomtype_list[0]
-                    mass =particle.data[CUBA.MASS]
+                    mass = particle.data[CUBA.MASS]
                     if not atomtype in particle_dict:
-                        particle_dict[atomtype]=mass
+                        particle_dict[atomtype] = mass
                         logging.debug('masses:'+str(particle_dict))
 
         else:
             for particle in pc.iter_particles():
-                atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                atomtype_list = particle.data[CUBA.CHEMICAL_SPECIE]
                 atomtype = atomtype_list[0]
                 mass =particle.data[CUBA.MASS]
                 if not atomtype in particle_dict:
                     particle_dict[atomtype]=mass
-                    logging.debug('masses:'+str(particle_dict))
-            #implement case where particular pc is sent
+                    logging.debug('masses:' + str(particle_dict))
+            # implement case where particular pc is sent
             pass
         return particle_dict
 
-    def _count_atom_types(self,pc=None):
+    def _count_atom_types(self, pc=None):
         '''
         Take a particular pc to count, otherwise count all datasets
         '''
@@ -1315,7 +1316,7 @@ class QeFileIoDataManager():
             return n_atom_types
         else:
             for particle in pc.iter_particles():
-                atomtype_list =particle.data[CUBA.CHEMICAL_SPECIE]
+                atomtype_list = particle.data[CUBA.CHEMICAL_SPECIE]
                 atomtype = atomtype_list[0]
                 logging.debug('0.atomtype:'+str(atomtype))
                 atomtypes.add(atomtype)
@@ -1325,7 +1326,7 @@ class QeFileIoDataManager():
 
     def _what_atom_types(self,pc=None):
         atomtype_set = self._what_atom_types_set(pc=pc)
-        logging.debug('2.atomtypes:'+str(atomtype_set))
+        logging.debug('2.atomtypes:' + str(atomtype_set))
         return [atomtype for atomtype in atomtype_set]
 
     def _what_atom_types_set(self,pc=None):
