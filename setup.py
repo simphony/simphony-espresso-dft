@@ -33,5 +33,4 @@ setup(
     entry_points={
         'simphony.engine': ['espresso = simespresso']},
     packages=find_packages(),
-#    install_requires=["simphony >= 0.2.0"]
     )

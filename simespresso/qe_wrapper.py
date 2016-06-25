@@ -13,6 +13,7 @@ from simespresso.io_QE.qe_process import QeProcess
 
 import logging
 
+
 @contextlib.contextmanager
 def _temp_directory():
     """ context manager that provides temp directory
@@ -21,7 +22,6 @@ def _temp_directory():
     """
     temp_dir = tempfile.mkdtemp()
     yield temp_dir
-    #shutil.rmtree(temp_dir)
 
 
 class QeWrapper(ABCModelingEngine):
