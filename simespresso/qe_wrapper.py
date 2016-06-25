@@ -152,8 +152,10 @@ class QeWrapper(ABCModelingEngine):
             CM = _combine(self.CM, self.CM_extension)
             SP = _combine(self.SP, self.SP_extension)
 
-            process = QeProcess(self._data_manager, qe_executable = \
-                self._executable_name, log_directory=temp_dir)
+            process = QeProcess(
+                self._data_manager,
+                qe_executable = self._executable_name,
+                log_directory=temp_dir)
             process.run(input_data_filename, output_data_filename, BC, CM, SP)
 
             # after running, we read any changes from lammps
