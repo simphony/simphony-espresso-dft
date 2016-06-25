@@ -89,15 +89,15 @@ class QeFileIoDataManager():
 
 # system
         self.celldm = [5, 5, 5]  # This should  come from lattice vectors
-        self.celldm_margin = 3  # if no valid clldm given, go this far past edge
+        self.celldm_margin = 3  # if no valid clldm given, go past edge
 # if the user only specificies atom positions, what should this be
         self.ibrav = 8  # this should also be defined in cuba
-        self.n_atom_types = 0 # comes from pc
+        self.n_atom_types = 0  # comes from pc
         self.ecutwfc = 60.0  # find reasonable default
-        self.ecutrho = 240 # find reasonable default
+        self.ecutrho = 240  # find reasonable default
 # electrons
         self.mixing_mode = 'local-TF'
-        self.mixing_beta = 0.8 # good default?
+        self.mixing_beta = 0.8  # good default?
         self.convergence_threshold = 1.0*10**-2
         self.etot_convergence_threshold = 1.0*10**-2
         self.force_convergence_threshold = 1.0*10**-2
@@ -109,7 +109,7 @@ class QeFileIoDataManager():
         self.output_filename = "qe_output"
         self.path_to_espresso = 'pw.x'
         self.mpi = True
-        self.mpi_Nprocessors = max(1,multiprocessing.cpu_count() -1)
+        self.mpi_Nprocessors = max(1, multiprocessing.cpu_count() -1)
 
     def get_data(self, uname):
         """Returns data container associated with particle container
@@ -131,8 +131,8 @@ class QeFileIoDataManager():
         """
 
         self._pc_cache[uname].data = data
-        #is DC necessary or is PC ok here
-        #self._pc_cache[uname].data = DataContainer(data)
+        # is DC necessary or is PC ok here
+        # self._pc_cache[uname].data = DataContainer(data)
 
     def get_data_extension(self, uname):
         """Returns data container extension associated with particle container
@@ -205,7 +205,6 @@ class QeFileIoDataManager():
             _filter_unsupported_data(iterable, self._supported_cuba))
 
     def add_particles(self, pc):
-# def add_particles(self, iterable, uname):
         """Add particles
         """
 # unclear to me what this line from lammps was doing
@@ -214,8 +213,8 @@ class QeFileIoDataManager():
         self._pc_cache[pc.name] = pc
 # filter the cached particles of unsupported CUBA
 # todo implement this filter
-      #  self._pc_cache[pc.uname].update_particles(_filter_unsupported_data(
-      #      self._pc_cache[uname].iter_particles(uids), self._supported_cuba))
+#  self._pc_cache[pc.uname].update_particles(_filter_unsupported_data(
+#      self._pc_cache[uname].iter_particles(uids), self._supported_cuba))
         uids = []
         for particle in pc.iter_particles():
             uids.append(particle.uid)
@@ -285,7 +284,7 @@ class QeFileIoDataManager():
                 pp_filename = input_data_filename + '.pp'
                 self._write_espresso_pp_file(ppfilename=pp_filename)
         else:
-            logging.warning('Desired simulations not indicated, finding just total energy')
+            logging.warning('Desired simulations not indicated, finding total energy')
 
     def read(self, output_data_filename):
         """read from file
@@ -304,8 +303,8 @@ class QeFileIoDataManager():
         self._read_espresso_input_file(data_filename)
         atoms = self.pc
         number_atom_types = self.n_atom_types
-        #velocities = handler.get_velocities()
-        masses = self.masses
+        # velocities = handler.get_velocities()
+#        masses = self.masses
 
         type_data = {}
         for atom_type in range(1, number_atom_types+1):
@@ -335,7 +334,7 @@ class QeFileIoDataManager():
         for particle in self.pc.iter_particles():
             atom_type = particle.data
             #   specie = atom_type[CUBA.CHEMICAL_SPECIE]
-            atom = atom_type[CUBA.CHEMICAL_SPECIE][0]
+#            atom = atom_type[CUBA.CHEMICAL_SPECIE][0]
             p.coordinates.append(particle.coordinates)
             p.data.append(atom_type)
             cache_pc.update_particles([p])
@@ -381,38 +380,36 @@ class QeFileIoDataManager():
                 mass[material_type] = data[CUBA.MASS]
         return mass
 
-    def _pcs_to_single_pc(self,pcs):
+    def _pcs_to_single_pc(self, pcs):
         particle_list = []
         mapping = []
         i = 0
         for dataset in pcs:
               for particle in dataset.iter_particles():
-#                    particle_copy=copy.deepcopy(particle)
                     particle_list.append(particle)
                     mapentry = [dataset.name, particle, i]
                     mapping.append(mapentry)
                     i += 1
         if len(particle_list):
-#            self.pc.add_particles(particle_list)
             self.mapping = mapping
 
     def _single_pc_to_pcs(self,pcs):
-        pcs={} #dict of pcs
+        pcs={} # dict of pcs
         for entry in self.mapping:
             pc_name = entry[0]
             particle = entry[1]
             if pc_name in pcs:
                 pcs[pc_name].add_particles([particle])
-                #check if list needed for single particle
+                # check if list needed for single particle
             else:
                 pcs[pc_name] = Particles(pc_name)
                 pcs[pc_name].add_particles([particle])
-                #check if list needed
+                # check if list needed
             pc_name = entry[0]
             particle = entry[1]
             if pc_name in pcs:
                 pcs[pc_name].add_particles([particle])
-                #check if list needed for single particle
+                # check if list needed for single particle
             else:
                 pcs[pc_name] = Particles(pc_name)
                 pcs[pc_name].add_particles([particle])
@@ -437,7 +434,7 @@ class QeFileIoDataManager():
         :param file_name: name of the espresso output file
         :return:
         '''
-        #should read total energy, iteration, deltaE, etc
+        # should read total energy, iteration, deltaE, etc
         if not (os.path.exists(file_name)):
             logging.debug("file " + str(file_name) + " not found")
             return (1)
@@ -582,8 +579,8 @@ class QeFileIoDataManager():
                         for k in range(0, n_elements[2]):
                             z = k * base_vector[0]
                             density = xyz_array[i, j, k]
-                            line = 'C ' + str(x) + ' ' + str(y) + ' ' + str(z) + \
-                                   ' ' + str(density) + '\n'
+                            line = 'C ' + str(x) + ' ' + str(y) + ' ' + \
+                                   str(z) + ' ' + str(density) + '\n'
                             f.write(line)
             except:
                 print('error writing aviz file')
@@ -633,9 +630,9 @@ class QeFileIoDataManager():
 
     def get_dataset_names(self):
         names = []
-        for pc_name in self._pc_cache: #iterates over names
+        for pc_name in self._pc_cache:  # iterates over names
             names.append(pc_name)
-        if len(names)<1:
+        if len(names) < 1:
             raise RuntimeError('no particles found to write')
         return names
 
@@ -643,13 +640,13 @@ class QeFileIoDataManager():
         maxima = [0,0,0]
         for name, pc in self._pc_cache.iteritems():
             for particle in pc.iter_particles():
-                for d in range(0, 3): #3 dimensions, needs to be more general?
+                for d in range(0, 3):  # 3 dimensions, needs to be more general?
                     maxima[d] = max(maxima[d],particle.coordinates[d])
 #                    logging.debug('p:{0},{1},{2} m:{3},{4},{5}'
 #                    .format(particle.coordinates[0],particle.coordinates[1],
 #                       particle.coordinates[2],maxima[0],maxima[1],maxima[2]))
-#check if celldm is too small
-        for d in range(0,3): #3 dimensions, needs to be more general?
+# check if celldm is too small
+        for d in range(0, 3):  # 3 dimensions, needs to be more general?
             if self.celldm[d] < maxima[d]:
                 newbound = maxima[d]*self.celldm_margin
                 logging.warning(
@@ -700,8 +697,8 @@ class QeFileIoDataManager():
                            + '\'\n'
                     f.write(line)
                 if hasattr(self, 'pseudopotential_directory'):
-                    line = '\t pseudo_dir=\'' + str(self.pseudopotential_directory) \
-                           + '\'\n'
+                    line = '\t pseudo_dir=\'' + \
+                           str(self.pseudopotential_directory) + '\'\n'
                     f.write(line)
                 if hasattr(self, 'pseudopotential_prefix'):
                     line = '\t prefix=\'' + str(self.pseudopotential_prefix) \
@@ -718,10 +715,12 @@ class QeFileIoDataManager():
                     line = '\t outdir=\'' + str(self.output_directory) + '\'\n'
                     f.write(line)
                 if hasattr(self, 'etot_convergence_threshold'):
-                    line = '\t etot_conv_thr=' + str(self.etot_convergence_threshold) + '\n'
+                    line = '\t etot_conv_thr=' + str(self.etot_convergence_threshold) \
+                           + '\n'
                     f.write(line)
                 if hasattr(self, 'force_convergence_threshold'):
-                    line = '\t forc_conv_thr=' + str(self.force_convergence_threshold) + '\n'
+                    line = '\t forc_conv_thr=' + str(self.force_convergence_threshold) \
+                           + '\n'
                     f.write(line)
                 if hasattr(self, 'max_iterations'):
                     line = '\t nstep=' + str(self.max_iterations) + '\n'

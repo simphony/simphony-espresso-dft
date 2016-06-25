@@ -154,7 +154,7 @@ class QeWrapper(ABCModelingEngine):
 
             process = QeProcess(
                 self._data_manager,
-                qe_executable = self._executable_name,
+                qe_executable=self._executable_name,
                 log_directory=temp_dir)
             process.run(input_data_filename, output_data_filename, BC, CM, SP)
 
