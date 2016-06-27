@@ -4,19 +4,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-def generate_polyhedral_nanotube(m,n,sigma = 1.44):
+def generate_polyhedral_nanotube(m,n,sigma = 1.44,n_atoms_per_helix=10):
     initial_value = np.pi*(2*n+m)/(2*(n**2+n*m+m**2))
-    if m==0:
+    if m == 0:
         initial_value = 0.1
 #    scipy.optimize.minimize(fun, x0, args=(), method=None, jac=None, hess=None, hessp=None, bounds=None, constraints=(), tol=None, callback=None, options=None)
 #    x = scipy.optimize.newton(test_eqn,initial_value,args=(m,n))
 #    print('x {} f(x) {}'.format(x,test_eqn(x,m,n)))
     R0 = conventional_r0(sigma,m,n)
 #    theta1 = conventional_chiral_angle(m,n)
-    theta2 = conventional_chiral_angle2(m,n)
-    r0  = conventional_r0(sigma,m,n)
-    phi = scipy.optimize.newton(phi_newton,initial_value,args=(m,n))
-    print('theta {} r0 {} phi {}'.format(theta2,R0,phi))
+    theta2 = conventional_chiral_angle2(m, n)
+    r0 = conventional_r0(sigma,m,n)
+    phi = scipy.optimize.newton(phi_newton, initial_value,args=(m, n))
+    print('theta {} r0 {} phi {}'.format(theta2, R0, phi))
 #    print('phi {} f(phi) {} ok? {}'.format(phi,phi_newton(phi,m,n),check_bounds(m,n,phi)))
 #    theta = theta_direct(phi,m,n)
 #    print('thetadirect {} f(theta) {}'.format(theta,theta_direct(phi,m,n)))
@@ -27,17 +27,16 @@ def generate_polyhedral_nanotube(m,n,sigma = 1.44):
     n_helices = int(np.round(n_helices))
 #    n_helices = 2
     print('n_helices '+str(n_helices))
-    n_atoms = 20
     current_phi = 0
     positions = []
     for i in range(0,n_helices):
-        positions = positions + generate_helix(theta2,current_phi,phi,sigma,R0,n_atoms)
+        positions = positions + generate_helix(theta2,current_phi,phi,sigma,R0,n_atoms_per_helix)
         current_phi = current_phi + np.pi*2 / (n_helices)
 
     xs = [p[0] for p in positions]
     ys = [p[1] for p in positions]
     zs = [p[2] for p in positions]
-    print('xs:'+str(xs))
+    # print('xs:'+str(xs))
     filewrite(positions)
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -60,7 +59,7 @@ def generate_helix(theta,initial_phi,phi,sigma,R0,n_atoms):
         current_z = current_z + sigma*np.sin(theta)
         positions.append([current_x,current_y,current_z])
         current_phi = (current_phi + phi)%((np.pi)*2)
-        print('x {} y {} z {} phi {}'.format(current_x,current_y,current_z,current_phi))
+        # print('x {} y {} z {} phi {}'.format(current_x,current_y,current_z,current_phi))
     return positions
 
 def test_eqn(x,m,n):
