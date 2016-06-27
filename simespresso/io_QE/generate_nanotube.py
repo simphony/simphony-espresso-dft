@@ -1,29 +1,129 @@
 __author__ = 'jeremy'
 import scipy.optimize
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-def generate_polyhedral_nanotube(m,n):
+def generate_polyhedral_nanotube(m,n,sigma = 1.44):
     initial_value = np.pi*(2*n+m)/(2*(n**2+n*m+m**2))
+    if m==0:
+        initial_value = 0.1
 #    scipy.optimize.minimize(fun, x0, args=(), method=None, jac=None, hess=None, hessp=None, bounds=None, constraints=(), tol=None, callback=None, options=None)
-    x = scipy.optimize.newton(test_eqn,initial_value,args=(m,n))
-    print('x {} f(x) {}'.format(x,test_eqn(x,m,n)))
-    x = scipy.optimize.newton(phi_transcedental,initial_value,args=(m,n))
-    print('x {} f(x) {} ok? {}'.format(x,phi_transcedental(x,m,n),check_bounds(m,n,x)))
-    print('soln x {} f(x) {} ok? {}'.format(x,phi_transcedental(x,m,n)))
+#    x = scipy.optimize.newton(test_eqn,initial_value,args=(m,n))
+#    print('x {} f(x) {}'.format(x,test_eqn(x,m,n)))
+    R0 = conventional_r0(sigma,m,n)
+#    theta1 = conventional_chiral_angle(m,n)
+    theta2 = conventional_chiral_angle2(m,n)
+    r0  = conventional_r0(sigma,m,n)
+    phi = scipy.optimize.newton(phi_newton,initial_value,args=(m,n))
+    print('theta {} r0 {} phi {}'.format(theta2,R0,phi))
+#    print('phi {} f(phi) {} ok? {}'.format(phi,phi_newton(phi,m,n),check_bounds(m,n,phi)))
+#    theta = theta_direct(phi,m,n)
+#    print('thetadirect {} f(theta) {}'.format(theta,theta_direct(phi,m,n)))
+#   theta = scipy.optimize.newton(theta_newton,theta,args=(phi,m,n))
+#    print('thetanewton {} f(theta) {}'.format(theta,theta_newton(theta,phi,m,n)))
+    n_helices = np.pi*2/phi
+    print('n_helices '+str(n_helices))
+    n_helices = int(np.round(n_helices))
+#    n_helices = 2
+    print('n_helices '+str(n_helices))
+    n_atoms = 20
+    current_phi = 0
+    positions = []
+    for i in range(0,n_helices):
+        positions = positions + generate_helix(theta2,current_phi,phi,sigma,R0,n_atoms)
+        current_phi = current_phi + np.pi*2 / (n_helices)
+
+    xs = [p[0] for p in positions]
+    ys = [p[1] for p in positions]
+    zs = [p[2] for p in positions]
+    print('xs:'+str(xs))
+    filewrite(positions)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(xs,ys,zs)
+    plt.show()
+
+def filewrite(positions):
+    with open('nanotube.txt','w') as f:
+        for p in positions:
+            f.write(str(p[0])+','+str(p[1])+','+str(p[2])+'\n')
+
+def generate_helix(theta,initial_phi,phi,sigma,R0,n_atoms):
+    print('new helix, theta {} phi0 {} phi {} sigma {} R0 {} n {}'.format(theta,initial_phi,phi,sigma,R0,n_atoms))
+    positions = []
+    current_phi = initial_phi
+    current_z = 0
+    for i in range(n_atoms):
+        current_x = R0*np.cos(current_phi)
+        current_y = R0*np.sin(current_phi)
+        current_z = current_z + sigma*np.sin(theta)
+        positions.append([current_x,current_y,current_z])
+        current_phi = (current_phi + phi)%((np.pi)*2)
+        print('x {} y {} z {} phi {}'.format(current_x,current_y,current_z,current_phi))
+    return positions
 
 def test_eqn(x,m,n):
     print('x {} m {} n {}'.format(x,m,n))
     y = m*x**2+n*x+1
     return y
 
+
+def conventional_chiral_angle(m,n):
+    print('chiral angle1: m {} n {}'.format(m,n))
+    costheta = (2*n+m)/(np.sqrt(n**2+n*m+m**2))
+    print('costheta {}'.format(costheta))
+    theta = np.arccos(costheta)
+#    print('theta conv:'+str(theta))
+    return theta
+
+def conventional_chiral_angle2(m,n):
+    print('chiral angle2: m {} n {}'.format(m,n))
+    tantheta = m*np.sqrt(3)/(2*n+m)
+    print('tantheta {}'.format(tantheta))
+    theta = np.arctan(tantheta)
+#    print('theta conv:'+str(theta))
+    return theta
+
+def conventional_r0(sigma,m,n):
+    print('sigma {} m {} n {}'.format(sigma,m,n))
+    r0 = sigma*np.sqrt(3*(n**2 + n*m + m**2))/(2*np.pi)
+    return r0
+
 def check_bounds(m,n,phi):
     ok = np.pi/(n+m)<phi and phi < np.pi/n
     return ok
 
-def phi_transcedental(phi,m,n):
+def theta_direct(phi,m,n):
+    print('calculating theta directly: phi {} m {} n {}'.format(phi,m,n))
+    if m==0:
+        ksi = 0
+    else:
+        ksi = (n*phi - np.pi)/m
+    costheta2 = (n*(n+2*m) * (np.sin(phi))**2)/((n+m)**2*(np.sin(phi))**2 - m**2*(np.sin(ksi+phi))**2)
+    theta = np.arccos(np.sqrt((costheta2)))
+    print('theta calculated '+str(theta))
+    return theta
+
+def theta_newton(theta,phi,m,n):
+    print('calculating theta using newton: phi {} m {} n {}'.format(phi,m,n))
+    if m==0:
+        ksi = 0
+    else:
+        ksi = (n*phi - np.pi)/m
+    costheta2 = (n*(n+2*m) * (np.sin(phi))**2)/((n+m)**2*(np.sin(phi))**2 - m**2*(np.sin(ksi+phi))**2)
+    x = np.cos(theta)**2 - costheta2
+    print('THETA RESIDUAL '+str(x))
+    return x
+
+def phi_newton(phi,m,n):
     print('phi {} m {} n {}'.format(phi,m,n))
-    ksi = (n*phi - np.pi)/m
+    if m==0:
+        ksi = 0
+    else:
+        ksi = (n*phi - np.pi)/m
     x = (n**2 - m**2)*(np.sin(ksi+phi)**2)-n*(n+2*m)*(np.sin(ksi))**2+m*(2*n+m)*(np.sin(phi))**2
+    print('phi residual '+str(x))
     return x
 
 def generate_nanotube_xyz(type = 'armchair'):
@@ -75,3 +175,5 @@ def generate_nanotube_xyz(type = 'armchair'):
         return xyz_03
 
 
+if __name__ == "__main__":
+    generate_polyhedral_nanotube(0,3)
