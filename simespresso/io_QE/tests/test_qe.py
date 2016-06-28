@@ -11,7 +11,15 @@ class OutcomesTest(unittest.TestCase):
     def setUp(self):
         self.filename = 'pwtest.in'
         with open(self.filename, 'w') as text_file:
-            text_file.write(_data_file_contents)
+            text_file.write('test')
+
+        x = os.path.abspath('./')
+        y = qe_wrapper.QeFileIoDataManager
+        z = CUBA._create_()
+        a = DataContainer()
+        b = Particle()
+        c = Particles()
+        print(a,b,c,x,y,z)
 
 '''    def test_espresso_data_file_read(self):
         print('TEST OF READING QE INPUT FILE')
