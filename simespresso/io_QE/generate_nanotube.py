@@ -1,14 +1,15 @@
-__author__ = 'jeremy'
 import scipy.optimize
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
-def generate_polyhedral_nanotube(m,n,sigma = 1.44,n_atoms_per_helix=10):
+
+def generate_polyhedral_nanotube(m, n, sigma=1.44, n_atoms_per_helix=10):
     initial_value = np.pi*(2*n+m)/(2*(n**2+n*m+m**2))
     if m == 0:
         initial_value = 0.1
-#    scipy.optimize.minimize(fun, x0, args=(), method=None, jac=None, hess=None, hessp=None, bounds=None, constraints=(), tol=None, callback=None, options=None)
+#    scipy.optimize.minimize(
+# fun, x0, args=(), method=None, jac=None, hess=None, hessp=None, bounds=None,
+# constraints=(), tol=None, callback=None, options=None)
 #    x = scipy.optimize.newton(test_eqn,initial_value,args=(m,n))
 #    print('x {} f(x) {}'.format(x,test_eqn(x,m,n)))
     R0 = conventional_r0(sigma,m,n)
@@ -17,7 +18,8 @@ def generate_polyhedral_nanotube(m,n,sigma = 1.44,n_atoms_per_helix=10):
     r0 = conventional_r0(sigma,m,n)
     phi = scipy.optimize.newton(phi_newton, initial_value,args=(m, n))
     print('theta {} r0 {} phi {}'.format(theta2, R0, phi))
-#    print('phi {} f(phi) {} ok? {}'.format(phi,phi_newton(phi,m,n),check_bounds(m,n,phi)))
+#    print('phi {} f(phi) {} ok? {}'.format(
+# phi,phi_newton(phi,m,n),check_bounds(m,n,phi)))
 #    theta = theta_direct(phi,m,n)
 #    print('thetadirect {} f(theta) {}'.format(theta,theta_direct(phi,m,n)))
 #   theta = scipy.optimize.newton(theta_newton,theta,args=(phi,m,n))
@@ -31,7 +33,9 @@ def generate_polyhedral_nanotube(m,n,sigma = 1.44,n_atoms_per_helix=10):
     positions = []
     for i in range(0,n_helices):
         z0 = 0
-        positions = positions + generate_helix(theta2,current_phi,phi,sigma,R0,n_atoms_per_helix,z0)
+        positions = positions + \
+                    generate_helix(
+                        theta2,current_phi,phi,sigma,R0,n_atoms_per_helix,z0)
         current_phi = current_phi + np.pi*2 / (n_helices)
 
     xs = [p[0] for p in positions]
@@ -45,7 +49,7 @@ def generate_polyhedral_nanotube(m,n,sigma = 1.44,n_atoms_per_helix=10):
     plt.show()
 
 def filewrite(positions):
-    with open('nanotube.txt','w') as f:
+    with open('nanotube.txt', 'w') as f:
         for p in positions:
             f.write(str(p[0])+','+str(p[1])+','+str(p[2])+'\n')
 
