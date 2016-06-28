@@ -16,8 +16,8 @@ class OutcomesTest(unittest.TestCase):
     def test_espresso_data_file_read(self):
         print('TEST OF READING QE INPUT FILE')
 #        wrapper = qe_wrapper.qe_functions()
-        wrapper = qe_wrapper
-        wrapper.read_espresso_input_file(self.filename)
+        wrapper = qe_wrapper.QeFileIoDataManager
+        wrapper._read_espresso_input_file(self.filename)
         expected_atom_positions = []
         expected_atom_species = []
         expected_atom_positions.append((1.0e-10, 2.0e-10, 3.0e-10))
