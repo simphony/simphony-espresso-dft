@@ -129,8 +129,8 @@ class OutcomesTest(unittest.TestCase):
             print("file "+str(file_name)+" not found")
             return(1)
         print('testing reading of qe output file '+str(file_name))
-        qe_wrapper = qe_file_io.qe_functions()
-        qe_wrapper.QeFileIoDataManager._read_espresso_input_file(file_name)
+        qeio = qe_wrapper.QeFileIoDataManager
+        qeio._read_espresso_input_file(file_name)
 
 
     def test_running_index_to_node_inredex(self):
@@ -139,7 +139,7 @@ class OutcomesTest(unittest.TestCase):
         index = 5
         qeio = qe_wrapper.QeFileIoDataManager
         indices = qeio._running_index_to_node_index(index,
-                                                               n_latticepoints)
+                                                    n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [5, 0, 0])
 
@@ -151,25 +151,25 @@ class OutcomesTest(unittest.TestCase):
 
         index = 23
         indices = qe_wrapper.running_index_to_node_index(index,
-                                                               n_latticepoints)
+                                                         n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [3, 2, 0])
 
         index = 70
         indices = qe_wrapper.running_index_to_node_index(index,
-                                                               n_latticepoints)
+                                                         n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [0, 0, 1])
 
         index = 75
         indices = qe_wrapper.running_index_to_node_index(index,
-                                                               n_latticepoints)
+                                                         n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [5, 0, 1])
 
         index = 150
         indices = qe_wrapper.running_index_to_node_index(index,
-                                                               n_latticepoints)
+                                                         n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [0, 1, 2])
 

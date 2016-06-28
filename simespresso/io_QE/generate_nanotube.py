@@ -133,7 +133,6 @@ def theta_newton(theta, phi, m, n):
     return x
 
 
-
 def phi_newton(phi, m, n):
     print('phi {} m {} n {}'.format(phi, m, n))
     if m == 0:
@@ -194,9 +193,8 @@ def generate_nanotube_xyz(kind='armchair'):
                   [1.032295,    -1.787988,    -0.000000],
                   [1.943242,    -0.697384,    -0.000000]]
         return xyz_33
-    elif kind == 'zigzag':
-   #n = 3, m = 0  zigzag
-        xyz_30= [[1.216023,     0.000000,    -0.735207],
+    elif kind == 'zigzag':  # n = 3, m = 0  zigzag
+        xyz_30 = [[1.216023,     0.000000,    -0.735207],
                  [1.216023,     0.000000,    -2.156207],
                  [0.608011,     1.053107,     1.421000],
                  [0.608011,     1.053107,     0.000000],
@@ -209,8 +207,7 @@ def generate_nanotube_xyz(kind='armchair'):
                  [0.608011,    -1.053107,     1.421000],
                  [0.608011,    -1.053107,    -0.000000]]
         return xyz_30
-    else:
-           #n = 0, m = 3
+    else:  # n = 0, m = 3
         xyz_03 = [[1.216023,     0.000000,    -2.156207],
                   [0.608011,     1.053107,    -1.421000],
                   [-0.608011,     1.053107,    -2.156207],
@@ -227,4 +224,4 @@ def generate_nanotube_xyz(kind='armchair'):
 
 
 if __name__ == "__main__":
-    generate_polyhedral_nanotube(0,3)
+    generate_polyhedral_nanotube(1, 3)
