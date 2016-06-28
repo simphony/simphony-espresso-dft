@@ -132,7 +132,6 @@ class OutcomesTest(unittest.TestCase):
         qeio = qe_wrapper.QeFileIoDataManager
         qeio._read_espresso_input_file(file_name)
 
-
     def test_running_index_to_node_inredex(self):
         print('testing espresso_data_file_read')
         n_latticepoints = [10, 7, 6]
@@ -180,10 +179,10 @@ class OutcomesTest(unittest.TestCase):
         mpi = False
         mpi_Nprocessors = 2
         path_to_espresso = 'pw.x'  # /usr/bin/pw.x is not default apparently
-        wrapper = qe_file_io.qe_functions()
-#        wrapper.start_qe2(name_in, name_out)
-        wrapper.start_qe(name_in, name_out, path_to_espresso=path_to_espresso,
-                         mpi=mpi, mpi_Nprocessors=mpi_Nprocessors)
+        bc = DataContainer()
+        cm = DataContainer()
+        sp = DataContainer()
+        qe_wrapper.QeProcess.run(name_in, name_out, bc, cm, sp)
 
 _data_file_contents = """&CONTROL
     calculation='scf'
