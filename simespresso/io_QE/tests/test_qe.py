@@ -19,7 +19,7 @@ class OutcomesTest(unittest.TestCase):
         a = DataContainer()
         b = Particle()
         c = Particles()
-        print(a, b, c, x, y, z)
+        print(x, y, z, a, b, c)
 # and another commenbt
 # commented to check if i pass travis tests otherwise
 '''    def test_espresso_data_file_read(self):
