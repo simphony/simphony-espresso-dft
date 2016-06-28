@@ -19,7 +19,7 @@ class OutcomesTest(unittest.TestCase):
         a = DataContainer()
         b = Particle()
         c = Particles()
-        print(a,b,c,x,y,z)
+        print(a, b, c, x, y, z)
 
 '''    def test_espresso_data_file_read(self):
         print('TEST OF READING QE INPUT FILE')
