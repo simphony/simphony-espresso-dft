@@ -33,9 +33,8 @@ def generate_polyhedral_nanotube(m, n, sigma=1.44, n_atoms_per_helix=10):
     positions = []
     for i in range(0, n_helices):
         z0 = 0
-        positions = positions + \
-                    generate_helix(theta2, current_phi, phi, sigma,
-                                   R0, n_atoms_per_helix, z0)
+        positions = positions + generate_helix(
+            theta2, current_phi, phi, sigma, R0, n_atoms_per_helix, z0)
         current_phi = current_phi + np.pi*2 / (n_helices)
 
     xs = [p[0] for p in positions]
@@ -79,7 +78,7 @@ def test_eqn(x, m, n):
 
 
 def conventional_chiral_angle(m, n):
-    print('chiral angle1: m {} n {}'.format(m,n))
+    print('chiral angle1: m {} n {}'.format(m, n))
     costheta = (2*n+m)/(np.sqrt(n**2+n*m+m**2))
     print('costheta {}'.format(costheta))
     theta = np.arccos(costheta)
@@ -102,26 +101,28 @@ def conventional_r0(sigma, m, n):
     return r0
 
 
-def check_bounds(m,n,phi):
-    ok = np.pi/(n+m)<phi and phi < np.pi/n
+def check_bounds(m, n, phi):
+    ok = np.pi / (n+m) < phi and phi < np.pi/n
     return ok
+
 
 def theta_direct(phi, m, n):
     print('calculating theta directly: phi {} m {} n {}'.format(phi, m, n))
-    if m==0:
+    if m == 0:
         ksi = 0
     else:
         ksi = (n*phi - np.pi)/m
-    costheta2 = (n*(n+2*m) * (np.sin(phi))**2)/((n+m)**2* \
-                (np.sin(phi))**2 - m**2*(np.sin(ksi+phi))**2)
-    theta = np.arccos(np.sqrt((costheta2)))
+    costheta2 = (n*(n+2*m) * (np.sin(phi))**2) / \
+                ((n+m)**2 * (np.sin(phi))**2 - m**2*(np.sin(ksi+phi))**2)
+    theta = np.arccos(np.sqrt(costheta2))
     print('theta calculated '+str(theta))
     return theta
+
 
 def theta_newton(theta, phi, m, n):
     print('calculating theta using newton: phi {} m {} n {}'.format(
         phi, m, n))
-    if m==0:
+    if m == 0:
         ksi = 0
     else:
         ksi = (n*phi - np.pi)/m
@@ -133,14 +134,15 @@ def theta_newton(theta, phi, m, n):
 
 def phi_newton(phi, m, n):
     print('phi {} m {} n {}'.format(phi, m, n))
-    if m==0:
+    if m == 0:
         ksi = 0
     else:
         ksi = (n*phi - np.pi)/m
-    x = (n**2 - m**2)*(np.sin(ksi+phi)**2)-n*(n+2*m)*(np.sin(ksi))**2+\
-        m*(2*n+m)*(np.sin(phi))**2
+    x = (n**2 - m**2) * (np.sin(ksi+phi)**2) - n * (n+2*m) * \
+        (np.sin(ksi))**2 + m*(2*n+m)*(np.sin(phi))**2
     print('phi residual '+str(x))
     return x
+
 
 def read_xyz(filename):
     with open(filename, 'r') as f:
@@ -161,23 +163,23 @@ def read_xyz(filename):
             positions_list.append(pos)
         return positions_list
 
+
 def show_xyz(filename):
     positions = read_xyz(filename)
-
     xs = [p[0] for p in positions]
     ys = [p[1] for p in positions]
     zs = [p[2] for p in positions]
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(xs,ys,zs)
+    ax.scatter(xs, ys, zs)
     plt.show()
 
 
 def generate_nanotube_xyz(type = 'armchair'):
-    #coords from http://turin.nss.udel.edu/research/tubegenonline.html
+    # coords from http://turin.nss.udel.edu/research/tubegenonline.html
     if type == 'armchair':
-    #armchair
+    # armchair
         xyz_33 = [[2.064591,     0.000000,    -1.232141],
            [1.575573,     1.334205,    -1.232141],
            [1.032295,     1.787988,   -0.000000],

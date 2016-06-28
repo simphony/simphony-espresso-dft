@@ -117,8 +117,8 @@ class OutcomesTest(unittest.TestCase):
     def test_espresso_ppfile_write(self, ppfilename="testpp.in"):
         print('TEST OF WRITING QE PP FILE')
 
-        wrp = qe_file_io.qe_functions()
-        wrp.write_espresso_pp_file(ppfilename="testpp.in")
+        qe_wrapper.QeFileIoDataManager._read_espresso_input_file(
+            ppfilename='testpp.in')
 
     def test_read_espresso_output_file(self):
         print('TEST OF READING QE OUTPUT FILE')
@@ -130,14 +130,14 @@ class OutcomesTest(unittest.TestCase):
             return(1)
         print('testing reading of qe output file '+str(file_name))
         qe_wrapper = qe_file_io.qe_functions()
-        qe_wrapper.read_espresso_output_file(file_name)
+        qe_wrapper.QeFileIoDataManager._read_espresso_input_file(file_name)
 
     def test_running_index_to_node_inredex(self):
         print('testing espresso_data_file_read')
         n_latticepoints = [10, 7, 6]
         index = 5
-        espresso_wrapper = qe_file_io.qe_functions()
-        indices = espresso_wrapper.running_index_to_node_index(index,
+        espresso_functions = qe_file_io.qe_functions
+        indices = espresso_functions.running_index_to_node_index(index,
                                                                n_latticepoints)
         print('index '+str(index)+' indices:'+str(indices))
         self.assertTrue(indices == [5, 0, 0])
