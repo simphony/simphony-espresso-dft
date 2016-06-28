@@ -133,6 +133,7 @@ def theta_newton(theta, phi, m, n):
     return x
 
 
+
 def phi_newton(phi, m, n):
     print('phi {} m {} n {}'.format(phi, m, n))
     if m == 0:
@@ -177,9 +178,9 @@ def show_xyz(filename):
     plt.show()
 
 
-def generate_nanotube_xyz(type='armchair'):
+def generate_nanotube_xyz(kind='armchair'):
     # coords from http://turin.nss.udel.edu/research/tubegenonline.html
-    if type == 'armchair':  # armchair
+    if kind == 'armchair':  # armchair
         xyz_33 = [[2.064591,     0.000000,    -1.232141],
                   [1.575573,     1.334205,    -1.232141],
                   [1.032295,     1.787988,   -0.000000],
@@ -193,7 +194,7 @@ def generate_nanotube_xyz(type='armchair'):
                   [1.032295,    -1.787988,    -0.000000],
                   [1.943242,    -0.697384,    -0.000000]]
         return xyz_33
-    elif type == 'zigzag':
+    elif kind == 'zigzag':
    #n = 3, m = 0  zigzag
         xyz_30= [[1.216023,     0.000000,    -0.735207],
                  [1.216023,     0.000000,    -2.156207],
