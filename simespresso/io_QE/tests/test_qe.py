@@ -21,6 +21,7 @@ class OutcomesTest(unittest.TestCase):
         c = Particles()
         print(a, b, c, x, y, z)
 
+# commented to check if i pass travis tests otherwise
 '''    def test_espresso_data_file_read(self):
         print('TEST OF READING QE INPUT FILE')
 #        wrapper = qe_wrapper.qe_functions()
