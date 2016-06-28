@@ -81,7 +81,8 @@ class QeFileIoDataManager():
         logging.debug('cwd1 for pp file:'+str(cwd1))
         cwd = os.path.dirname(os.path.realpath(__file__))
         logging.debug('cwd for pp file:'+str(cwd))
-        self.pseudopotential_directory = cwd
+#        self.pseudopotential_directory = cwd
+        self.pseudopotential_directory = './'
         self.pseudopotential_prefix = 'simphony_pp'
         self.tprnfor = '.true.'
         self. max_seconds = 3600*24
