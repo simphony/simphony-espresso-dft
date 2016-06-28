@@ -16,8 +16,9 @@ class OutcomesTest(unittest.TestCase):
     def test_espresso_data_file_read(self):
         print('TEST OF READING QE INPUT FILE')
 #        wrapper = qe_wrapper.qe_functions()
+        wrp = qe_wrapper.QeFileIoDataManager()
         wrapper = qe_wrapper.QeFileIoDataManager
-        wrapper._read_espresso_input_file(self.filename)
+        wrapper._read_espresso_input_file(wrp, self.filename)
         expected_atom_positions = []
         expected_atom_species = []
         expected_atom_positions.append((1.0e-10, 2.0e-10, 3.0e-10))
@@ -112,13 +113,16 @@ class OutcomesTest(unittest.TestCase):
         p4 = Particle([4.0 * 1e-10, 5.0 * 1e-10, 6.0 * 1e-10])
         p4.data[CUBA.CHEMICAL_SPECIE] = 'C'
         pc.add_particles([p1, p2, p3, p4])
-        wrp.write_espresso_input_file(espresso_input_filename)
+        wrpr = qe_wrapper.QeFileIoDataManager()
+
+        wrp.QeFileIoDataManager._write_espresso_input_file(
+            wrpr,espresso_input_filename)
 
     def test_espresso_ppfile_write(self, ppfilename="testpp.in"):
         print('TEST OF WRITING QE PP FILE')
-
+        wrp = qe_wrapper.QeFileIoDataManager()
         qe_wrapper.QeFileIoDataManager._read_espresso_input_file(
-            ppfilename='testpp.in')
+            wrp,ppfilename='testpp.in')
 
     def test_read_espresso_output_file(self):
         print('TEST OF READING QE OUTPUT FILE')
@@ -130,7 +134,8 @@ class OutcomesTest(unittest.TestCase):
             return(1)
         print('testing reading of qe output file '+str(file_name))
         qeio = qe_wrapper.QeFileIoDataManager
-        qeio._read_espresso_input_file(file_name)
+        wrp = qe_wrapper.QeFileIoDataManager()
+        qeio._read_espresso_input_file(wrp,file_name)
 
     def test_running_index_to_node_inredex(self):
         print('testing espresso_data_file_read')
@@ -176,13 +181,12 @@ class OutcomesTest(unittest.TestCase):
         print('TEST OF STARTING QE')
         name_in = './pwtest.in'
         name_out = './pwtest.out'
-        mpi = False
-        mpi_Nprocessors = 2
-        path_to_espresso = 'pw.x'  # /usr/bin/pw.x is not default apparently
         bc = DataContainer()
         cm = DataContainer()
         sp = DataContainer()
-        qe_wrapper.QeProcess.run(name_in, name_out, bc, cm, sp)
+        fio = qe_wrapper.QeFileIoDataManager
+        wrp = qe_wrapper.QeFileIoDataManager()
+        qe_wrapper.QeProcess.run(wrp,name_in, name_out, bc, cm, sp)
 
 _data_file_contents = """&CONTROL
     calculation='scf'
