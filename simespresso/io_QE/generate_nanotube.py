@@ -30,7 +30,8 @@ def generate_polyhedral_nanotube(m,n,sigma = 1.44,n_atoms_per_helix=10):
     current_phi = 0
     positions = []
     for i in range(0,n_helices):
-        positions = positions + generate_helix(theta2,current_phi,phi,sigma,R0,n_atoms_per_helix)
+        z0 = 0
+        positions = positions + generate_helix(theta2,current_phi,phi,sigma,R0,n_atoms_per_helix,z0)
         current_phi = current_phi + np.pi*2 / (n_helices)
 
     xs = [p[0] for p in positions]
@@ -48,17 +49,17 @@ def filewrite(positions):
         for p in positions:
             f.write(str(p[0])+','+str(p[1])+','+str(p[2])+'\n')
 
-def generate_helix(theta,initial_phi,phi,sigma,R0,n_atoms):
-    print('new helix, theta {} phi0 {} phi {} sigma {} R0 {} n {}'.format(theta,initial_phi,phi,sigma,R0,n_atoms))
+def generate_helix(theta,initial_phi,phi,sigma,R0,n_atoms,z0):
+    print('new helix, theta {} phi0 {} phi {} sigma {} R0 {} n {} z0'.format(theta,initial_phi,phi,sigma,R0,n_atoms,z0))
     positions = []
     current_phi = initial_phi
-    current_z = 0
+    current_z = z0
     for i in range(n_atoms):
         current_x = R0*np.cos(current_phi)
         current_y = R0*np.sin(current_phi)
-        current_z = current_z + sigma*np.sin(theta)
         positions.append([current_x,current_y,current_z])
         current_phi = (current_phi + phi)%((np.pi)*2)
+        current_z = current_z + sigma*np.sin(theta)
         # print('x {} y {} z {} phi {}'.format(current_x,current_y,current_z,current_phi))
     return positions
 
@@ -124,6 +125,38 @@ def phi_newton(phi,m,n):
     x = (n**2 - m**2)*(np.sin(ksi+phi)**2)-n*(n+2*m)*(np.sin(ksi))**2+m*(2*n+m)*(np.sin(phi))**2
     print('phi residual '+str(x))
     return x
+
+def read_xyz(filename):
+    with open(filename,'r') as f:
+        atomsline = f.readline()
+        n_atoms = int(atomsline)
+        print('atomsline:'+str(atomsline))
+        commentline = f.readline()
+        print('commentline:'+str(commentline))
+        print('n_atoms:'+str(n_atoms))
+        positions_list = []
+        for n in range(n_atoms):
+            line = f.readline()
+            print(line)
+            vals = line.split()
+            atomtype = vals[0]
+            pos = [float(vals[1]), float(vals[2]), float(vals[3])]
+            print('atom:' + str(atomtype) + 'pos:' + str(pos))
+            positions_list.append(pos)
+        return positions_list
+
+def show_xyz(filename):
+    positions = read_xyz(filename)
+
+    xs = [p[0] for p in positions]
+    ys = [p[1] for p in positions]
+    zs = [p[2] for p in positions]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(xs,ys,zs)
+    plt.show()
+
 
 def generate_nanotube_xyz(type = 'armchair'):
     #coords from http://turin.nss.udel.edu/research/tubegenonline.html
