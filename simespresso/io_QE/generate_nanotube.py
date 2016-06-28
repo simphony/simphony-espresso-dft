@@ -12,10 +12,9 @@ def generate_polyhedral_nanotube(m, n, sigma=1.44, n_atoms_per_helix=10):
 # constraints=(), tol=None, callback=None, options=None)
 #    x = scipy.optimize.newton(test_eqn,initial_value,args=(m,n))
 #    print('x {} f(x) {}'.format(x,test_eqn(x,m,n)))
-    R0 = conventional_r0(sigma,m,n)
+    R0 = conventional_r0(sigma, m, n)
 #    theta1 = conventional_chiral_angle(m,n)
     theta2 = conventional_chiral_angle2(m, n)
-    r0 = conventional_r0(sigma,m,n)
     phi = scipy.optimize.newton(phi_newton, initial_value,args=(m, n))
     print('theta {} r0 {} phi {}'.format(theta2, R0, phi))
 #    print('phi {} f(phi) {} ok? {}'.format(
@@ -23,7 +22,8 @@ def generate_polyhedral_nanotube(m, n, sigma=1.44, n_atoms_per_helix=10):
 #    theta = theta_direct(phi,m,n)
 #    print('thetadirect {} f(theta) {}'.format(theta,theta_direct(phi,m,n)))
 #   theta = scipy.optimize.newton(theta_newton,theta,args=(phi,m,n))
-#    print('thetanewton {} f(theta) {}'.format(theta,theta_newton(theta,phi,m,n)))
+#    print('thetanewton {} f(theta) {}'.format(
+# theta,theta_newton(theta,phi,m,n)))
     n_helices = np.pi*2/phi
     print('n_helices '+str(n_helices))
     n_helices = int(np.round(n_helices))
@@ -31,11 +31,11 @@ def generate_polyhedral_nanotube(m, n, sigma=1.44, n_atoms_per_helix=10):
     print('n_helices '+str(n_helices))
     current_phi = 0
     positions = []
-    for i in range(0,n_helices):
+    for i in range(0, n_helices):
         z0 = 0
         positions = positions + \
                     generate_helix(
-                        theta2,current_phi,phi,sigma,R0,n_atoms_per_helix,z0)
+                        theta2, current_phi, phi, sigma, R0, n_atoms_per_helix, z0)
         current_phi = current_phi + np.pi*2 / (n_helices)
 
     xs = [p[0] for p in positions]
@@ -48,13 +48,16 @@ def generate_polyhedral_nanotube(m, n, sigma=1.44, n_atoms_per_helix=10):
     ax.scatter(xs,ys,zs)
     plt.show()
 
+
 def filewrite(positions):
     with open('nanotube.txt', 'w') as f:
         for p in positions:
             f.write(str(p[0])+','+str(p[1])+','+str(p[2])+'\n')
 
-def generate_helix(theta,initial_phi,phi,sigma,R0,n_atoms,z0):
-    print('new helix, theta {} phi0 {} phi {} sigma {} R0 {} n {} z0'.format(theta,initial_phi,phi,sigma,R0,n_atoms,z0))
+
+def generate_helix(theta, initial_phi, phi, sigma, R0, n_atoms, z0):
+    print('new helix, theta {} phi0 {} phi {} sigma {} R0 {} n {} z0'.format(
+        theta, initial_phi, phi, sigma, R0, n_atoms, z0))
     positions = []
     current_phi = initial_phi
     current_z = z0
