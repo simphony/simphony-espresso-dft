@@ -4,8 +4,9 @@ from simespresso import qe_wrapper
 import generate_nanotube
 
 
-def generate_and_simulate_cswnt():
-    particle_coordinates = generate_nanotube.read_xyz('tests/cswnt_m1n2l5.xyz')
+def generate_and_simulate_cswnt(xyzfile='tests/cswnt_m1n2l2.xyz'):
+    particle_coordinates = generate_nanotube.read_xyz(xyzfile)
+    # particle_coordinates = generate_nanotube.read_xyz('tests/cswnt_m1n2l5.xyz')
     # particle_coordinates = generate_nanotube.generate_nanotube_xyz('armchair')
 
     unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
