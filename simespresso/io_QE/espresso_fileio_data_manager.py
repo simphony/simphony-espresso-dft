@@ -832,7 +832,7 @@ class QeFileIoDataManager():
                 f.write(line)
 
                 # K POINTS
-                x = self._wrappper
+                x = self._wrapper
                 sampling_mode = x.CM_extension['K_POINT_SAMPLING_METHOD']
                 line = 'K_POINTS ' + str(sampling_mode) + '\n'
                 f.write(line)
