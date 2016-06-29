@@ -4,7 +4,7 @@ from simespresso import qe_wrapper
 import generate_nanotube
 
 
-#particle_coordinates = generate_nanotube.generate_nanotube_xyz('armchair')
+# particle_coordinates = generate_nanotube.generate_nanotube_xyz('armchair')
 particle_coordinates = generate_nanotube.read_xyz('tests/cswnt_m1n2l5.xyz')
 
 unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
