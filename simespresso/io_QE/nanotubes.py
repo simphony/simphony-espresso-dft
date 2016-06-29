@@ -31,7 +31,8 @@ def generate_and_simulate_cswnt(xyzfile='tests/cswnt_m1n2l2.xyz'):
         ['TOTAL_ENERGY', 'CHARGE_DENSITY']
     wrapper.run()
     extracted_pc = wrapper.get_dataset("Carbon")
-    # charge_density = wrapper._data_manager._read_espresso_output_file('output.charge')
+    # charge_density = wrapper._data_manager._read_espresso_output_file(
+    # 'output.charge')
     print('checking particles:')
     for particle in extracted_pc.iter_particles():
         print('particle:'+str(particle))
