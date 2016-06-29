@@ -6,8 +6,8 @@ import generate_nanotube
 
 def generate_and_simulate_cswnt(xyzfile='tests/cswnt_m1n2l2.xyz'):
     particle_coordinates = generate_nanotube.read_xyz(xyzfile)
-    # particle_coordinates = generate_nanotube.read_xyz('tests/cswnt_m1n2l5.xyz')
-    # particle_coordinates = generate_nanotube.generate_nanotube_xyz('armchair')
+    # particle_coordinates = generate_nanotube.generate_nanotube_xyz(
+    # 'armchair')
 
     unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
     a_latt = 3.61  # Angstroms
@@ -31,7 +31,7 @@ def generate_and_simulate_cswnt(xyzfile='tests/cswnt_m1n2l2.xyz'):
         ['TOTAL_ENERGY', 'CHARGE_DENSITY']
     wrapper.run()
     extracted_pc = wrapper.get_dataset("Carbon")
-    charge_density = wrapper._data_manager._read_espresso_output_file('output.charge')
+    # charge_density = wrapper._data_manager._read_espresso_output_file('output.charge')
     print('checking particles:')
     for particle in extracted_pc.iter_particles():
         print('particle:'+str(particle))
