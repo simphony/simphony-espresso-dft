@@ -3,12 +3,14 @@ from simphony.cuds.particles import Particle, Particles
 from simespresso import qe_wrapper
 import generate_nanotube
 
+
+#particle_coordinates = generate_nanotube.generate_nanotube_xyz('armchair')
+particle_coordinates = generate_nanotube.read_xyz('tests/cswnt_m1n2l5.xyz')
+
 unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 a_latt = 3.61  # Angstroms
 super_cell = [[x*a_latt for x in v] for v in unit_cell]
-# super_cell =
 
-particle_coordinates = generate_nanotube.generate_nanotube_xyz('armchair')
 pc = Particles("Carbon")
 for particle in particle_coordinates:
     p = Particle(coordinates=particle)
@@ -20,7 +22,7 @@ pc.data_extension = {'BOX_VECTORS': super_cell}
 wrapper = qe_wrapper.QeWrapper()
 wrapper.BC_extension['BOX_FACES'] = ["periodic", "periodic", "periodic"]
 wrapper.add_dataset(pc)
-wrapper.SP_extension['PSEUDO_POTENTIAL'] = 'Cu.pz-d-hgh.UPF'
+wrapper.SP_extension['PSEUDO_POTENTIAL'] = '06-C.GGA.fhi.UPF'
 wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
 wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
 wrapper.CM_extension['DESIRED_SIMULATIONS'] = \
