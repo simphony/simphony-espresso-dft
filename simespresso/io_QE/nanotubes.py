@@ -29,6 +29,7 @@ wrapper.CM_extension['DESIRED_SIMULATIONS'] = \
     ['TOTAL_ENERGY', 'CHARGE_DENSITY']
 wrapper.run()
 extracted_pc = wrapper.get_dataset("Carbon")
+charge_density = wrapper._data_manager._read_espresso_output_file('output.charge')
 print('checking particles:')
 for particle in extracted_pc.iter_particles():
     print('particle:'+str(particle))
@@ -37,3 +38,4 @@ if 'TOTAL_ENERGY' in extracted_pc.data_extension:
     print('tot energy:'+str(etot))
 else:
     print('tot energy not found')
+
