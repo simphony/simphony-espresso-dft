@@ -4,6 +4,7 @@ import logging
 import matplotlib.pyplot as plt
 from simespresso import qe_wrapper
 from simespresso.io_QE.qeCubaExtensions import qeCUBAExtension
+import numpy as np
 
 # Create the Cu unit cell, assuming a simple cubic system with 4 basis
 # atoms (for an FCC latticle)
@@ -22,10 +23,32 @@ max_dist = 5
 distances = []
 total_energies = []
 
-for i in range(1, n_steps+1):
-    basis = [
+def make_fcc():
+    positions = [
         [0.0, 0.0, 0.0],
-        [0.0, 1.0*i/n_steps, 0]]
+        [0.0, 1.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [1.0, 1.0, 0.0],
+        [0.5, 0.5, 0.0],
+
+        [0.5, 0.0, 0.5],
+        [0.0, 0.5, 0.5],
+        [1.0, 0.5, 0.5],
+        [0.5, 1.0, 0.5],
+
+        [0.0, 0.0, 1.0],
+        [0.0, 1.0, 1.0],
+        [1.0, 0.0, 1.0],
+        [1.0, 1.0, 1.0],
+        [0.5, 0.5, 1.0]]
+    return positions
+
+for i in range(1, n_steps+1):
+#    basis = [
+#        [0.0, 0.0, 0.0],
+#        [0.0, 1.0*i/n_steps, 0]]
+    basis = np.array(make_fcc)
+    basis = np.multiply(basis, i/n_steps)
     distances.append(1.0*i/n_steps * a_latt)
     pc = Particles("Copper")
     for base_vector in basis:
