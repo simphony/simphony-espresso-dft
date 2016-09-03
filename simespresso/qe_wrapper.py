@@ -136,7 +136,7 @@ class QeWrapper(ABCModelingEngine):
                         'Particle container \'{}\` does not exist'.format(
                             name))
 
-    def run(self,mpirun=True):
+    def run(self, mpirun=True):
         """ Run qe based on configuration and data
         """
         with _temp_directory() as temp_dir:
@@ -156,7 +156,8 @@ class QeWrapper(ABCModelingEngine):
                 self._data_manager,
                 qe_executable=self._executable_name,
                 log_directory=temp_dir)
-            process.run(input_data_filename, output_data_filename, BC, CM, SP,mpirun=mpirun)
+            process.run(input_data_filename, output_data_filename, BC, CM, SP,
+                        mpirun=mpirun)
 
 # after running, we read any changes from lammps
             self._data_manager._read_espresso_output_file(output_data_filename)
