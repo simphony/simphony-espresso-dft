@@ -72,10 +72,13 @@ for i in range(1, n_steps+1):
     else:
         print('tot energy not found')
 
-plt.plot(distances, total_energies, 'ko-')
-plt.title('Tot energy v. dist for Cu-Cu ({0})'.format(
-    wrapper.SP_extension['PSEUDO_POTENTIAL']))
-plt.ylabel('Tot. energy (Rydberg)')
-plt.xlabel('Cu-Cu distance (Angstrom)')
-plt.savefig('Cu-Cu.jpg')
-plt.show()
+if len(total_energies) > 0:
+    plt.plot(distances, total_energies, 'ko-')
+    plt.title('Tot energy v. dist for Cu-Cu ({0})'.format(
+        wrapper.SP_extension['PSEUDO_POTENTIAL']))
+    plt.ylabel('Tot. energy (Rydberg)')
+    plt.xlabel('Cu-Cu distance (Angstrom)')
+    plt.savefig('Cu-Cu.jpg')
+    plt.show()
+else:
+    print('total energies not returned by qe')
