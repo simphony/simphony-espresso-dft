@@ -43,12 +43,14 @@ def make_fcc():
         [0.5, 0.5, 1.0]]
     return positions
 
-for i in range(1, n_steps+1):
+
+scalefactors = [0.8,0.9,1.0,1.1,1.2]
+for i in range(1, len(scalefactors)):
 #    basis = [
 #        [0.0, 0.0, 0.0],
 #        [0.0, 1.0*i/n_steps, 0]]
     basis = np.array(make_fcc())
-    basis = np.multiply(basis, i/n_steps)
+    basis = np.multiply(basis, a_latt * scalefactors[i])
     distances.append(1.0*i/n_steps * a_latt)
     pc = Particles("Copper")
     for base_vector in basis:
