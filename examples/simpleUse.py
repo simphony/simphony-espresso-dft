@@ -47,7 +47,7 @@ for i in range(1, n_steps+1):
 #    basis = [
 #        [0.0, 0.0, 0.0],
 #        [0.0, 1.0*i/n_steps, 0]]
-    basis = np.array(make_fcc)
+    basis = np.array(make_fcc())
     basis = np.multiply(basis, i/n_steps)
     distances.append(1.0*i/n_steps * a_latt)
     pc = Particles("Copper")
