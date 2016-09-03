@@ -23,6 +23,7 @@ max_dist = 5
 distances = []
 total_energies = []
 
+
 def make_fcc():
     positions = [
         [0.0, 0.0, 0.0],
@@ -41,14 +42,14 @@ def make_fcc():
         [1.0, 0.0, 1.0],
         [1.0, 1.0, 1.0],
         [0.5, 0.5, 1.0]]
-    return positions
-
-
-scalefactors = [0.8,0.9,1.0,1.1,1.2]
-for i in range(1, len(scalefactors)):
 #    basis = [
 #        [0.0, 0.0, 0.0],
 #        [0.0, 1.0*i/n_steps, 0]]
+    return positions
+
+
+scalefactors = [0.8, 0.9, 1.0, 1.1, 1.2]
+for i in range(1, len(scalefactors)):
     basis = np.array(make_fcc())
     basis = np.multiply(basis, a_latt * scalefactors[i])
     distances.append(1.0*i/n_steps * a_latt)
