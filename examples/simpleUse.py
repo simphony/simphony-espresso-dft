@@ -3,7 +3,7 @@ from simphony.cuds.particles import Particle, Particles
 import logging
 import matplotlib.pyplot as plt
 from simespresso import qe_wrapper
-from qeCubaExtensions import qeCUBAExtension
+from simespresso.io_QE.qeCubaExtensions import qeCUBAExtension
 
 # Create the Cu unit cell, assuming a simple cubic system with 4 basis
 # atoms (for an FCC latticle)

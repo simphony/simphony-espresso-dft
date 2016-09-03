@@ -1,7 +1,7 @@
 from simphony.core.cuba import CUBA
 from simphony.cuds.particles import Particle, Particles
 from simespresso import qe_wrapper
-from qeCubaExtensions import qeCUBAExtension
+from simespresso.io_QE.qeCubaExtensions import qeCUBAExtension
 
 a_latt = 3.61  # Angstroms
 unit_cell = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
