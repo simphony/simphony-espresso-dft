@@ -49,7 +49,7 @@ class QeProcess(object):
 #       #    msg += " stdout/err: " + self._stdout + " " + self._stderr
 #       #raise RuntimeError(msg)
 
-    def run(self, input_data_file, output_data_file, BC, CM, SP):
+    def run(self, input_data_file, output_data_file, BC, CM, SP, mpirun=True):
         """Run engine with a set of commands
         Parameters
         ----------
@@ -63,7 +63,8 @@ class QeProcess(object):
         logging.debug('starting qe engine')
         logging.debug('path to espresso:'+self._qe_executable)
 
-        if self._datahandler.mpi:
+#        if self._datahandler.mpi:
+        if mpirun:
             command = 'mpirun -np ' + str(
                 self._datahandler.mpi_Nprocessors) + ' ' + \
                       self._qe_executable + ' < ' + input_data_file + ' > ' \

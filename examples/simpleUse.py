@@ -54,7 +54,7 @@ for i in range(1, n_steps+1):
 # wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "Monkhorst-Pack"
     wrapper.CM_extension['K_POINT_SAMPLING_METHOD'] = "automatic"
     wrapper.CM_extension['K_POINT_SAMPLING'] = [3, 3, 3, 0, 0, 0]
-    wrapper.run()
+    wrapper.run(mpirun=True)
 # the wrapper would add the CUBA.TOTAL_ENERGY to the data of the pc
 # within the value of the total energy from the output (log file) of QE
     names = wrapper.get_dataset_names()
