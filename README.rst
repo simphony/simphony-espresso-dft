@@ -30,6 +30,10 @@ Requirements
 Optional requirements
 ~~~~~~~~~~~~~~~~~~~~~
 
+TTo take advantage of mpi it needs to be installed, for example
+
+- sudo apt-get install libcr-dev mpich2 mpich2-doc
+
 To support the documentation built you need the following packages:
 
 - sphinx >= 1.2.3
@@ -51,11 +55,13 @@ or::
 quantum espresso installation
 ~~~~~~~~~~~~~~~~~~~
 
-This engine-wrapper uses the quantum espresso simulation engine.
+This engine-wrapper uses the quantum espresso simulation engine, which on ubuntu linux may be installed with
+
+    sudo apt-get install build-essential fftw3-dev gfortran
+    sudo apt-get install quantum-espresso
 
 For general quantum-espresso install information, see http://www.quantum-espresso.org/wp-content/uploads/Doc/user_guide.pdf
 
-LIGGGHTS installation varies depending on which interface is being used.  See the
 
 Usage
 -----
